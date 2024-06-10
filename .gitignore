@@ -90,3 +90,6 @@ typings/
 
 # Electron-Forge
 out/
+
+# ignore auto generated files.
+resources/LICENSES.dependency.html

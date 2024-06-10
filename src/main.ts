@@ -1,5 +1,11 @@
-import { app, BrowserWindow } from 'electron';
+import { app, BrowserWindow, Menu, Tray } from 'electron';
 import path from 'path';
+
+const calcAbsoluteResourcePath = (relative: string) => {
+  return process.env.NODE_ENV === 'development'
+    ? path.join(__dirname, '../../resources/', relative)
+    : path.join(process.resourcesPath, 'resources', relative);
+}
 
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
 if (require('electron-squirrel-startup')) {
@@ -7,6 +13,20 @@ if (require('electron-squirrel-startup')) {
 }
 
 const createWindow = () => {
+  const imgFilePath = calcAbsoluteResourcePath('mrdamian-icon.png');
+  const contextMenu = Menu.buildFromTemplate([
+    {
+      label: 'credits',
+      click: () => {
+        new BrowserWindow().loadFile(calcAbsoluteResourcePath('LICENSES.dependency.html'));
+      },
+    },
+    { label: 'quit', role: 'quit'}
+   ]);
+  const tray = new Tray(imgFilePath);
+  tray.setToolTip(app.name);
+  tray.setContextMenu(contextMenu);
+
   // Create the browser window.
   const mainWindow = new BrowserWindow({
     width: 800,

@@ -3,16 +3,41 @@ import { MakerSquirrel } from '@electron-forge/maker-squirrel';
 import { MakerZIP } from '@electron-forge/maker-zip';
 import { MakerDeb } from '@electron-forge/maker-deb';
 import { MakerRpm } from '@electron-forge/maker-rpm';
+import { MakerDMG } from '@electron-forge/maker-dmg';
 import { VitePlugin } from '@electron-forge/plugin-vite';
 import { FusesPlugin } from '@electron-forge/plugin-fuses';
 import { FuseV1Options, FuseVersion } from '@electron/fuses';
 
+import path from 'path';
+import fs from 'fs/promises';
+
+import { checkDependency, generateDependencyLicenses } from './src/utils/dependency';
+
 const config: ForgeConfig = {
   packagerConfig: {
     asar: true,
+    extraResource: [
+      "resources/",
+    ],
   },
   rebuildConfig: {},
-  makers: [new MakerSquirrel({}), new MakerZIP({}, ['darwin']), new MakerRpm({}), new MakerDeb({})],
+  hooks: {
+    generateAssets: async () => {
+      const mods = await checkDependency();
+      const html = await generateDependencyLicenses(mods);
+
+      const dst = path.join(__dirname, 'resources', 'LICENSES.dependency.html');
+      await fs.mkdir(path.dirname(dst), { recursive: true });
+      await fs.writeFile(dst, html);
+    },
+  },
+  makers: [
+    new MakerSquirrel({}),
+    new MakerZIP({}),
+    new MakerDMG({}),
+    new MakerRpm({}),
+    new MakerDeb({}),
+  ],
   plugins: [
     new VitePlugin({
       // `build` can specify multiple entry builds, which can be Main process, Preload scripts, Worker process, etc.
