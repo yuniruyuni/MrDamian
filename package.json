@@ -3,7 +3,8 @@
   "productName": "mrdamian",
   "version": "1.0.0",
   "description": "My Electron application description",
-  "main": ".vite/build/main.js",
+  "main": ".vite/build/src/main.js",
+  "module": "es2022",
   "scripts": {
     "start": "electron-forge start",
     "package": "electron-forge package",
@@ -26,6 +27,7 @@
     "@twurple/auth": "^7.1.0",
     "@twurple/chat": "^7.1.0",
     "@twurple/eventsub-ws": "^7.1.0",
+    "@types/electron-squirrel-startup": "^1.0.2",
     "@types/express": "^4.17.21",
     "@types/license-checker": "^25.0.6",
     "@types/node": "^20.14.2",

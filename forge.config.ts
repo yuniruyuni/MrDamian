@@ -40,22 +40,28 @@ const config: ForgeConfig = {
   ],
   plugins: [
     new VitePlugin({
-      // `build` can specify multiple entry builds, which can be Main process, Preload scripts, Worker process, etc.
-      // If you are familiar with Vite configuration, it will look really familiar.
+      // TODO: implement auto (sub-component's) config generation that scans index.html in src/** dirs.
       build: [
         {
-          // `entry` is just an alias for `build.lib.entry` in the corresponding file of `config`.
           entry: 'src/main.ts',
           config: 'vite.main.config.ts',
         },
         {
-          entry: 'src/preload.ts',
+          entry: 'src/editor/preload.ts',
+          config: 'vite.preload.config.ts',
+        },
+        {
+          entry: 'src/component/twitch/preload.ts',
           config: 'vite.preload.config.ts',
         },
       ],
       renderer: [
         {
-          name: 'main_window',
+          name: 'editor',
+          config: 'vite.renderer.config.ts',
+        },
+        {
+          name: 'component/twitch',
           config: 'vite.renderer.config.ts',
         },
       ],

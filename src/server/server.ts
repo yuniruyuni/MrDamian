@@ -1,11 +1,9 @@
-import express from 'express';
+import express, { type Express } from 'express';
 import {type AddressInfo} from 'net';
-
-import { assign_twitch_oauth_endpoints } from './twitch_oauth';
 
 const port = 54976;
 
-export function upserver() {
+export function upserver(): Express {
   const app = express();
 
   const server = app.listen(port, () => {
@@ -19,5 +17,5 @@ export function upserver() {
     res.send('にぱ〜✨');
   });
 
-  assign_twitch_oauth_endpoints(app);
+  return app;
 }

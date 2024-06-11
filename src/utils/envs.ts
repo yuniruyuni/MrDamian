@@ -19,7 +19,7 @@ export function isDev(): boolean {
 
 export function calcPath(rel: string): string {
     switch( getEnv() ) {
-    case 'development': return path.join(__dirname, '../../', rel);
+    case 'development': return path.join(__dirname, '../../../', rel);
     case 'production': return path.join(process.resourcesPath, rel);
     }
 }

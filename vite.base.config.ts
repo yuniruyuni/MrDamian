@@ -2,6 +2,7 @@ import { builtinModules } from 'node:module';
 import type { AddressInfo } from 'node:net';
 import type { ConfigEnv, Plugin, UserConfig } from 'vite';
 import pkg from './package.json';
+import path from 'path';
 
 export const builtins = ['electron', ...builtinModules.map((m) => [m, `node:${m}`]).flat()];
 
@@ -9,6 +10,8 @@ export const external = [...builtins, ...Object.keys('dependencies' in pkg ? (pk
 
 export function getBuildConfig(env: ConfigEnv<'build'>): UserConfig {
   const { root, mode, command } = env;
+  const entry = env.forgeConfigSelf.entry ?? '';
+  const dir = path.dirname(entry as string);
 
   return {
     root,
@@ -17,7 +20,7 @@ export function getBuildConfig(env: ConfigEnv<'build'>): UserConfig {
       // Prevent multiple builds from interfering with each other.
       emptyOutDir: false,
       // 🚧 Multiple builds may conflict.
-      outDir: '.vite/build',
+      outDir: `.vite/build/${dir}`,
       watch: command === 'serve' ? {} : null,
       minify: command === 'build',
     },
@@ -25,38 +28,36 @@ export function getBuildConfig(env: ConfigEnv<'build'>): UserConfig {
   };
 }
 
-export function getDefineKeys(names: string[]) {
-  const define: { [name: string]: VitePluginRuntimeKeys } = {};
+export function getDefineKey(names: string[]) {
+  const define: { [name: string]: VitePluginRuntimeKey } = {};
 
   return names.reduce((acc, name) => {
-    const NAME = name.toUpperCase();
-    const keys: VitePluginRuntimeKeys = {
-      VITE_DEV_SERVER_URL: `${NAME}_VITE_DEV_SERVER_URL`,
-      VITE_NAME: `${NAME}_VITE_NAME`,
-    };
+    const NAME = name.replace("/", "_").toUpperCase();
+    const key: VitePluginRuntimeKey = `VITE_${NAME}_HOTLOAD`;
 
-    return { ...acc, [name]: keys };
+    return { ...acc, [name]: key };
   }, define);
 }
 
 export function getBuildDefine(env: ConfigEnv<'build'>) {
   const { command, forgeConfig } = env;
-  const names = forgeConfig.renderer.filter(({ name }) => name != null).map(({ name }) => name!);
-  const defineKeys = getDefineKeys(names);
-  const define = Object.entries(defineKeys).reduce((acc, [name, keys]) => {
-    const { VITE_DEV_SERVER_URL, VITE_NAME } = keys;
+  const names = forgeConfig.renderer.map(({ name }) => name).filter((name) => name != null);
+  const defineKeys = getDefineKey(names);
+  const define = Object.entries(defineKeys).reduce((acc, [name, key]) => {
     const def = {
-      [VITE_DEV_SERVER_URL]: command === 'serve' ? JSON.stringify(process.env[VITE_DEV_SERVER_URL]) : undefined,
-      [VITE_NAME]: JSON.stringify(name),
+      [key]: JSON.stringify({
+        url: command === 'serve' ? process.env[key] : undefined,
+        path: `.vite/renderer/${name}/index.html`,
+      }),
     };
     return { ...acc, ...def };
-  }, {} as Record<string, any>);
+  }, {} as Record<string, { [key: string]: string }>);
 
   return define;
 }
 
 export function pluginExposeRenderer(name: string): Plugin {
-  const { VITE_DEV_SERVER_URL } = getDefineKeys([name])[name];
+  const key = getDefineKey([name])[name];
 
   return {
     name: '@electron-forge/plugin-vite:expose-renderer',
@@ -66,9 +67,9 @@ export function pluginExposeRenderer(name: string): Plugin {
       process.viteDevServers[name] = server;
 
       server.httpServer?.once('listening', () => {
-        const addressInfo = server.httpServer!.address() as AddressInfo;
+        const addressInfo = server.httpServer?.address() as AddressInfo | null;
         // Expose env constant for main process use.
-        process.env[VITE_DEV_SERVER_URL] = `http://localhost:${addressInfo?.port}`;
+        process.env[key] = `http://localhost:${addressInfo?.port}/src/${name}/index.html`;
       });
     },
   };

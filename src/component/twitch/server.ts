@@ -1,6 +1,6 @@
 import { type Express } from 'express';
 
-export function assign_twitch_oauth_endpoints(app: Express) {
+export function register_endpoints(app: Express) {
     app.get('/system/oauth', async (req, res) => {
         res.send(oauth);
     });

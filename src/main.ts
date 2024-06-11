@@ -1,15 +1,21 @@
-import { app, BrowserWindow, Menu, Tray, ipcMain, type IpcMainEvent } from 'electron';
-import path from 'path';
+import { app, BrowserWindow, Menu, Tray } from 'electron';
+import squirrelStartup from 'electron-squirrel-startup';
 
 import { calcPath } from './utils/envs';
 import { upserver } from './server/server';
 
+import { Editor } from './editor/editor';
+import { Twitch } from './component/twitch/twitch';
+
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
-if (require('electron-squirrel-startup')) {
+if (squirrelStartup) {
   app.quit();
 }
 
-upserver();
+const server = upserver();
+
+const editor = new Editor(server);
+const twitch = new Twitch(server);
 
 const createTasktray = () => {
   const imgFilePath = calcPath('resources/mrdamian-icon.png');
@@ -27,54 +33,13 @@ const createTasktray = () => {
   tray.setContextMenu(contextMenu);
 };
 
-const createWindow = () => {
-  const mainWindow = new BrowserWindow({
-    width: 800,
-    height: 600,
-    webPreferences: {
-      preload: path.join(__dirname, 'preload.js'),
-    },
-  });
-
-  // and load the index.html of the app.
-  if (MAIN_WINDOW_VITE_DEV_SERVER_URL) {
-    mainWindow.loadURL(MAIN_WINDOW_VITE_DEV_SERVER_URL);
-  } else {
-    mainWindow.loadFile(path.join(__dirname, `../renderer/${MAIN_WINDOW_VITE_NAME}/index.html`));
-  }
-
-  // Open the DevTools.
-  mainWindow.webContents.openDevTools();
-};
-
-let authWindow: BrowserWindow;
-
-let twitchToken = "";
-function handleSetToken(event: IpcMainEvent, token: string) {
-  twitchToken = token;
-
-  if( authWindow !== null ) {
-    authWindow.destroy();
-    authWindow = null;
-  }
-}
-
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
 app.on('ready', () => {
-  ipcMain.on('set-token', handleSetToken);
-
-  authWindow = new BrowserWindow({
-    webPreferences: {
-      preload: path.join(__dirname, 'preload.js')
-    }
-  });
-  authWindow.loadURL('https://id.twitch.tv/oauth2/authorize?client_id=vpqmjg81mnkdsu1llaconpz0oayuqt&redirect_uri=http://localhost:54976/system/oauth&response_type=token&scope=moderator:manage:shoutouts+moderator:manage:announcements+user:manage:chat_color+chat:edit+chat:read+user:edit:broadcast+channel:manage:broadcast+channel_editor');
-  authWindow.webContents.openDevTools();
-
   createTasktray();
-  createWindow()
+  editor.onReady();
+  twitch.onReady();
 });
 
 // Quit when all windows are closed, except on macOS. There, it's common
@@ -87,12 +52,5 @@ app.on('window-all-closed', () => {
 });
 
 app.on('activate', () => {
-  // On OS X it's common to re-create a window in the app when the
-  // dock icon is clicked and there are no other windows open.
-  if (BrowserWindow.getAllWindows().length === 0) {
-    createWindow();
-  }
+  editor.onActivate();
 });
-
-// In this file you can include the rest of your app's specific main process
-// code. You can also put them in separate files and import them here.

@@ -7,10 +7,12 @@ export default defineConfig((env) => {
   const forgeEnv = env as ConfigEnv<'build'>;
   const { forgeConfigSelf } = forgeEnv;
   const define = getBuildDefine(forgeEnv);
+  const entry = forgeConfigSelf.entry ?? '';
+
   const config: UserConfig = {
     build: {
       lib: {
-        entry: forgeConfigSelf.entry!,
+        entry: entry,
         fileName: () => '[name].js',
         formats: ['cjs'],
       },
