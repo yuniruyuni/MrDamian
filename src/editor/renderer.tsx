@@ -6,14 +6,19 @@ import './index.css';
 const App: React.FC = () => {
   const [clips, setClips] = React.useState("loading...");
   React.useEffect( () => {
-    window.clips.onSetClips((val: string) => {
+    window.editor.onSetClips((val: string) => {
       console.log("set-clips was called.");
       setClips(val);
     });
     console.log("set-clips was registered.");
   });
 
-  return <div>{clips}</div>;
+  return <div>
+    <button onClick={() => window.editor.twitchLoginClick()}>
+      Login with Twitch
+    </button>
+    {clips}
+    </div>;
 };
 
 ReactDOM.createRoot(document.getElementById('root')).render(

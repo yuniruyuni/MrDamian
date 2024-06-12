@@ -13,10 +13,15 @@ if (squirrelStartup) {
 
 const clientId = "vpqmjg81mnkdsu1llaconpz0oayuqt"; // MrDamian's client id.
 
-const editor = new Editor();
+const editor = new Editor({
+  onTwitchLoginClick: () => {
+    console.log("ok");
+    twitch.login();
+  },
+});
 const twitch = new Twitch({
   clientId: clientId,
-  onComplete: (twitch) => editor.onLoggedIn( clientId, twitch.token, twitch.refresh ),
+  onComplete: (twitch) => editor.onLoggedIn( clientId, twitch.token ),
 });
 
 const createTasktray = () => {
@@ -41,7 +46,6 @@ const createTasktray = () => {
 app.on('ready', () => {
   createTasktray();
   editor.onReady();
-  twitch.onReady();
 });
 
 // Quit when all windows are closed, except on macOS. There, it's common

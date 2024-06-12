@@ -50,18 +50,10 @@ const config: ForgeConfig = {
           entry: 'src/editor/preload.ts',
           config: 'vite.preload.config.ts',
         },
-        {
-          entry: 'src/component/twitch/preload.ts',
-          config: 'vite.preload.config.ts',
-        },
       ],
       renderer: [
         {
           name: 'editor',
-          config: 'vite.renderer.config.ts',
-        },
-        {
-          name: 'component/twitch',
           config: 'vite.renderer.config.ts',
         },
       ],

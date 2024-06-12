@@ -42,7 +42,7 @@ export class Twitch {
         this.params = params;
     }
 
-    public async onReady() {
+    public async login() {
         const deviceRes = await this.fetchDeviceToken();
         shell.openExternal(deviceRes.verification_uri);
 

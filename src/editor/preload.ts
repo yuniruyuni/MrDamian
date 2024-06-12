@@ -2,14 +2,16 @@ import { contextBridge, ipcRenderer } from 'electron';
 
 declare global {
   interface Window {
-    clips: ClipsApi;
+    editor: EditorApi;
   }
 }
 
-export interface ClipsApi {
+export interface EditorApi {
   onSetClips: (listener: (clips: string) => void) => () => void;
+  twitchLoginClick: () => void;
 }
 
-contextBridge.exposeInMainWorld('clips', {
+contextBridge.exposeInMainWorld('editor', {
   onSetClips: (callback: (clips: string) => void) => ipcRenderer.on('set-clips', (_event, value) => callback(value)),
+  twitchLoginClick: () => ipcRenderer.send('twitch-loggin-click'),
 });

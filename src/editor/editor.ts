@@ -1,4 +1,4 @@
-import { BrowserWindow } from 'electron';
+import { BrowserWindow, ipcMain } from 'electron';
 import path from 'path';
 import { hotload } from '../utils/hotload';
 
@@ -6,8 +6,17 @@ import { StaticAuthProvider } from '@twurple/auth';
 import { ApiClient } from '@twurple/api';
 import { ChatClient } from '@twurple/chat';
 
+type Params = {
+    onTwitchLoginClick: () => void,
+};
+
 export class Editor {
     window: BrowserWindow;
+    params: Params;
+
+    constructor(params: Params) {
+        this.params = params;
+    }
 
     public async onLoggedIn(clientId: string, token: string /*, refresh: string*/) {
         // following routine is just test for twitch api call...
@@ -28,6 +37,9 @@ export class Editor {
 
     public onReady() {
         this.createWindow();
+        ipcMain.on('twitch-loggin-click', () => {
+            this.params.onTwitchLoginClick();
+        });
     }
 
     public onActivate() {
