@@ -1,0 +1,10 @@
+{
+  "args": {},
+  "pipeline": [
+    {
+      "type": "send",
+      "source": "en",
+      "target": "ja"
+    }
+  ]
+}

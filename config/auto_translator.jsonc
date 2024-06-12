@@ -1,0 +1,13 @@
+{
+  "args": {
+    "source": "en",
+    "target": "es"
+  },
+  "pipeline": [
+    {
+      "type": "translate",
+      "source": "en",
+      "target": "ja"
+    }
+  ]
+}

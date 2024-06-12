@@ -1,0 +1,52 @@
+{
+  "pipeline": [
+    {
+      "type": "twitch",
+      // subtypeがないならコンポネントの初期化
+      "instance": "main-channel", // 指定がなかったら空文字列がインスタンス名
+      "api_key": "xxxxxxxxxx",
+      "channel": "yuniruyuni"
+    },
+    {
+      "type": "youtube",
+      // subtypeがないならコンポネントの初期化
+      "instance": "main-channel",
+      "api_key": "xxxxxxxxxx",
+      "channel": "yuniruyuni"
+    },
+    {
+      "type": "panel",
+      // subtypeがないならコンポネントの初期化
+      "components": [
+        {
+          "type": "toggle",
+          "name": "auto_shoutout",
+          "text": "Auto shoutout"
+        },
+        {
+          "type": "button",
+          "name": "shoutout",
+          "text": "Send shoutout"
+        }
+      ]
+    },
+    {
+      "when": "panel.shoutout",
+      "type": "call",
+      "path": "periodic_message.jsonc",
+      "interval": "30s",
+      "message": "Discordチャンネルもあります！チャンネルポイント交換から！"
+    },
+    {
+      "type": "call",
+      "path": "auto_translator.jsonc",
+      // もし twitchの "instance" が空文字列なら何も指定しなくてよい。
+      "instance": "main-channel"
+    },
+    {
+      "type": "call",
+      "path": "logger.jsonc",
+      "dir": "/home/yuniruyuni/log/twitch/"
+    }
+  ]
+}

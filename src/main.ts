@@ -6,6 +6,9 @@ import { calcPath } from './utils/envs';
 import { Editor } from './editor/editor';
 import { Twitch } from './component/twitch';
 
+import { loadModuleConfig } from "./model/config";
+import { constructModule } from "./model/module";
+
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
 if (squirrelStartup) {
   app.quit();
@@ -43,9 +46,12 @@ const createTasktray = () => {
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
-app.on('ready', () => {
+app.on('ready', async () => {
   createTasktray();
   editor.onReady();
+
+  const config = await loadModuleConfig("./config/main.jsonc");
+  constructModule(config);
 });
 
 // Quit when all windows are closed, except on macOS. There, it's common
