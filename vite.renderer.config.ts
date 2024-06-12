@@ -1,5 +1,6 @@
 import type { ConfigEnv, UserConfig } from 'vite';
 import { defineConfig } from 'vite';
+import react from "@vitejs/plugin-react-swc";
 import { pluginExposeRenderer } from './vite.base.config';
 
 import path from 'path';
@@ -17,10 +18,14 @@ export default defineConfig((env) => {
     build: {
       outDir: path.join(__dirname, `.vite/renderer/${name}`),
     },
-    plugins: [pluginExposeRenderer(name)],
+    plugins: [react(), pluginExposeRenderer(name)],
     resolve: {
       preserveSymlinks: true,
     },
     clearScreen: false,
+    // workaround to "504 (Outdated Optimize Dep)" problem.
+    optimizeDeps: {
+      force: true,
+    }
   } as UserConfig;
 });

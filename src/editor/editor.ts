@@ -14,7 +14,7 @@ export class Editor {
         const authProvider = new StaticAuthProvider(clientId, token);
         const chatClient = new ChatClient({ authProvider, channels: ['yuniruyuni'] });
         await chatClient.connect();
-        await chatClient.say('yuniruyuni', "test say.");
+        // await chatClient.say('yuniruyuni', "test say.");
         const apiClient = new ApiClient({ authProvider });
         const channel_id = await apiClient.users.getUserByName("yuniruyuni");
         const res = await apiClient.clips.getClipsForBroadcaster(channel_id);

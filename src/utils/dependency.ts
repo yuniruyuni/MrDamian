@@ -18,6 +18,7 @@ const allowedLicenes = [
   "Apache-2.0",
   "BSD-2-Clause",
   "BSD-3-Clause",
+  "CC-BY-4.0",
   "CC-BY-3.0",
   "CC0-1.0",
   "ISC",
@@ -25,6 +26,7 @@ const allowedLicenes = [
   "MIT*",
   "Python-2.0",
   "Unlicense",
+  "Apache-2.0 AND MIT",
   "(MIT AND CC-BY-3.0)",
   "(MIT OR CC0-1.0)",
 ];
