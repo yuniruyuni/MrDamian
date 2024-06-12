@@ -1,17 +1,26 @@
 import path from 'path';
 import { BrowserWindow, ipcMain, type IpcMainEvent } from 'electron';
 import { type Express } from 'express';
-import { isDev } from '../../utils/envs';
-import { register_endpoints } from './server';
 
-const client_id = "vpqmjg81mnkdsu1llaconpz0oayuqt"; // MrDamian's client id.
+import { isDev } from '../../utils/envs';
+import { register } from './server';
+
+export type Params = {
+    clientId: string;
+    onComplete: (twitch: Twitch) => void;
+};
 
 export class Twitch {
     authWindow: BrowserWindow;
     token: string;
+    params: Params;
 
-    constructor(server: Express) {
-        register_endpoints(server);
+    constructor(params: Params) {
+        this.params = params;
+    }
+
+    public registerEndpoints(server: Express) {
+        register(server);
     }
 
     public onReady() {
@@ -27,13 +36,15 @@ export class Twitch {
         }
     }
 
-    handleSetToken(event: IpcMainEvent, token: string) {
+    async handleSetToken(event: IpcMainEvent, token: string) {
         this.token = token;
 
         if( this.authWindow ) {
             this.authWindow.destroy();
             this.authWindow = undefined;
         }
+
+        this.params.onComplete(this);
     }
 
     calc_twitch_authorize_url(): string {
@@ -51,7 +62,7 @@ export class Twitch {
         const endpoint = "https://id.twitch.tv/oauth2/authorize";
 
         const params = {
-            client_id: client_id,
+            client_id: this.params.clientId,
             response_type: "token",
             redirect_uri: "http://localhost:54976/system/oauth",
             scope: scopes.join('+'),

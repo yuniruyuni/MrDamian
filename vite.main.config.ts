@@ -11,6 +11,7 @@ export default defineConfig((env) => {
 
   const config: UserConfig = {
     build: {
+      ssr: true,
       lib: {
         entry: entry,
         fileName: () => '[name].js',
@@ -19,6 +20,9 @@ export default defineConfig((env) => {
       rollupOptions: {
         external,
       },
+    },
+    ssr: {
+      noExternal: true,
     },
     plugins: [pluginHotRestart('restart')],
     define,

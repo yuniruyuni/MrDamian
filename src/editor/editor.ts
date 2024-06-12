@@ -1,13 +1,29 @@
-import { type Express } from 'express';
 import { BrowserWindow } from 'electron';
 import path from 'path';
 import { hotload } from '../utils/hotload';
 
+import { StaticAuthProvider } from '@twurple/auth';
+import { ApiClient } from '@twurple/api';
+import { ChatClient } from '@twurple/chat';
+
 export class Editor {
     window: BrowserWindow;
 
-    constructor(server: Express) {
-        // register_endpoints(server);
+    public async onLoggedIn(clientId: string, token: string) {
+        // following routine is just test for twitch api call...
+        const authProvider = new StaticAuthProvider(clientId, token);
+        const chatClient = new ChatClient({ authProvider, channels: ['yuniruyuni'] });
+        await chatClient.connect();
+        await chatClient.say('yuniruyuni', "test say.");
+        const apiClient = new ApiClient({ authProvider });
+        const channel_id = await apiClient.users.getUserByName("yuniruyuni");
+        const res = await apiClient.clips.getClipsForBroadcaster(channel_id);
+
+        let clips = "";
+        for( const clip of res.data ) {
+            clips += `${clip.broadcasterDisplayName}(${clip.creationDate}): ${clip.title}\n`;
+        }
+        this.window.webContents.send('set-clips', clips);
     }
 
     public onReady() {

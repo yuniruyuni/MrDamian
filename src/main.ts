@@ -5,17 +5,23 @@ import { calcPath } from './utils/envs';
 import { upserver } from './server/server';
 
 import { Editor } from './editor/editor';
-import { Twitch } from './component/twitch/twitch';
+import { Twitch } from './component/twitch';
 
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
 if (squirrelStartup) {
   app.quit();
 }
 
+const clientId = "vpqmjg81mnkdsu1llaconpz0oayuqt"; // MrDamian's client id.
+
 const server = upserver();
 
-const editor = new Editor(server);
-const twitch = new Twitch(server);
+const editor = new Editor();
+const twitch = new Twitch({
+  clientId: clientId,
+  onComplete: (twitch) => editor.onLoggedIn( clientId, twitch.token ),
+});
+twitch.registerEndpoints(server);
 
 const createTasktray = () => {
   const imgFilePath = calcPath('resources/mrdamian-icon.png');
