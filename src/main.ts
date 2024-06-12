@@ -2,7 +2,6 @@ import { app, BrowserWindow, Menu, Tray } from 'electron';
 import squirrelStartup from 'electron-squirrel-startup';
 
 import { calcPath } from './utils/envs';
-import { upserver } from './server/server';
 
 import { Editor } from './editor/editor';
 import { Twitch } from './component/twitch';
@@ -14,14 +13,11 @@ if (squirrelStartup) {
 
 const clientId = "vpqmjg81mnkdsu1llaconpz0oayuqt"; // MrDamian's client id.
 
-const server = upserver();
-
 const editor = new Editor();
 const twitch = new Twitch({
   clientId: clientId,
-  onComplete: (twitch) => editor.onLoggedIn( clientId, twitch.token ),
+  onComplete: (twitch) => editor.onLoggedIn( clientId, twitch.token, twitch.refresh ),
 });
-twitch.registerEndpoints(server);
 
 const createTasktray = () => {
   const imgFilePath = calcPath('resources/mrdamian-icon.png');

@@ -1,53 +1,100 @@
-import path from 'path';
-import { BrowserWindow, ipcMain, type IpcMainEvent } from 'electron';
-import { type Express } from 'express';
-
-import { isDev } from '../../utils/envs';
-import { register } from './server';
+import { BrowserWindow, shell } from 'electron';
+import { setTimeout } from 'timers/promises';
 
 export type Params = {
     clientId: string;
     onComplete: (twitch: Twitch) => void;
 };
 
+type TwitchOAuth2DeviceResponse = {
+    device_code: string,
+    expires_in: number,
+    interval: number,
+    user_code: string,
+    verification_uri: string,
+};
+
+type TwitchOAuth2TokenResponse = {
+    access_token: string,
+    expires_in: number,
+    refresh_token: string,
+    scope: string[],
+    token_type: string,
+};
+
+type TwitchOAuth2TokenErrorResponse = {
+    status: number,
+    message: string,
+};
+
+function tokenReceiveSuccessful(res: TwitchOAuth2TokenResponse | TwitchOAuth2TokenErrorResponse): res is TwitchOAuth2TokenResponse {
+    if( "status" in res && res.status === 400 ) return false;
+    return true;
+}
+
 export class Twitch {
     authWindow: BrowserWindow;
     token: string;
+    refresh: string;
     params: Params;
 
     constructor(params: Params) {
         this.params = params;
     }
 
-    public registerEndpoints(server: Express) {
-        register(server);
-    }
+    public async onReady() {
+        const deviceRes = await this.fetchDeviceToken();
+        shell.openExternal(deviceRes.verification_uri);
 
-    public onReady() {
-        ipcMain.on('set-token', (event, token) => this.handleSetToken(event, token));
-        this.authWindow = new BrowserWindow({
-            webPreferences: {
-                preload: path.join(__dirname, 'component/twitch/preload.js')
-            }
-        });
-        this.authWindow.loadURL(this.calc_twitch_authorize_url());
-        if( isDev ) {
-            this.authWindow.webContents.openDevTools();
-        }
-    }
+        const device_code = deviceRes.device_code;
 
-    async handleSetToken(event: IpcMainEvent, token: string) {
-        this.token = token;
+        // TODO: add polling timeout.
+        let tokenRes;
+        do {
+            tokenRes = await this.fetchTokenByDeviceCode(device_code);
+            await setTimeout(1000); // 1second.
+        } while ( !tokenReceiveSuccessful(tokenRes) );
 
-        if( this.authWindow ) {
-            this.authWindow.destroy();
-            this.authWindow = undefined;
-        }
+        this.refresh = tokenRes?.refresh_token;
+        this.token = tokenRes?.access_token;
 
         this.params.onComplete(this);
     }
 
-    calc_twitch_authorize_url(): string {
+    async fetchDeviceToken(): Promise<TwitchOAuth2DeviceResponse> {
+        const obj = {
+            client_id: this.params.clientId,
+            scopes: this.scopes(),
+        };
+        return this.post("https://id.twitch.tv/oauth2/device", obj);
+    }
+
+    async fetchTokenByDeviceCode(device_code: string): Promise<TwitchOAuth2TokenResponse | TwitchOAuth2TokenErrorResponse> {
+        const obj = {
+            client_id: this.params.clientId,
+            scopes: this.scopes(),
+            device_code,
+            grant_type: "urn:ietf:params:oauth:grant-type:device_code",
+        };
+        return await this.post("https://id.twitch.tv/oauth2/token", obj);
+    }
+
+    // because json result is essentialy any, disable eslint for any type.
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    async post(url: string, obj: { [key: string]: string}): Promise<any> {
+        const method = "POST";
+        const body = Object.entries(obj).map(
+            ([key, value]) => `${encodeURIComponent(key)}=${encodeURIComponent(value)}`
+        ).join("&");
+        const headers = {
+            'Accept': 'application/json',
+            'Content-Type': 'application/x-www-form-urlencoded; charset=utf-8'
+        };
+        const res = await fetch(url, {method, headers, body})
+        return await res.json();
+    }
+
+    scopes(): string {
         const scopes = [
             "moderator:manage:shoutouts",
             "moderator:manage:announcements",
@@ -58,16 +105,6 @@ export class Twitch {
             "channel:manage:broadcast",
             "channel_editor",
         ];
-
-        const endpoint = "https://id.twitch.tv/oauth2/authorize";
-
-        const params = {
-            client_id: this.params.clientId,
-            response_type: "token",
-            redirect_uri: "http://localhost:54976/system/oauth",
-            scope: scopes.join('+'),
-        };
-
-        return endpoint + "?" + Object.entries(params).map(([key, val]) => `${key}=${val}`).join('&');
+        return scopes.join(" ");
     }
 }

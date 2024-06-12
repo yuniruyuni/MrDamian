@@ -9,7 +9,7 @@ import { ChatClient } from '@twurple/chat';
 export class Editor {
     window: BrowserWindow;
 
-    public async onLoggedIn(clientId: string, token: string) {
+    public async onLoggedIn(clientId: string, token: string /*, refresh: string*/) {
         // following routine is just test for twitch api call...
         const authProvider = new StaticAuthProvider(clientId, token);
         const chatClient = new ChatClient({ authProvider, channels: ['yuniruyuni'] });
