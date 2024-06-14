@@ -41,10 +41,10 @@ export class Module {
     this.pipeline = pipeline;
   }
 
-  run(init: Environment, sender: EventSender): Environment {
+  run(init: Environment): Environment {
     return this.pipeline.reduce((env, comp) => {
       const args = evaluateVariables(comp.config, env)
-      const rets = comp.run({...env, ...args}, sender);
+      const rets = comp.run({...env, ...args});
       return {...env, [comp.config.name]: rets };
     }, init);
   }
@@ -65,7 +65,7 @@ export abstract class Component<T extends ComponentConfig> {
     this.sender.send(event);
   }
 
-  abstract run(args: Environment, sender: EventSender): Environment;
+  abstract run(args: Environment): Environment;
 }
 
 export interface ComponentConstructor<T extends ComponentConfig> {
@@ -117,8 +117,8 @@ class Call extends Component<CallConfig> {
       this.submodule = factory.constructModule(params.module);
     }
 
-    run(env: Environment, sender: EventSender): Environment {
-        return this.submodule.run(env, sender);
+    run(env: Environment): Environment {
+        return this.submodule.run(env);
     }
 }
 

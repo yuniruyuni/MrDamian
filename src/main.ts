@@ -30,7 +30,7 @@ async function run() {
 
   for( ; ; ) {
     const event = await receiver.receive();
-    await mod.run(event, sender);
+    await mod.run(event);
   }
 }
 
