@@ -91,5 +91,8 @@ typings/
 # tsup
 dist/
 
+# nexe
+main
+
 # ignore auto generated files.
 resources/LICENSES.dependency.html
