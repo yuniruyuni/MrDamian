@@ -9,6 +9,8 @@ import {
 
 import { Value, ObjectValue, Variables } from './variable';
 
+import { EventSender } from './events';
+
 function evaluateVariables(target: Variables, envs: Variables): Variables {
   return Object.fromEntries(Object.entries(target).map(([key, val]) => {
     if( val.type !== "expression" ) return [key, val];
@@ -29,10 +31,10 @@ export class Module {
     this.pipeline = pipeline;
   }
 
-  run(init: Variables): Variables {
+  run(init: Variables, sender: EventSender): Variables {
     return this.pipeline.reduce((env, comp) => {
       const args = evaluateVariables(comp.variables, env)
-      const rets = comp.run(args);
+      const rets = comp.run({...env, ...args}, sender);
       const retvars: ObjectValue = { type: "object", value: rets };
       return {...env, [comp.config.name]: retvars };
     }, init);
@@ -50,7 +52,7 @@ export abstract class Component {
     this.variables = variables;
   }
 
-  abstract run(args: Variables): Variables;
+  abstract run(args: Variables, sender: EventSender): Variables;
 }
 
 export interface ComponentConstructor {
@@ -133,8 +135,8 @@ class Call {
         this.submodule = factory.constructModule(this.config.module);
     }
 
-    run(env: Variables): Variables {
-        return this.submodule.run(env);
+    run(env: Variables, sender: EventSender): Variables {
+        return this.submodule.run(env, sender);
     }
 }
 

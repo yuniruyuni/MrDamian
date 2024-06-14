@@ -49,6 +49,7 @@ export class Twitch extends Component {
     refresh: string;
 
     public async login() {
+        console.log("login() started");
         const deviceRes = await this.fetchDeviceToken();
         open(deviceRes.verification_uri);
 
