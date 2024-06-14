@@ -1,16 +1,16 @@
 import {
-  type ComponentConfig,
-} from './config';
+  type ComponentParameters,
+} from './parameters';
 
-import { Environment } from './variable';
+import { Environment, evaluate } from './variable';
 import { EventSender } from './events';
 
-export abstract class Component<T extends ComponentConfig> {
-  readonly config: T;
+export abstract class Component<T extends ComponentParameters> {
+  readonly params: T;
   readonly sender: EventSender;
 
-  constructor(config: T, sender: EventSender) {
-    this.config = config;
+  constructor(params: T, sender: EventSender) {
+    this.params = params;
     this.sender = sender;
   }
 
@@ -18,8 +18,12 @@ export abstract class Component<T extends ComponentConfig> {
     this.sender.send(event);
   }
 
-  runRaw(args: Environment): Environment {
+  runRaw(env: Environment): Environment {
     // TODO: Validate args
+    const args = {
+      ...env,
+      ...evaluate(this.params, env),
+    };
     return this.run(args as T);
   }
 

@@ -1,11 +1,11 @@
 import { type Environment } from '../../model/variable';
-import { type ComponentConfig } from '../../model/config';
+import { type ComponentParameters } from '../../model/parameters';
 import { Component } from '../../model/component';
 
-type LoggerConfig = ComponentConfig;
+type LoggerParameters = ComponentParameters;
 
-export class Logger extends Component<LoggerConfig> {
-    public run(envs: LoggerConfig): Environment {
+export class Logger extends Component<LoggerParameters> {
+    public run(envs: LoggerParameters): Environment {
         // TODO: implement
         console.log("logger component is running with", envs);
         return {};

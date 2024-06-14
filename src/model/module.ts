@@ -1,42 +1,39 @@
 import {
-  type ComponentConfig,
-  type ModuleConfig,
-  type PipelineConfig,
-  type CallConfig,
-} from './config';
+  type ComponentParameters,
+  type ModuleParameters,
+  type PipelineParameters,
+  type CallParameters,
+} from './parameters';
 
-import { Environment, evaluate } from './variable';
-
+import { Environment } from './variable';
 import { EventSender } from './events';
 import { Component } from './component';
 
-
 export class Module {
-  config: ModuleConfig;
+  params: ModuleParameters;
   pipeline: Pipeline;
 
-  constructor(config: ModuleConfig, pipeline: Pipeline) {
-    this.config = config;
+  constructor(params: ModuleParameters, pipeline: Pipeline) {
+    this.params = params;
     this.pipeline = pipeline;
   }
 
   run(init: Environment): Environment {
     return this.pipeline.reduce((env, comp) => {
-      const args = evaluate(comp.config, env)
-      const rets = comp.runRaw({...env, ...args});
-      return {...env, [comp.config.name]: rets };
+      const rets = comp.runRaw(env);
+      return {...env, [comp.params.name]: rets };
     }, init);
   }
 }
 
-export type Pipeline = Component<ComponentConfig>[];
+export type Pipeline = Component<ComponentParameters>[];
 
-export interface ComponentConstructor<T extends ComponentConfig> {
-  new (config: ComponentConfig, sender: EventSender): Component<T>;
+export interface ComponentConstructor<T extends ComponentParameters> {
+  new (params: ComponentParameters, sender: EventSender): Component<T>;
 }
 
 export type ComponentConstructors = {
-  [key: string]: ComponentConstructor<ComponentConfig>;
+  [key: string]: ComponentConstructor<ComponentParameters>;
 };
 
 export class ModuleFactory {
@@ -47,34 +44,34 @@ export class ModuleFactory {
     this.sender = sender;
   }
 
-  constructModule(config: ModuleConfig): Module {
-    const pipeline = this.constructPipeline(config.pipeline);
-    return new Module( config, pipeline );
+  constructModule(params: ModuleParameters): Module {
+    const pipeline = this.constructPipeline(params.pipeline);
+    return new Module( params, pipeline );
   }
 
-  constructPipeline(pipeline: PipelineConfig): Pipeline {
-    return pipeline.map((config) => this.constructComponent(config));
+  constructPipeline(pipeline: PipelineParameters): Pipeline {
+    return pipeline.map((params) => this.constructComponent(params));
   }
 
-  constructComponent(config: ComponentConfig): Component<ComponentConfig> {
+  constructComponent(params: ComponentParameters): Component<ComponentParameters> {
     // call is system component so it's special case.
-    if( config.type === "call" ) {
-      return new Call(config as CallConfig, this.sender, this);
+    if( params.type === "call" ) {
+      return new Call(params as CallParameters, this.sender, this);
     }
 
-    const constructor = this.constructors[config.type];
+    const constructor = this.constructors[params.type];
     if( !constructor ) {
-      console.log(`Unsupported component: ${config.type}`)
-      return new Unsupported(config, this.sender);
+      console.log(`Unsupported component: ${params.type}`)
+      return new Unsupported(params, this.sender);
     }
-    return new constructor(config, this.sender);
+    return new constructor(params, this.sender);
   }
 }
 
-class Call extends Component<CallConfig> {
+class Call extends Component<CallParameters> {
     submodule: Module;
 
-    constructor(params: CallConfig, sender: EventSender, factory: ModuleFactory) {
+    constructor(params: CallParameters, sender: EventSender, factory: ModuleFactory) {
       super(params, sender);
       // TODO: validate params with some schema.
       this.submodule = factory.constructModule(params.module);
@@ -85,7 +82,7 @@ class Call extends Component<CallConfig> {
     }
 }
 
-class Unsupported extends Component<ComponentConfig> {
+class Unsupported extends Component<ComponentParameters> {
     run(): Environment {
         // just ignore all things.
         return {};

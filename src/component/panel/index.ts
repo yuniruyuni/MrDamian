@@ -1,10 +1,10 @@
 import { type Environment } from '../../model/variable';
-import { type ComponentConfig } from '../../model/config';
+import { type ComponentParameters } from '../../model/parameters';
 import { Component } from '../../model/component';
 
-type PanelConfig = ComponentConfig;
-export class Panel extends Component<PanelConfig> {
-    public run(envs: PanelConfig): Environment {
+type PanelParameters = ComponentParameters;
+export class Panel extends Component<PanelParameters> {
+    public run(envs: PanelParameters): Environment {
         // TODO: implement
         console.log("panel component is running with", envs);
         return {};

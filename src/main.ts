@@ -1,4 +1,4 @@
-import { loadModuleConfig } from "./model/config";
+import { loadModuleParameters } from "./model/parameters";
 import { type ComponentConstructors, ModuleFactory } from "./model/module";
 import { eventChannel } from "./model/events";
 
@@ -21,8 +21,8 @@ async function run() {
   const [sender, receiver] = eventChannel();
 
   const factory = new ModuleFactory(constructors, sender);
-  const config = await loadModuleConfig("./config/main.json5");
-  const mod = factory.constructModule(config);
+  const params = await loadModuleParameters("./config/main.json5");
+  const mod = factory.constructModule(params);
 
   sender.send({
     event:  "system/initialize",
