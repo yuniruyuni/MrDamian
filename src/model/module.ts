@@ -44,19 +44,25 @@ export class Module {
 export type Pipeline = Component[];
 
 export abstract class Component {
-  config: ComponentConfig;
-  variables: Variables;
+  readonly config: ComponentConfig;
+  readonly variables: Variables;
+  readonly sender: EventSender;
 
-  constructor(config: ComponentConfig, variables: Variables) {
+  constructor(config: ComponentConfig, variables: Variables, sender: EventSender) {
     this.config = config;
     this.variables = variables;
+    this.sender = sender;
+  }
+
+  send(event: Variables) {
+    this.sender.send(event);
   }
 
   abstract run(args: Variables, sender: EventSender): Variables;
 }
 
 export interface ComponentConstructor {
-  new (config: ComponentConfig, variables: Variables): Component;
+  new (config: ComponentConfig, variables: Variables, sender: EventSender): Component;
 }
 
 export type ComponentConstructors = {
@@ -65,8 +71,10 @@ export type ComponentConstructors = {
 
 export class ModuleFactory {
   readonly constructors: ComponentConstructors;
-  constructor(constructors: ComponentConstructors) {
+  readonly sender: EventSender;
+  constructor(constructors: ComponentConstructors, sender: EventSender) {
     this.constructors = constructors;
+    this.sender = sender;
   }
 
   constructModule(config: ModuleConfig): Module {
@@ -83,15 +91,15 @@ export class ModuleFactory {
 
     // call is system component so it's special case.
     if( config.type === "call" ) {
-      return new Call(config as CallConfig, variables, this);
+      return new Call(config as CallConfig, variables, this.sender, this);
     }
 
     const constructor = this.constructors[config.type];
     if( !constructor ) {
       console.log(`Unsupported component: ${config.type}`)
-      return new Unsupported(config, variables);
+      return new Unsupported(config, variables, this.sender);
     }
-    return new constructor(config, variables);
+    return new constructor(config, variables, this.sender);
   }
 
   constructVariables(vars: { [key: string]: any }): Variables {
@@ -123,16 +131,12 @@ export class ModuleFactory {
   }
 }
 
-class Call {
-    config: CallConfig
-    variables: Variables;
+class Call extends Component {
     submodule: Module;
 
-    constructor(config: CallConfig, variables: Variables, factory: ModuleFactory) {
-        this.config = config;
-        this.variables = variables;
-
-        this.submodule = factory.constructModule(this.config.module);
+    constructor(config: CallConfig, variables: Variables, sender: EventSender, factory: ModuleFactory) {
+      super(config, variables, sender);
+      this.submodule = factory.constructModule(config.module);
     }
 
     run(env: Variables, sender: EventSender): Variables {
@@ -140,15 +144,7 @@ class Call {
     }
 }
 
-class Unsupported {
-    config: ComponentConfig
-    variables: Variables;
-
-    constructor(config: ComponentConfig, variables: Variables) {
-        this.config = config;
-        this.variables = variables;
-    }
-
+class Unsupported extends Component {
     run(): Variables {
         // just ignore all things.
         return {};

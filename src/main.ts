@@ -20,11 +20,11 @@ const constructors: ComponentConstructors = {
 };
 
 async function run() {
-  const factory = new ModuleFactory(constructors);
+  const [sender, receiver] = eventChannel();
+
+  const factory = new ModuleFactory(constructors, sender);
   const config = await loadModuleConfig("./config/main.json5");
   const mod = factory.constructModule(config);
-
-  const [sender, receiver] = eventChannel();
 
   sender.send({
     event: {
