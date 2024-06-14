@@ -8,6 +8,7 @@ import {
 import { Environment, evaluate } from './variable';
 
 import { EventSender } from './events';
+import { Component } from './component';
 
 
 export class Module {
@@ -22,29 +23,13 @@ export class Module {
   run(init: Environment): Environment {
     return this.pipeline.reduce((env, comp) => {
       const args = evaluate(comp.config, env)
-      const rets = comp.run({...env, ...args});
+      const rets = comp.runRaw({...env, ...args});
       return {...env, [comp.config.name]: rets };
     }, init);
   }
 }
 
 export type Pipeline = Component<ComponentConfig>[];
-
-export abstract class Component<T extends ComponentConfig> {
-  readonly config: T;
-  readonly sender: EventSender;
-
-  constructor(config: T, sender: EventSender) {
-    this.config = config;
-    this.sender = sender;
-  }
-
-  send(event: Environment) {
-    this.sender.send(event);
-  }
-
-  abstract run(args: Environment): Environment;
-}
 
 export interface ComponentConstructor<T extends ComponentConfig> {
   new (config: ComponentConfig, sender: EventSender): Component<T>;

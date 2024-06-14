@@ -5,7 +5,7 @@ import { ChatClient } from '@twurple/chat';
 
 import { type Environment } from '../../model/variable';
 import { type ComponentConfig } from '../../model/config';
-import { Component } from '../../model/module';
+import { Component } from '../../model/component';
 
 const clientId = "vpqmjg81mnkdsu1llaconpz0oayuqt"; // MrDamian's client id.
 
@@ -40,7 +40,7 @@ type TwitchConfig = ComponentConfig & {
 };
 
 export class Twitch extends Component<TwitchConfig> {
-    public run(envs: Environment): Environment {
+    public run(envs: TwitchConfig): Environment {
         // TODO: implement
         console.log("twitch componentn is running with", envs);
 
