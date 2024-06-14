@@ -1,36 +1,75 @@
 import { expect, describe, it } from "vitest";
-import { Value } from './variable';
+import { Parameters, Environment } from './variable';
 
-describe("Variables", () => {
-    it("can be split type with switch", () => {
-        const values = [
-            { type: "object", value: {}, },
-            { type: "array", value: [], },
-            { type: "boolean", value: true, },
-            { type: "number", value: 1, },
-            { type: "string", value: "test", },
-            { type: "expression", value: "a < b", },
-        ] as Value[];
+describe("Parameters", () => {
+    it("can contains basic types", () => {
+        const params: Parameters = {
+            "string": "test",
+            "expression": "$ a < b",
+            "boolean": true,
+            "number": 1,
+            "array": [],
+            "object": {},
+        };
 
-        for( const v of values ) {
-            switch(v.type) {
+        for( const [k, v] of Object.entries(params) ) {
+            switch(k) {
                 case "boolean":
-                    expect(v.value).toMatchObject(true);
+                    expect(v).toMatchObject(true);
                     break;
                 case "number":
-                    expect(v.value).toMatchObject(1);
+                    expect(v).toMatchObject(1);
                     break;
                 case "string":
-                    expect(v.value).toMatchObject("test");
+                    expect(v).toMatchObject("test");
                     break
                 case "expression":
-                    expect(v.value).toMatchObject("a < b");
+                    expect(v).toMatchObject("$ a < b");
                     break;
                 case "array":
-                    expect(v.value).toMatchObject([]);
+                    expect(v).toMatchObject([]);
                     break;
                 case "object":
-                    expect(v.value).toMatchObject({});
+                    expect(v).toMatchObject({});
+                    break;
+                default:
+                    expect(false);
+                    break;
+            }
+        }
+    });
+});
+
+describe("Environment", {}, () => {
+    it("can contains basic types", () => {
+        const params: Environment = {
+            "string": "test",
+            // "expression": "$ a < b", // Environment is already evaluated so expression type is not exists.
+            "boolean": true,
+            "number": 1,
+            "array": [],
+            "object": {},
+        };
+
+        for( const [k, v] of Object.entries(params) ) {
+            switch(k) {
+                case "boolean":
+                    expect(v).toMatchObject(true);
+                    break;
+                case "number":
+                    expect(v).toMatchObject(1);
+                    break;
+                case "string":
+                    expect(v).toMatchObject("test");
+                    break
+                case "expression":
+                    expect(v).toMatchObject("$ a < b");
+                    break;
+                case "array":
+                    expect(v).toMatchObject([]);
+                    break;
+                case "object":
+                    expect(v).toMatchObject({});
                     break;
                 default:
                     expect(false);
