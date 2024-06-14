@@ -1,32 +1,135 @@
+import { parse, EvalAstFactory } from 'jexpr';
+
 import {
-  ComponentConfig,
-  ModuleConfig,
-  PipelineConfig,
-  CallConfig,
-} from "./schema";
+  type ComponentConfig,
+  type ModuleConfig,
+  type PipelineConfig,
+  type CallConfig,
+} from './config';
 
-// TODO: add validation by some schema.
+import { Value, ObjectValue, Variables } from './variable';
 
-export async function constructModule(config: ModuleConfig) {
-  await constructPipeline(config.pipeline);
+function evaluateVariables(target: Variables, envs: Variables): Variables {
+  return Object.fromEntries(Object.entries(target).map(([key, val]) => {
+    if( val.type !== "expression" ) return [key, val];
+
+    const astFactory = new EvalAstFactory();
+    const expr = parse(val.value, astFactory);
+    const res = expr?.evaluate(envs);
+    return [key, res];
+  }));
 }
 
-async function constructPipeline(pipeline: PipelineConfig) {
-  await Promise.all(pipeline.map(constructComponent));
-}
+export class Module {
+  config: ModuleConfig;
+  pipeline: Pipeline;
 
-async function constructComponent(config: ComponentConfig) {
-  switch (config.type) {
-    case "call":
-      await callModule(config);
-      break;
-    default:
-      console.warn("Unsupported component type: " + config.type);
-      break;
+  constructor(config: ModuleConfig, pipeline: Pipeline) {
+    this.config = config;
+    this.pipeline = pipeline;
+  }
+
+  run(init: Variables): Variables {
+    return this.pipeline.reduce((env, comp) => {
+      const args = evaluateVariables(comp.variables, env)
+      const rets = comp.run(args);
+      const retvars: ObjectValue = { type: "object", value: rets };
+      return {...env, [comp.config.name]: retvars };
+    }, init);
   }
 }
 
-async function callModule(config: ComponentConfig) {
-  if (config.type !== "call") return;
-  await constructModule((config as CallConfig).module);
+export type Pipeline = Component[];
+
+export interface Component {
+  config: ComponentConfig;
+  variables: Variables;
+
+  run(args: Variables): Variables;
+}
+
+export interface ComponentConstructor {
+  new (config: ComponentConfig, variables: Variables): Component;
+}
+
+export type ComponentConstructors = {
+  [key: string]: ComponentConstructor
+};
+
+export class ModuleFactory {
+  readonly constructors: ComponentConstructors;
+  constructor(constructors: ComponentConstructors) {
+    this.constructors = constructors;
+  }
+
+  constructModule(config: ModuleConfig): Module {
+    const pipeline = this.constructPipeline(config.pipeline);
+    return new Module( config, pipeline );
+  }
+
+  constructPipeline(pipeline: PipelineConfig): Pipeline {
+    return pipeline.map((config) => this.constructComponent(config));
+  }
+
+  constructComponent(config: ComponentConfig): Component {
+    const variables = this.constructVariables(config);
+
+    // call is system component so it's special case.
+    if( config.type === "call" ) {
+      return new Call(config as CallConfig, variables, this);
+    }
+
+    const constructor = this.constructors[config.type];
+    if( !constructor ) {
+      console.log(`Unsupported component: ${config.type}`)
+      return null;
+    }
+    return new constructor(config, variables);
+  }
+
+  constructVariables(vars: { [key: string]: any }): Variables {
+    return Object.fromEntries(
+      Object.entries(vars).map(([key, val]) => [key, this.convertValue(val)])
+    );
+  }
+
+  convertValue(val: any): Value {
+    switch(true) {
+      case (typeof val === "string"):
+      {
+        const trimed = val.trim();
+        if( trimed.length !== 0 && trimed[0] === "$" && trimed[1] !== "$" ) return { type: "expression", value: val };
+        return { type: "string", value: val };
+      }
+      case (typeof val === "number"):
+        return { type: "number", value: val };
+      case (typeof val === "boolean"):
+        return { type: "boolean", value: val };
+      case (typeof val === "object") && Array.isArray(val):
+        return { type: "array", value: val.map((v) => this.convertValue(v)) };
+      case (typeof val === "object") && !Array.isArray(val):
+        return { type: "object", value: this.constructVariables(val) };
+      default:
+        console.warn("unsupported variable type");
+        return undefined;
+    }
+  }
+}
+
+class Call {
+    config: CallConfig
+    target: Module
+    variables: Variables;
+    submodule: Module;
+
+    constructor(config: CallConfig, variables: Variables, factory: ModuleFactory) {
+        this.config = config;
+        this.variables = variables;
+
+        this.submodule = factory.constructModule(this.config.module);
+    }
+
+    run(env: Variables): Variables {
+        return this.target.run(env);
+    }
 }

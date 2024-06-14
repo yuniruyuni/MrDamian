@@ -2,12 +2,25 @@ import { dirname } from "path";
 import { parse } from "jsonc";
 import fs from 'fs/promises';
 
-import {
-  type ComponentConfig,
-  type ModuleConfig,
-  type PipelineConfig,
-  type CallConfig,
-} from "./schema";
+export type ModuleConfig = {
+  args: Record<string, string>;
+  pipeline: PipelineConfig;
+};
+
+export type PipelineConfig = ComponentConfig[];
+
+export type ComponentConfig = {
+  type: string;
+  name?: string;
+  [key: string]: string | undefined;
+};
+
+export type CallConfig = ComponentConfig & {
+  path: string;
+  module: ModuleConfig;
+};
+
+// TODO: add validation by some schema.
 
 export const ConfigParseError = new Error("Failed to parse config file");
 

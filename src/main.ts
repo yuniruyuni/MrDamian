@@ -4,27 +4,34 @@ import squirrelStartup from 'electron-squirrel-startup';
 import { calcPath } from './utils/envs';
 
 import { Editor } from './editor/editor';
-import { Twitch } from './component/twitch';
 
 import { loadModuleConfig } from "./model/config";
-import { constructModule } from "./model/module";
+import { type ComponentConstructors, ModuleFactory } from "./model/module";
+
+import { Twitch } from './component/twitch';
+import { Youtube } from './component/youtube';
+import { Logger } from './component/logger';
+import { Panel } from './component/panel';
+import { Translate } from './component/translate';
+
+const constructors: ComponentConstructors = {
+  twitch: Twitch,
+  youtube: Youtube,
+
+  logger: Logger,
+  panel: Panel,
+  translate: Translate,
+};
 
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
 if (squirrelStartup) {
   app.quit();
 }
 
-const clientId = "vpqmjg81mnkdsu1llaconpz0oayuqt"; // MrDamian's client id.
-
 const editor = new Editor({
   onTwitchLoginClick: () => {
     console.log("ok");
-    twitch.login();
   },
-});
-const twitch = new Twitch({
-  clientId: clientId,
-  onComplete: (twitch) => editor.onLoggedIn( clientId, twitch.token ),
 });
 
 const createTasktray = () => {
@@ -50,8 +57,13 @@ app.on('ready', async () => {
   createTasktray();
   editor.onReady();
 
+  const factory = new ModuleFactory(constructors);
   const config = await loadModuleConfig("./config/main.jsonc");
-  constructModule(config);
+  const mod = factory.constructModule(config);
+
+  for( ; ; ) {
+    await mod.run({});
+  }
 });
 
 // Quit when all windows are closed, except on macOS. There, it's common

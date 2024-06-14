@@ -1,10 +1,10 @@
 import { BrowserWindow, shell } from 'electron';
 import { setTimeout } from 'timers/promises';
 
-export type Params = {
-    clientId: string;
-    onComplete: (twitch: Twitch) => void;
-};
+import { type ComponentConfig } from '../../model/config';
+import { type Variables } from '../../model/variable';
+
+const clientId = "vpqmjg81mnkdsu1llaconpz0oayuqt"; // MrDamian's client id.
 
 type TwitchOAuth2DeviceResponse = {
     device_code: string,
@@ -33,14 +33,23 @@ function tokenReceiveSuccessful(res: TwitchOAuth2TokenResponse | TwitchOAuth2Tok
 }
 
 export class Twitch {
+    config: ComponentConfig;
+    variables: Variables;
+
+    public run(envs: Variables): Variables {
+        // TODO: implement
+        console.log("twitch componentn is running with", envs);
+
+        if( envs.event.value === "system/initialize" ) {
+            this.login();
+        }
+
+        return {};
+    }
+
     authWindow: BrowserWindow;
     token: string;
     refresh: string;
-    params: Params;
-
-    constructor(params: Params) {
-        this.params = params;
-    }
 
     public async login() {
         const deviceRes = await this.fetchDeviceToken();
@@ -58,12 +67,16 @@ export class Twitch {
         this.refresh = tokenRes?.refresh_token;
         this.token = tokenRes?.access_token;
 
-        this.params.onComplete(this);
+        this.startReceiveThread();
+    }
+
+    async startReceiveThread() {
+        // TODO: implement
     }
 
     async fetchDeviceToken(): Promise<TwitchOAuth2DeviceResponse> {
         const obj = {
-            client_id: this.params.clientId,
+            client_id: clientId,
             scopes: this.scopes(),
         };
         return this.post("https://id.twitch.tv/oauth2/device", obj);
@@ -71,7 +84,7 @@ export class Twitch {
 
     async fetchTokenByDeviceCode(device_code: string): Promise<TwitchOAuth2TokenResponse | TwitchOAuth2TokenErrorResponse> {
         const obj = {
-            client_id: this.params.clientId,
+            client_id: clientId,
             scopes: this.scopes(),
             device_code,
             grant_type: "urn:ietf:params:oauth:grant-type:device_code",
