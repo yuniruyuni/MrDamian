@@ -16,7 +16,7 @@ export function evaluate<T extends Parameters>(target: T, envs: Environment): En
     // check if it's an expression.
     if( val.length === 0 ) return [key, val];
     if( val[0] !== "$" ) return [key, val];
-    if( val[0] === "$" && val[1] !== "$" ) {
+    if( val[0] === "$" && val[1] === "$" ) {
       return [key, val.slice(1)];
     }
 

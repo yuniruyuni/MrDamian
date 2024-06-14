@@ -1,5 +1,5 @@
 import { expect, describe, it } from "vitest";
-import { Parameters, Environment } from './variable';
+import { Parameters, Environment, evaluate } from './variable';
 
 describe("Parameters", () => {
     it("can contains basic types", () => {
@@ -76,5 +76,30 @@ describe("Environment", {}, () => {
                     break;
             }
         }
+    });
+});
+
+
+describe("evaluate", {}, () => {
+    it("transforms parameter's expression into environment value", () => {
+        const params: Parameters = {
+            "expression": "$ a < b",
+            "escaped dollar": "$$a < b",
+            "spaced dollar": " $a < b",
+            "string": "a < b",
+        };
+        const envs: Environment = {
+            "a": 100,
+            "b": 200,
+        };
+        const expected: Environment = {
+            "expression": true,
+            "escaped dollar": "$a < b",
+            "spaced dollar": " $a < b",
+            "string": "a < b",
+        };
+
+        const actual = evaluate(params, envs);
+        expect(actual).toMatchObject(expected);
     });
 });
