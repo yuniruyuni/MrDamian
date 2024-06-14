@@ -3,7 +3,7 @@
   "productName": "mrdamian",
   "version": "1.0.0",
   "description": "My Electron application description",
-  "main": ".vite/build/src/main.js",
+  "main": "src/main.js",
   "type": "module",
   "module": "es2022",
   "scripts": {
@@ -28,10 +28,10 @@
     "eslint": "^8.57.0",
     "eslint-plugin-import": "^2.29.1",
     "license-checker": "^25.0.1",
+    "nexe": "^4.0.0-rc.6",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "ts-node": "^10.9.2",
-    "nexe": "^4.0.0-rc.6",
     "tsup": "^8.1.0",
     "typescript": "~4.5.4",
     "vitest": "^1.6.0"
@@ -48,5 +48,8 @@
     "jexpr": "^1.0.0-pre.9",
     "json5": "^2.2.3",
     "open": "^10.1.0"
+  },
+  "optionalDependencies": {
+    "@rollup/rollup-linux-x64-gnu": "^4.18.0"
   }
 }
