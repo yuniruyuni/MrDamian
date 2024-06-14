@@ -1,5 +1,3 @@
-import { parse, EvalAstFactory } from 'jexpr';
-
 import {
   type ComponentConfig,
   type ModuleConfig,
@@ -7,30 +5,10 @@ import {
   type CallConfig,
 } from './config';
 
-import { Parameters, Environment } from './variable';
+import { Environment, evaluate } from './variable';
 
 import { EventSender } from './events';
 
-function evaluateVariables<T extends Parameters>(target: T, envs: Environment): Environment {
-  return Object.fromEntries(Object.entries(target).map(([key, val]) => {
-    if(typeof val !== "string") return [key, val];
-    if( key === "type" ) return [key, val];
-
-    // check if it's an expression.
-    if( val.length === 0 ) return [key, val];
-    if( val[0] !== "$" ) return [key, val];
-    if( val[0] === "$" && val[1] !== "$" ) {
-      return [key, val.slice(1)];
-    }
-
-    const code = val.slice(1);
-    const astFactory = new EvalAstFactory();
-    const expr = parse(code, astFactory);
-    // TODO: follow up the evaluate result was invalid case.
-    const res = expr?.evaluate(envs);
-    return [key, res];
-  }));
-}
 
 export class Module {
   config: ModuleConfig;
@@ -43,7 +21,7 @@ export class Module {
 
   run(init: Environment): Environment {
     return this.pipeline.reduce((env, comp) => {
-      const args = evaluateVariables(comp.config, env)
+      const args = evaluate(comp.config, env)
       const rets = comp.run({...env, ...args});
       return {...env, [comp.config.name]: rets };
     }, init);
