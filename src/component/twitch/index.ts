@@ -1,8 +1,9 @@
-import { BrowserWindow, shell } from 'electron';
 import { setTimeout } from 'timers/promises';
 
-import { type ComponentConfig } from '../../model/config';
+import { Component } from '../../model/module';
 import { type Variables } from '../../model/variable';
+
+import open from 'open';
 
 const clientId = "vpqmjg81mnkdsu1llaconpz0oayuqt"; // MrDamian's client id.
 
@@ -32,28 +33,24 @@ function tokenReceiveSuccessful(res: TwitchOAuth2TokenResponse | TwitchOAuth2Tok
     return true;
 }
 
-export class Twitch {
-    config: ComponentConfig;
-    variables: Variables;
-
+export class Twitch extends Component {
     public run(envs: Variables): Variables {
         // TODO: implement
         console.log("twitch componentn is running with", envs);
 
-        if( envs.event.value === "system/initialize" ) {
+        if( envs.event?.value === "system/initialize" ) {
             this.login();
         }
 
         return {};
     }
 
-    authWindow: BrowserWindow;
     token: string;
     refresh: string;
 
     public async login() {
         const deviceRes = await this.fetchDeviceToken();
-        shell.openExternal(deviceRes.verification_uri);
+        open(deviceRes.verification_uri);
 
         const device_code = deviceRes.device_code;
 

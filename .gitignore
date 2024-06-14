@@ -88,8 +88,8 @@ typings/
 # Vite
 .vite/
 
-# Electron-Forge
-out/
+# tsup
+dist/
 
 # ignore auto generated files.
 resources/LICENSES.dependency.html

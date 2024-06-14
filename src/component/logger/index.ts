@@ -1,11 +1,7 @@
-import { type ComponentConfig } from '../../model/config';
+import { Component } from '../../model/module';
 import { type Variables } from '../../model/variable';
 
-export class Logger {
-    // TODO: implement
-    config: ComponentConfig;
-    variables: Variables;
-
+export class Logger extends Component {
     public run(envs: Variables): Variables {
         // TODO: implement
         console.log("logger component is running with", envs);

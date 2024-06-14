@@ -1,5 +1,5 @@
 import { dirname } from "path";
-import { parse } from "jsonc";
+import JSON5 from "json5";
 import fs from 'fs/promises';
 
 export type ModuleConfig = {
@@ -26,7 +26,7 @@ export const ConfigParseError = new Error("Failed to parse config file");
 
 export async function loadModuleConfig(path: string): Promise<ModuleConfig> {
   const content = await fs.readFile(path, {encoding: 'utf-8'});
-  const config = parse(content) as ModuleConfig;
+  const config = JSON5.parse(content) as ModuleConfig;
   config.pipeline = await loadPipelineConfig(path, config.pipeline);
 
   return config;

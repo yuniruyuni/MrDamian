@@ -1,5 +1,3 @@
-import path from 'path';
-
 type Env = "production" | "development";
 
 export function getEnv(): Env {
@@ -15,11 +13,4 @@ export function isProd(): boolean {
 
 export function isDev(): boolean {
     return getEnv() === 'development';
-}
-
-export function calcPath(rel: string): string {
-    switch( getEnv() ) {
-    case 'development': return path.join(__dirname, '../../../', rel);
-    case 'production': return path.join(process.resourcesPath, rel);
-    }
 }

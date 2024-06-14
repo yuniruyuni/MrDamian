@@ -41,11 +41,16 @@ export class Module {
 
 export type Pipeline = Component[];
 
-export interface Component {
+export abstract class Component {
   config: ComponentConfig;
   variables: Variables;
 
-  run(args: Variables): Variables;
+  constructor(config: ComponentConfig, variables: Variables) {
+    this.config = config;
+    this.variables = variables;
+  }
+
+  abstract run(args: Variables): Variables;
 }
 
 export interface ComponentConstructor {
@@ -82,7 +87,7 @@ export class ModuleFactory {
     const constructor = this.constructors[config.type];
     if( !constructor ) {
       console.log(`Unsupported component: ${config.type}`)
-      return null;
+      return new Unsupported(config, variables);
     }
     return new constructor(config, variables);
   }
@@ -118,7 +123,6 @@ export class ModuleFactory {
 
 class Call {
     config: CallConfig
-    target: Module
     variables: Variables;
     submodule: Module;
 
@@ -130,6 +134,21 @@ class Call {
     }
 
     run(env: Variables): Variables {
-        return this.target.run(env);
+        return this.submodule.run(env);
+    }
+}
+
+class Unsupported {
+    config: ComponentConfig
+    variables: Variables;
+
+    constructor(config: ComponentConfig, variables: Variables) {
+        this.config = config;
+        this.variables = variables;
+    }
+
+    run(): Variables {
+        // just ignore all things.
+        return {};
     }
 }

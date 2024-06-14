@@ -64,13 +64,13 @@
     },
     {
       "type": "call",
-      "path": "auto_translator.jsonc",
+      "path": "auto_translator.json5",
       // もし twitchの "instance" が空文字列なら何も指定しなくてよい。
       "instance": "main-channel"
     },
     {
       "type": "call",
-      "path": "logger.jsonc",
+      "path": "logger.json5",
       "dir": "/home/yuniruyuni/log/twitch/"
     }
   ]
