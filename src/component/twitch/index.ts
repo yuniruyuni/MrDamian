@@ -3,8 +3,9 @@ import open from 'open';
 import { StaticAuthProvider } from '@twurple/auth';
 import { ChatClient } from '@twurple/chat';
 
+import { type Environment } from '../../model/variable';
+import { type ComponentConfig } from '../../model/config';
 import { Component } from '../../model/module';
-import { type Variables } from '../../model/variable';
 
 const clientId = "vpqmjg81mnkdsu1llaconpz0oayuqt"; // MrDamian's client id.
 
@@ -34,17 +35,16 @@ function tokenReceiveSuccessful(res: TwitchOAuth2TokenResponse | TwitchOAuth2Tok
     return true;
 }
 
-export class Twitch extends Component {
-    channelId: string;
+type TwitchConfig = ComponentConfig & {
+    channel: string,
+};
 
-    public run(envs: Variables): Variables {
+export class Twitch extends Component<TwitchConfig> {
+    public run(envs: Environment): Environment {
         // TODO: implement
         console.log("twitch componentn is running with", envs);
 
-        if( envs.event?.value === "system/initialize" ) {
-            if( typeof envs.channelId?.value === "string") {
-                this.channelId = envs.channelId?.value;
-            }
+        if( envs.event === "system/initialize" ) {
             this.login();
         }
 
@@ -76,7 +76,7 @@ export class Twitch extends Component {
 
     async startReceiveThread(): Promise<void> {
         const authProvider = new StaticAuthProvider(clientId, this.token);
-        const chatClient = new ChatClient({ authProvider, channels: [this.channelId] });
+        const chatClient = new ChatClient({ authProvider, channels: [this.config.channel] });
         await chatClient.connect();
 
         chatClient.onMessage((channel, user, message) => {

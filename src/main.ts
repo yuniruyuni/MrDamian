@@ -25,10 +25,7 @@ async function run() {
   const mod = factory.constructModule(config);
 
   sender.send({
-    event: {
-      type: "string",
-      value: "system/initialize",
-    },
+    event:  "system/initialize",
   });
 
   for( ; ; ) {

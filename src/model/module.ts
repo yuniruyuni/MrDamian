@@ -7,16 +7,26 @@ import {
   type CallConfig,
 } from './config';
 
-import { Value, ObjectValue, Variables } from './variable';
+import { Parameters, Environment } from './variable';
 
 import { EventSender } from './events';
 
-function evaluateVariables(target: Variables, envs: Variables): Variables {
+function evaluateVariables<T extends Parameters>(target: T, envs: Environment): Environment {
   return Object.fromEntries(Object.entries(target).map(([key, val]) => {
-    if( val.type !== "expression" ) return [key, val];
+    if(typeof val !== "string") return [key, val];
+    if( key === "type" ) return [key, val];
 
+    // check if it's an expression.
+    if( val.length === 0 ) return [key, val];
+    if( val[0] !== "$" ) return [key, val];
+    if( val[0] === "$" && val[1] !== "$" ) {
+      return [key, val.slice(1)];
+    }
+
+    const code = val.slice(1);
     const astFactory = new EvalAstFactory();
-    const expr = parse(val.value, astFactory);
+    const expr = parse(code, astFactory);
+    // TODO: follow up the evaluate result was invalid case.
     const res = expr?.evaluate(envs);
     return [key, res];
   }));
@@ -31,42 +41,39 @@ export class Module {
     this.pipeline = pipeline;
   }
 
-  run(init: Variables, sender: EventSender): Variables {
+  run(init: Environment, sender: EventSender): Environment {
     return this.pipeline.reduce((env, comp) => {
-      const args = evaluateVariables(comp.variables, env)
+      const args = evaluateVariables(comp.config, env)
       const rets = comp.run({...env, ...args}, sender);
-      const retvars: ObjectValue = { type: "object", value: rets };
-      return {...env, [comp.config.name]: retvars };
+      return {...env, [comp.config.name]: rets };
     }, init);
   }
 }
 
-export type Pipeline = Component[];
+export type Pipeline = Component<ComponentConfig>[];
 
-export abstract class Component {
-  readonly config: ComponentConfig;
-  readonly variables: Variables;
+export abstract class Component<T extends ComponentConfig> {
+  readonly config: T;
   readonly sender: EventSender;
 
-  constructor(config: ComponentConfig, variables: Variables, sender: EventSender) {
+  constructor(config: T, sender: EventSender) {
     this.config = config;
-    this.variables = variables;
     this.sender = sender;
   }
 
-  send(event: Variables) {
+  send(event: Environment) {
     this.sender.send(event);
   }
 
-  abstract run(args: Variables, sender: EventSender): Variables;
+  abstract run(args: Environment, sender: EventSender): Environment;
 }
 
-export interface ComponentConstructor {
-  new (config: ComponentConfig, variables: Variables, sender: EventSender): Component;
+export interface ComponentConstructor<T extends ComponentConfig> {
+  new (config: ComponentConfig, sender: EventSender): Component<T>;
 }
 
 export type ComponentConstructors = {
-  [key: string]: ComponentConstructor
+  [key: string]: ComponentConstructor<ComponentConfig>;
 };
 
 export class ModuleFactory {
@@ -86,66 +93,37 @@ export class ModuleFactory {
     return pipeline.map((config) => this.constructComponent(config));
   }
 
-  constructComponent(config: ComponentConfig): Component {
-    const variables = this.constructVariables(config);
-
+  constructComponent(config: ComponentConfig): Component<ComponentConfig> {
     // call is system component so it's special case.
     if( config.type === "call" ) {
-      return new Call(config as CallConfig, variables, this.sender, this);
+      return new Call(config as CallConfig, this.sender, this);
     }
 
     const constructor = this.constructors[config.type];
     if( !constructor ) {
       console.log(`Unsupported component: ${config.type}`)
-      return new Unsupported(config, variables, this.sender);
+      return new Unsupported(config, this.sender);
     }
-    return new constructor(config, variables, this.sender);
-  }
-
-  constructVariables(vars: { [key: string]: any }): Variables {
-    return Object.fromEntries(
-      Object.entries(vars).map(([key, val]) => [key, this.convertValue(val)])
-    );
-  }
-
-  convertValue(val: any): Value {
-    switch(true) {
-      case (typeof val === "string"):
-      {
-        const trimed = val.trim();
-        if( trimed.length !== 0 && trimed[0] === "$" && trimed[1] !== "$" ) return { type: "expression", value: val };
-        return { type: "string", value: val };
-      }
-      case (typeof val === "number"):
-        return { type: "number", value: val };
-      case (typeof val === "boolean"):
-        return { type: "boolean", value: val };
-      case (typeof val === "object") && Array.isArray(val):
-        return { type: "array", value: val.map((v) => this.convertValue(v)) };
-      case (typeof val === "object") && !Array.isArray(val):
-        return { type: "object", value: this.constructVariables(val) };
-      default:
-        console.warn("unsupported variable type");
-        return undefined;
-    }
+    return new constructor(config, this.sender);
   }
 }
 
-class Call extends Component {
+class Call extends Component<CallConfig> {
     submodule: Module;
 
-    constructor(config: CallConfig, variables: Variables, sender: EventSender, factory: ModuleFactory) {
-      super(config, variables, sender);
-      this.submodule = factory.constructModule(config.module);
+    constructor(params: CallConfig, sender: EventSender, factory: ModuleFactory) {
+      super(params, sender);
+      // TODO: validate params with some schema.
+      this.submodule = factory.constructModule(params.module);
     }
 
-    run(env: Variables, sender: EventSender): Variables {
+    run(env: Environment, sender: EventSender): Environment {
         return this.submodule.run(env, sender);
     }
 }
 
-class Unsupported extends Component {
-    run(): Variables {
+class Unsupported extends Component<ComponentConfig> {
+    run(): Environment {
         // just ignore all things.
         return {};
     }

@@ -2,6 +2,8 @@ import { dirname } from "path";
 import JSON5 from "json5";
 import fs from 'fs/promises';
 
+import { Parameters } from "./variable";
+
 export type ModuleConfig = {
   args: Record<string, string>;
   pipeline: PipelineConfig;
@@ -9,10 +11,9 @@ export type ModuleConfig = {
 
 export type PipelineConfig = ComponentConfig[];
 
-export type ComponentConfig = {
+export type ComponentConfig = Parameters & {
   type: string;
   name?: string;
-  [key: string]: string | undefined;
 };
 
 export type CallConfig = ComponentConfig & {
