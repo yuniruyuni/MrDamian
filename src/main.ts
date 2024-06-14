@@ -1,8 +1,6 @@
-import { setTimeout } from 'timers/promises';
-
 import { loadModuleConfig } from "./model/config";
 import { type ComponentConstructors, ModuleFactory } from "./model/module";
-import { Timeout, eventChannel } from "./model/events";
+import { eventChannel } from "./model/events";
 
 import { Twitch } from './component/twitch';
 import { Youtube } from './component/youtube';

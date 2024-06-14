@@ -6,6 +6,7 @@ export default defineConfig({
   format: ['esm'],
   clean: true,
   sourcemap: true,
+  dts: true,
   banner(ctx) {
     if (ctx.format === "esm") {
       return {
