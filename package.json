@@ -9,7 +9,7 @@
   "scripts": {
     "build": "tsup",
     "start": "npm run build && node --enable-source-maps dist/main.js",
-    "package": "npm run build && nexe dist/main.js --build",
+    "package": "npm run build && node nexe.config.js",
     "lint": "eslint --ext .ts,.tsx .",
     "test": "vitest",
     "prettier": "prettier --write --ignore-unknown src/**/*"

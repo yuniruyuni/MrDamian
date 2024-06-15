@@ -7,6 +7,8 @@ export default defineConfig({
   clean: true,
   sourcemap: true,
   dts: true,
+  bundle: true,
+  noExternal:[ (/.*/)],
   banner(ctx) {
     if (ctx.format === "esm") {
       return {
