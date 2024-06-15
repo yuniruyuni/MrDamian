@@ -1,5 +1,5 @@
-import { loadModuleParameters } from "./model/parameters";
-import { type ComponentConstructors, ModuleFactory } from "./model/module";
+import { load } from "./model/parameters";
+import { type ComponentConstructors, ModuleFactory } from "./model/factory";
 import { eventChannel } from "./model/events";
 
 import { Twitch } from './component/twitch';
@@ -21,8 +21,10 @@ async function run() {
   const [sender, receiver] = eventChannel();
 
   const factory = new ModuleFactory(constructors, sender);
-  const params = await loadModuleParameters("./config/main.json5");
+  const params = await load("./config/main.json5");
   const mod = factory.constructModule(params);
+
+  await mod.init({});
 
   sender.send({
     event:  "system/initialize",

@@ -1,26 +1,26 @@
-import { type Environment } from '../../model/variable';
-import { type ComponentParameters } from '../../model/parameters';
+import { type Field } from '../../model/variable';
+import { type ComponentConfig } from '../../model/parameters';
 import { Component } from '../../model/component';
 import fs from 'fs/promises';
 import path from 'path';
 
-type LoggerParameters = ComponentParameters & {
+type LoggerArgs = {
   path: string;
+  output: Field;
 };
 
-export class Logger extends Component<LoggerParameters> {
-  public async run(envs: LoggerParameters): Promise<Environment> {
-    if( envs.path ) {
-      const file = envs.path;
-      const dir = path.dirname(file);
+type LoggerConfig = ComponentConfig & {
+  args: LoggerArgs;
+};
 
-      delete envs.type;
-      delete envs.path;
+export class Logger extends Component<LoggerConfig> {
+  public async run(args: LoggerArgs): Promise<Field> {
+    const file = args.path;
+    const dir = path.dirname(file);
 
-      await fs.mkdir(dir, { recursive: true });
-      await fs.appendFile(file, JSON.stringify(envs) + "\n");
-    }
+    await fs.mkdir(dir, { recursive: true });
+    await fs.appendFile(file, JSON.stringify(args.output) + "\n");
 
-    return {};
+    return undefined;
   }
 }

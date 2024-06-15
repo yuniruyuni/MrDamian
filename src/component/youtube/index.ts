@@ -1,11 +1,11 @@
-import { type ComponentParameters } from '../../model/parameters';
+import { type ComponentConfig } from '../../model/parameters';
 import { Component } from '../../model/component';
-import { type Environment } from '../../model/variable';
+import { type Field } from '../../model/variable';
 
-type YoutubeParameters = ComponentParameters;
+type YoutubeConfig = ComponentConfig;
 
-export class Youtube extends Component<YoutubeParameters> {
-  public async run(envs: YoutubeParameters): Promise<Environment> {
+export class Youtube extends Component<YoutubeConfig> {
+  public async run(): Promise<Field> {
     // TODO: implement
     return {};
   }

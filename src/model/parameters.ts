@@ -2,64 +2,85 @@ import { dirname } from 'path';
 import JSON5 from 'json5';
 import fs from 'fs/promises';
 
-import { Parameters, Environment } from './variable';
+import { Parameters, Arguments } from './variable';
 
-export type ModuleParameters = Parameters & {
-  args: Environment;
-  pipeline: PipelineParameters;
+export type ModuleConfig = {
+  main: boolean;
+  params: Parameters;
+  pipeline: PipelineConfig;
 };
 
-export type PipelineParameters = ComponentParameters[];
+export type PipelineConfig = ComponentConfig[];
 
-export type ComponentParameters = Parameters & {
+export type ComponentConfig = {
+  // "type" field is a component type.
   type: string;
+  // "name" field is an alias for "type" field.
+  // if "name" field is not defined, "type" field is used as "name".
   name?: string;
-};
-
-export type CallParameters = ComponentParameters & {
-  path: string;
-  module: ModuleParameters;
-};
-
-// TODO: add validation by some schema.
-
-export const ParameterParseError = new Error('Failed to parse parameter file');
-
-export async function loadModuleParameters(
-  path: string,
-): Promise<ModuleParameters> {
-  const content = await fs.readFile(path, { encoding: 'utf-8' });
-  const params = JSON5.parse(content) as ModuleParameters;
-  params.pipeline = await loadPipelineParameters(path, params.pipeline);
-
-  return params;
+  // "when" field is an expression for conditional execution.
+  // this expression don't need define with "$" prefix.
+  when?: string;
+  // "args" field is a list of arguments for component.
+  args?: Arguments;
 }
 
-async function loadPipelineParameters(
+export type CallConfig = ComponentConfig & {
+  // "path" field is a path to module file.
+  // All modules are defined as json5 files.
+  path: string;
+  module: ModuleConfig;
+};
+
+export function isCallConfig(config: ComponentConfig): config is CallConfig {
+  return (config as CallConfig).path !== undefined;
+}
+
+export const ConfigParseError = new Error('Failed to parse config file');
+
+export async function load(path: string): Promise<ModuleConfig> {
+  const config = await loadModuleConfig(path);
+  config.main = true;
+  return config;
+}
+
+async function loadModuleConfig(
   path: string,
-  params: PipelineParameters,
-): Promise<PipelineParameters> {
+): Promise<ModuleConfig> {
+  const content = await fs.readFile(path, { encoding: 'utf-8' });
+  // TODO: add validation by some schema.
+  const config = JSON5.parse(content) as ModuleConfig;
+  config.main = false;
+  config.pipeline = await loadPipelineConfig(path, config.pipeline);
+
+  return config;
+}
+
+async function loadPipelineConfig(
+  path: string,
+  config: PipelineConfig,
+): Promise<PipelineConfig> {
   return await Promise.all(
-    params.map(async (comp) => {
-      return await loadComponentParameters(path, comp);
+    config.map(async (comp) => {
+      return await loadComponentConfig(path, comp);
     }),
   );
 }
 
-async function loadComponentParameters(
+async function loadComponentConfig(
   path: string,
-  params: ComponentParameters,
-): Promise<ComponentParameters> {
+  config: ComponentConfig,
+): Promise<ComponentConfig> {
   // expand default name as type.
-  if( params.name === undefined ) {
-    params.name = params.type;
+  if( config.name === undefined ) {
+    config.name = config.type;
   }
 
-  if (params.type === 'call') {
+  if (isCallConfig(config)) {
     const base_dir = dirname(path);
-    const mpath = `${base_dir}/${params.path}`;
-    const mparams = await loadModuleParameters(mpath);
-    (params as CallParameters).module = mparams;
+    const mpath = `${base_dir}/${config.path}`;
+    const mparams = await loadModuleConfig(mpath);
+    (config as CallConfig).module = mparams;
   }
-  return params;
+  return config;
 }

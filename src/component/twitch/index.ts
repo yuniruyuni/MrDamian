@@ -1,25 +1,26 @@
 import { StaticAuthProvider } from '@twurple/auth';
 import { ChatClient } from '@twurple/chat';
 
-import { type Environment } from '../../model/variable';
-import { type ComponentParameters } from '../../model/parameters';
+import { type Field } from '../../model/variable';
+import { type ComponentConfig } from '../../model/parameters';
 import { Component } from '../../model/component';
 
 import { DeviceCodeGrantFlow } from './oauth';
 
-type TwitchParameters = ComponentParameters & {
+type TwitchConfig = ComponentConfig & {
   channel: string;
 };
 
-export class Twitch extends Component<TwitchParameters> {
-  public async run(envs: TwitchParameters): Promise<Environment> {
-    if (envs.event === 'system/initialize') {
+export class Twitch extends Component<TwitchConfig> {
+  async init(): Promise<Field> {
       // we don't await this function call,
       // because system can process other things while user is processing login.
       this.login();
-    }
+      return undefined;
+  }
 
-    return {};
+  async run(): Promise<Field> {
+    return undefined;
   }
 
   authProvider: StaticAuthProvider;
@@ -35,7 +36,7 @@ export class Twitch extends Component<TwitchParameters> {
   async startReceiveThread(): Promise<void> {
     const chatClient = new ChatClient({
       authProvider: this.authProvider,
-      channels: [this.params.channel],
+      channels: [this.config.channel],
     });
     await chatClient.connect();
 

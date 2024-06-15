@@ -1,11 +1,15 @@
 {
-  "args": {
-    "dir": "message.log"
+  params: {
+    path: "message.log",
+    output: {},
   },
-  "pipeline": [
+  pipeline: [
     {
-      "type": "logger",
-      "path": "$ dir"
+      type: "logger",
+      args: {
+        path: "$ path",
+        output: "$ output",
+      }
     }
   ]
 }

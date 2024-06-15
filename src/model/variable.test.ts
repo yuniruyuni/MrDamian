@@ -83,9 +83,13 @@ describe('evaluate', {}, () => {
   it("transforms parameter's expression into environment value", () => {
     const params: Parameters = {
       expression: '$ a < b',
-      'escaped dollar': '$$a < b',
-      'spaced dollar': ' $a < b',
+      escaped_dollar: '$$a < b',
+      spaced_dollar: ' $a < b',
       string: 'a < b',
+      recursive: {
+        string: 'a < b',
+        expression: '$ a < b',
+      },
     };
     const envs: Environment = {
       a: 100,
@@ -93,9 +97,13 @@ describe('evaluate', {}, () => {
     };
     const expected: Environment = {
       expression: true,
-      'escaped dollar': '$a < b',
-      'spaced dollar': ' $a < b',
+      escaped_dollar: '$a < b',
+      spaced_dollar: ' $a < b',
       string: 'a < b',
+      recursive: {
+        string: 'a < b',
+        expression: true,
+      },
     };
 
     const actual = evaluate(params, envs);

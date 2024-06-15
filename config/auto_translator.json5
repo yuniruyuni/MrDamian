@@ -1,13 +1,21 @@
 {
-  "args": {
-    "source": "en",
-    "target": "es"
+  params: {
+    message: "hello, world",
+    target: "ja",
   },
-  "pipeline": [
+  pipeline: [
     {
-      "type": "translate",
-      "source": "en",
-      "target": "ja"
+      type: "detect_language",
+      message: "$ message",
+    },
+    {
+      when: "detect_language !== 'ja'",
+      type: "translate",
+      args: {
+        message: "$ message",
+        source: "$ source",
+        target: "$ target"
+      }
     }
   ]
 }

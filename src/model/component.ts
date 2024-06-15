@@ -1,14 +1,15 @@
-import { type ComponentParameters } from './parameters';
+import { type ComponentConfig } from './parameters';
 
-import { Environment, evaluate } from './variable';
+import { Field, Environment, evaluate } from './variable';
 import { EventSender } from './events';
 
-export abstract class Component<T extends ComponentParameters> {
-  readonly params: T;
+export abstract class Component<C extends ComponentConfig> {
+  readonly config: C;
   readonly sender: EventSender;
 
-  constructor(params: T, sender: EventSender) {
-    this.params = params;
+  constructor(config: ComponentConfig, sender: EventSender) {
+    // TODO: implement some validator.
+    this.config = config as C;
     this.sender = sender;
   }
 
@@ -16,14 +17,18 @@ export abstract class Component<T extends ComponentParameters> {
     this.sender.send(event);
   }
 
-  async runRaw(env: Environment): Promise<Environment> {
-    // TODO: Validate args
-    const args = {
-      ...env,
-      ...evaluate(this.params, env),
-    };
-    return this.run(args as T);
+  async initRaw(env: Environment): Promise<Field> {
+    // TODO: validate args
+    const args = evaluate(this.config.args, env);
+    return this.init(args);
   }
 
-  abstract run(args: T): Promise<Environment>;
+  async runRaw(env: Environment): Promise<Field> {
+    // TODO: validate args
+    const args = evaluate(this.config.args, env);
+    return this.run(args);
+  }
+
+  async init(_args: C["args"]): Promise<Field> { return undefined; }
+  abstract run(args: C["args"]): Promise<Field>;
 }

@@ -1,5 +1,5 @@
 {
-  "pipeline": [
+  pipeline: [
     // typeだけはjexprによる式を受け取ることができないが、
     // それ以外はありとあらゆるフィールドがjexprを使える…というルール付けにしてしまおうと思う
     // そして文字列の頭が$で始まる時のみjexprに渡るので普段はただの文字列に見える。
@@ -11,67 +11,82 @@
     */
     // twitchコンポネント例
     {
-      "type": "twitch",
+      type: "twitch",
       // subtypeがないならコンポネントの初期化
-      "instance": "main-channel", // 指定がなかったら空文字列がインスタンス名
+      instance: "main-channel", // 指定がなかったら空文字列がインスタンス名
       // "client_id": "'xxxxxxxxxx'", // client_idは組み込みの値を使って構わないはずで不要にできる
-      "channel": "yuniruyuni"
+      channel: "yuniruyuni"
     },
     // youtubeコンポネント例
     {
       // APIは https://developers.google.com/youtube/v3/live/docs?hl=ja が使える
       // OAuthのdevice code grant flowも存在する: https://developers.google.com/identity/protocols/oauth2/native-app?hl=ja
       // 多分twitchと使い心地は同じ感じにできる。
-      "type": "youtube",
+      type: "youtube",
       // subtypeがないならコンポネントの初期化
-      "instance": "main-channel",
-      "channel": "yuniruyuni"
+      instance: "main-channel",
+      channel: "yuniruyuni"
     },
     {
-      "type": "panel",
+      type: "panel",
       // subtypeがないならcomponentsの初期化
       // pipelineにおけるcomponent(これ自体)と被ってるからいい名称が必要。form?
-      "components": [
-        {
-          "type": "toggle", // トグルボタン。クリック時イベント発生し、次のイベントからはずっと値が入っている。
-          "name": "auto_shoutout",
-          "text": "Auto shoutout"
-        },
-        {
-          "type": "button", // ボタン。クリックごとにイベント発生
-          "name": "shoutout",
-          "text": "Send shoutout"
-        },
-        {
-          "type": "text", // テキストラベル
-          "name": "latest_message",
-          // 1文字目が $ で始まるので jexpr に渡る。
-          // このようにオブジェクトの内側にあっても相変わらずjexprの呼び出しが可能である。
-          "text": "$ format('{}: {}', message.name, message.text)"
-        },
-        {
-          "type": "$ hoge", // ここにtypeとかあってもjexprの展開を許すことになるだろうけれど
-          "name": "hoge_component",
-          "hoge": "hogehoge" // こういうふうに引数が噛み合わなくなるのを回避できないのでは？とは思う。
-        }
-      ]
+      args: {
+        components: [
+          {
+            type: "toggle", // トグルボタン。クリック時イベント発生し、次のイベントからはずっと値が入っている。
+            name: "auto_shoutout",
+            text: "Auto shoutout"
+          },
+          {
+            type: "button", // ボタン。クリックごとにイベント発生
+            name: "shoutout",
+            text: "Send shoutout"
+          },
+          {
+            type: "text", // テキストラベル
+            name: "latest_message",
+            // 1文字目が $ で始まるので jexpr に渡る。
+            // このようにオブジェクトの内側にあっても相変わらずjexprの呼び出しが可能である。
+            text: "$ format('{}: {}', message.name, message.text)"
+          },
+          {
+            type: "$ hoge", // ここにtypeとかあってもjexprの展開を許すことになるだろうけれど
+            name: "hoge_component",
+            hoge: "hogehoge", // こういうふうに引数が噛み合わなくなるのを回避できないのでは？とは思う。
+          }
+        ],
+      }
     },
     {
       // when は一番よくあるargsの適用先
-      "when": "$ panel.shoutout || (panel.auto_shoutout && periodic)",
-      "type": "send",
-      "message": "'Discordチャンネルもあります！チャンネルポイント交換から！'"
+      when: "$ panel.shoutout || (panel.auto_shoutout && periodic)",
+      type: "send",
+
+      args: {
+        message: "'Discordチャンネルもあります！チャンネルポイント交換から！'"
+      }
     },
     {
-      "type": "call",
-      "path": "auto_translator.json5",
+      type: "call",
+      path: "auto_translator.json5",
       // もし twitchの "instance" が空文字列なら何も指定しなくてよい。
-      "instance": "main-channel"
+      instance: "main-channel",
+      args: {
+        message: "$ message",
+      }
     },
     {
-      "type": "call",
-      "path": "logger.json5",
-      "dir": "/home/yuniruyuni/log/twitch/message.log"
+      type: "call",
+      path: "logger.json5",
+      args: {
+        path: "./log/twitch/message.log",
+        output: {
+          name: "$ user",
+          message: "$ message",
+          channel: "$ channel",
+        },
+      }
     }
   ]
 }
