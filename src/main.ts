@@ -30,8 +30,7 @@ async function run() {
     event:  "system/initialize",
   });
 
-  for( ; ; ) {
-    const event = await receiver.receive();
+  for await (const event of receiver) {
     await mod.run(event);
   }
 }
