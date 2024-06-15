@@ -19,7 +19,7 @@ export class Logger extends Component<LoggerConfig> {
     const dir = path.dirname(file);
 
     await fs.mkdir(dir, { recursive: true });
-    await fs.appendFile(file, JSON.stringify(args.output) + "\n");
+    await fs.appendFile(file, JSON.stringify(args.output) + '\n');
 
     return undefined;
   }

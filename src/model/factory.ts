@@ -37,9 +37,7 @@ export class ModuleFactory {
     return pipeline.map((params) => this.constructComponent(params));
   }
 
-  constructComponent(
-    config: ComponentConfig,
-  ): Component<ComponentConfig> {
+  constructComponent(config: ComponentConfig): Component<ComponentConfig> {
     // call is system component so it's special case.
     if (isCallConfig(config)) {
       return new Call(config, this.sender, this);
@@ -57,11 +55,7 @@ export class ModuleFactory {
 class Call extends Component<CallConfig> {
   submodule: Module;
 
-  constructor(
-    config: CallConfig,
-    sender: EventSender,
-    factory: ModuleFactory,
-  ) {
+  constructor(config: CallConfig, sender: EventSender, factory: ModuleFactory) {
     super(config, sender);
     // TODO: validate params with some schema.
     this.submodule = factory.constructModule(config.module);

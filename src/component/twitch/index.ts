@@ -13,10 +13,10 @@ type TwitchConfig = ComponentConfig & {
 
 export class Twitch extends Component<TwitchConfig> {
   async init(): Promise<Field> {
-      // we don't await this function call,
-      // because system can process other things while user is processing login.
-      this.login();
-      return undefined;
+    // we don't await this function call,
+    // because system can process other things while user is processing login.
+    this.login();
+    return undefined;
   }
 
   async run(): Promise<Field> {
@@ -42,7 +42,7 @@ export class Twitch extends Component<TwitchConfig> {
 
     chatClient.onMessage((channel, user, message) => {
       this.send({
-        event: "twitch/message",
+        event: 'twitch/message',
         channel: channel,
         user: user,
         message: message,

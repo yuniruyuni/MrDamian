@@ -1,12 +1,12 @@
 import { parse, EvalAstFactory } from 'jexpr';
 
 export type Field =
-    | Parameters
-    | Array<Parameters>
-    | string
-    | number
-    | boolean
-    | undefined;
+  | Parameters
+  | Array<Parameters>
+  | string
+  | number
+  | boolean
+  | undefined;
 
 // Environment is a recursive type that can be used to define a nested object structure.
 // Environment contains the evaluated result of the Parameters type.
@@ -34,7 +34,8 @@ export function evaluate<T extends Arguments>(
 ): Environment {
   return Object.fromEntries(
     Object.entries(args ?? {}).map(([key, val]) => {
-      if (typeof val === 'object') return [key, evaluate(val as Environment, envs)];
+      if (typeof val === 'object')
+        return [key, evaluate(val as Environment, envs)];
       if (typeof val !== 'string') return [key, val];
 
       // check if it's an expression.

@@ -29,6 +29,8 @@ export abstract class Component<C extends ComponentConfig> {
     return this.run(args);
   }
 
-  async init(_args: C["args"]): Promise<Field> { return undefined; }
-  abstract run(args: C["args"]): Promise<Field>;
+  async init(_args: C['args']): Promise<Field> {
+    return undefined;
+  }
+  abstract run(args: C['args']): Promise<Field>;
 }

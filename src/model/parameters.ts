@@ -23,7 +23,7 @@ export type ComponentConfig = {
   when?: string;
   // "args" field is a list of arguments for component.
   args?: Arguments;
-}
+};
 
 export type CallConfig = ComponentConfig & {
   // "path" field is a path to module file.
@@ -44,9 +44,7 @@ export async function load(path: string): Promise<ModuleConfig> {
   return config;
 }
 
-async function loadModuleConfig(
-  path: string,
-): Promise<ModuleConfig> {
+async function loadModuleConfig(path: string): Promise<ModuleConfig> {
   const content = await fs.readFile(path, { encoding: 'utf-8' });
   // TODO: add validation by some schema.
   const config = JSON5.parse(content) as ModuleConfig;
@@ -72,7 +70,7 @@ async function loadComponentConfig(
   config: ComponentConfig,
 ): Promise<ComponentConfig> {
   // expand default name as type.
-  if( config.name === undefined ) {
+  if (config.name === undefined) {
     config.name = config.type;
   }
 
