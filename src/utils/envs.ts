@@ -1,16 +1,16 @@
-type Env = 'production' | 'development'
+type Env = 'production' | 'development';
 
 export function getEnv(): Env {
   if (process.env.NODE_ENV !== 'development') {
-    return 'production'
+    return 'production';
   }
-  return 'development'
+  return 'development';
 }
 
 export function isProd(): boolean {
-  return getEnv() === 'production'
+  return getEnv() === 'production';
 }
 
 export function isDev(): boolean {
-  return getEnv() === 'development'
+  return getEnv() === 'development';
 }
