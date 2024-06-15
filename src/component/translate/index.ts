@@ -7,7 +7,6 @@ type TranslateParametes = ComponentParameters;
 export class Translate extends Component<TranslateParametes> {
   public async run(envs: TranslateParametes): Promise<Environment> {
     // TODO: implement
-    console.log('translate component is running with', envs);
     return {};
   }
 }

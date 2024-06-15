@@ -25,8 +25,6 @@ export class Twitch extends Component<TwitchParameters> {
   authProvider: StaticAuthProvider;
 
   public async login() {
-    console.log('login() started');
-
     const flow = new DeviceCodeGrantFlow();
     this.authProvider = await flow.login();
 
@@ -42,7 +40,6 @@ export class Twitch extends Component<TwitchParameters> {
     await chatClient.connect();
 
     chatClient.onMessage((channel, user, message) => {
-      console.log(`${channel} - ${user}: ${message}`);
       this.send({
         event: "twitch/message",
         channel: channel,

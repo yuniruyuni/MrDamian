@@ -7,7 +7,6 @@ type YoutubeParameters = ComponentParameters;
 export class Youtube extends Component<YoutubeParameters> {
   public async run(envs: YoutubeParameters): Promise<Environment> {
     // TODO: implement
-    console.log('youtube componentn is running with', envs);
     return {};
   }
 }

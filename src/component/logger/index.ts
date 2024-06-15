@@ -10,11 +10,10 @@ type LoggerParameters = ComponentParameters & {
 
 export class Logger extends Component<LoggerParameters> {
   public async run(envs: LoggerParameters): Promise<Environment> {
-    console.log('logger component is running with', envs);
-
     if( envs.path ) {
       const file = envs.path;
       const dir = path.dirname(file);
+
       delete envs.type;
       delete envs.path;
 
