@@ -32,7 +32,6 @@ export class Module {
 
     return await this.pipeline.reduce(async (penv, comp) => {
       const env: Environment = await penv;
-      console.log(env);
       const ret = await comp[field](env);
       if ( ret === undefined ) return env;
       return { ...env, [comp.config.name]: ret };
