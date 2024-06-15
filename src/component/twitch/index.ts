@@ -12,11 +12,10 @@ type TwitchParameters = ComponentParameters & {
 };
 
 export class Twitch extends Component<TwitchParameters> {
-  public run(envs: TwitchParameters): Environment {
-    // TODO: implement
-    console.log('twitch componentn is running with', envs);
-
+  public async run(envs: TwitchParameters): Promise<Environment> {
     if (envs.event === 'system/initialize') {
+      // we don't await this function call,
+      // because system can process other things while user is processing login.
       this.login();
     }
 
@@ -31,6 +30,7 @@ export class Twitch extends Component<TwitchParameters> {
     const flow = new DeviceCodeGrantFlow();
     this.authProvider = await flow.login();
 
+    // start receiving thread so we don't await this call.
     this.startReceiveThread();
   }
 
@@ -43,10 +43,12 @@ export class Twitch extends Component<TwitchParameters> {
 
     chatClient.onMessage((channel, user, message) => {
       console.log(`${channel} - ${user}: ${message}`);
-      // TODO: implement event sender.
-      // this.send({
-      //     event: "twitch/message",
-      // });
+      this.send({
+        event: "twitch/message",
+        channel: channel,
+        user: user,
+        message: message,
+      });
     });
   }
 }

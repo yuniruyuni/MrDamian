@@ -1,11 +1,11 @@
 {
   "args": {
-    "path": "message.log"
+    "dir": "message.log"
   },
   "pipeline": [
     {
       "type": "logger",
-      "path": "args.path"
+      "path": "$ dir"
     }
   ]
 }

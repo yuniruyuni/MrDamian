@@ -16,7 +16,7 @@ export abstract class Component<T extends ComponentParameters> {
     this.sender.send(event);
   }
 
-  runRaw(env: Environment): Environment {
+  async runRaw(env: Environment): Promise<Environment> {
     // TODO: Validate args
     const args = {
       ...env,
@@ -25,5 +25,5 @@ export abstract class Component<T extends ComponentParameters> {
     return this.run(args as T);
   }
 
-  abstract run(args: T): Environment;
+  abstract run(args: T): Promise<Environment>;
 }

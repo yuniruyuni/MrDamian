@@ -71,7 +71,7 @@
     {
       "type": "call",
       "path": "logger.json5",
-      "dir": "/home/yuniruyuni/log/twitch/"
+      "dir": "/home/yuniruyuni/log/twitch/message.log"
     }
   ]
 }

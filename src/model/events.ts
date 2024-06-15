@@ -1,19 +1,19 @@
 import Queue from 'in-queue';
-import { Variables } from './variable';
+import { Environment } from './variable';
 
 class EventChannel {
-  queue: Queue<Variables>;
+  queue: Queue<Environment>;
 
   constructor() {
     this.queue = new Queue();
   }
 
-  send(item: Variables) {
+  send(item: Environment) {
     // our queue length is infinite so this method never fail.
-    this.queue.push_nowait(item);
+    this.queue.push(item);
   }
 
-  async receive(timeout?: number): Promise<Variables> {
+  async receive(timeout?: number): Promise<Environment> {
     return await this.queue.get(timeout);
   }
 }
@@ -24,11 +24,11 @@ export class EventReceiver {
     this.channel = channel;
   }
 
-  async receive(timeout?: number): Promise<Variables> {
+  async receive(timeout?: number): Promise<Environment> {
     return await this.channel.receive(timeout);
   }
 
-  async *[Symbol.asyncIterator](): AsyncIterableIterator<Variables> {
+  async *[Symbol.asyncIterator](): AsyncIterableIterator<Environment> {
     while (true) {
       yield await this.receive();
     }
@@ -41,7 +41,7 @@ export class EventSender {
     this.channel = channel;
   }
 
-  send(item: Variables): void {
+  send(item: Environment): void {
     this.channel.send(item);
   }
 }

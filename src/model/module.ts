@@ -18,11 +18,14 @@ export class Module {
     this.pipeline = pipeline;
   }
 
-  run(init: Environment): Environment {
-    return this.pipeline.reduce((env, comp) => {
-      const rets = comp.runRaw(env);
+  async run(init: Environment): Promise<Environment> {
+    return await this.pipeline.reduce(async (penv, comp) => {
+      const env: Environment = await penv;
+      // our component have default value as "args" in it's configuration file.
+      const envWithDefault = { ...this.params.args, ...env };
+      const rets = await comp.runRaw(envWithDefault);
       return { ...env, [comp.params.name]: rets };
-    }, init);
+    }, Promise.resolve(init));
   }
 }
 
@@ -83,13 +86,13 @@ class Call extends Component<CallParameters> {
     this.submodule = factory.constructModule(params.module);
   }
 
-  run(env: Environment): Environment {
-    return this.submodule.run(env);
+  async run(env: Environment): Promise<Environment> {
+    return await this.submodule.run(env);
   }
 }
 
 class Unsupported extends Component<ComponentParameters> {
-  run(): Environment {
+  async run(): Promise<Environment> {
     // just ignore all things.
     return {};
   }

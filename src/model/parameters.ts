@@ -2,10 +2,10 @@ import { dirname } from 'path';
 import JSON5 from 'json5';
 import fs from 'fs/promises';
 
-import { Parameters } from './variable';
+import { Parameters, Environment } from './variable';
 
-export type ModuleParameters = {
-  args: Record<string, string>;
+export type ModuleParameters = Parameters & {
+  args: Environment;
   pipeline: PipelineParameters;
 };
 
@@ -50,6 +50,11 @@ async function loadComponentParameters(
   path: string,
   params: ComponentParameters,
 ): Promise<ComponentParameters> {
+  // expand default name as type.
+  if( params.name === undefined ) {
+    params.name = params.type;
+  }
+
   if (params.type === 'call') {
     const base_dir = dirname(path);
     const mpath = `${base_dir}/${params.path}`;

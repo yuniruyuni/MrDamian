@@ -4,7 +4,7 @@ import { Component } from '../../model/component';
 
 type PanelParameters = ComponentParameters;
 export class Panel extends Component<PanelParameters> {
-  public run(envs: PanelParameters): Environment {
+  public async run(envs: PanelParameters): Promise<Environment> {
     // TODO: implement
     console.log('panel component is running with', envs);
     return {};
