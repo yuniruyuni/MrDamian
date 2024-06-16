@@ -8,45 +8,45 @@ class EventChannel {
     this.queue = new Queue();
   }
 
-  send(item: Environment) {
+  emit(item: Environment) {
     // our queue length is infinite so this method never fail.
     this.queue.push(item);
   }
 
-  async receive(timeout?: number): Promise<Environment> {
+  async absorb(timeout?: number): Promise<Environment> {
     return await this.queue.get(timeout);
   }
 }
 
-export class EventReceiver {
+export class EventAbsorber {
   channel: EventChannel;
   constructor(channel: EventChannel) {
     this.channel = channel;
   }
 
-  async receive(timeout?: number): Promise<Environment> {
-    return await this.channel.receive(timeout);
+  async absorb(timeout?: number): Promise<Environment> {
+    return await this.channel.absorb(timeout);
   }
 
   async *[Symbol.asyncIterator](): AsyncIterableIterator<Environment> {
     while (true) {
-      yield await this.receive();
+      yield await this.absorb();
     }
   }
 }
 
-export class EventSender {
+export class EventEmitter {
   channel: EventChannel;
   constructor(channel: EventChannel) {
     this.channel = channel;
   }
 
-  send(item: Environment): void {
-    this.channel.send(item);
+  emit(item: Environment): void {
+    this.channel.emit(item);
   }
 }
 
-export function eventChannel(): [EventSender, EventReceiver] {
+export function eventChannel(): [EventEmitter, EventAbsorber] {
   const channel = new EventChannel();
-  return [new EventSender(channel), new EventReceiver(channel)];
+  return [new EventEmitter(channel), new EventAbsorber(channel)];
 }

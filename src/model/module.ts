@@ -13,17 +13,14 @@ export class Module {
   }
 
   async init(init: Environment): Promise<Environment> {
-    return await this.event('initRaw', init);
+    return await this.event('init', init);
   }
 
   async run(init: Environment): Promise<Environment> {
-    return await this.event('runRaw', init);
+    return await this.event('run', init);
   }
 
-  async event(
-    field: 'initRaw' | 'runRaw',
-    init: Environment,
-  ): Promise<Environment> {
+  async event(field: 'init' | 'run', init: Environment): Promise<Environment> {
     const params = this.config.params ?? {};
     // our component have default value as "params" in it's configuration file.
     const filled = { ...params, ...init };

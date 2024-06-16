@@ -7,41 +7,90 @@ import { Component } from '../../model/component';
 
 import { DeviceCodeGrantFlow } from './oauth';
 
-type TwitchConfig = ComponentConfig & {
+type LoginConfig = {
+  action: 'login' | '' | undefined;
   channel: string;
 };
 
+type SendConfig = {
+  action: 'send';
+  args: {
+    message: string;
+  };
+};
+
+type TwitchConfig = ComponentConfig & (LoginConfig | SendConfig);
+
+function isLoginConfig(
+  config: TwitchConfig,
+): config is ComponentConfig & LoginConfig {
+  switch (config.action) {
+    case 'login':
+      return true;
+    case '':
+      return true;
+    case undefined:
+      return true;
+    default:
+      return false;
+  }
+}
+
 export class Twitch extends Component<TwitchConfig> {
-  async init(): Promise<Field> {
-    // we don't await this function call,
-    // because system can process other things while user is processing login.
-    this.login();
+  async init(config: TwitchConfig): Promise<Field> {
+    if (isLoginConfig(config)) {
+      // we don't await this function call,
+      // because system can process other things while user is processing login.
+      this.login(config);
+    }
     return undefined;
   }
 
-  async run(): Promise<Field> {
-    return undefined;
+  async run(config: TwitchConfig): Promise<Field> {
+    switch (config.action) {
+      case 'login':
+      case '':
+      case undefined:
+        return undefined;
+      case 'send':
+        return await this.send(config);
+      default:
+        return undefined;
+    }
   }
 
   authProvider: StaticAuthProvider;
+  chatClient: ChatClient;
+  channel?: string;
 
-  public async login() {
+  async login(config: LoginConfig) {
     const flow = new DeviceCodeGrantFlow();
     this.authProvider = await flow.login();
 
     // start receiving thread so we don't await this call.
-    this.startReceiveThread();
+    this.startReceiveThread(config.channel);
   }
 
-  async startReceiveThread(): Promise<void> {
-    const chatClient = new ChatClient({
-      authProvider: this.authProvider,
-      channels: [this.config.channel],
-    });
-    await chatClient.connect();
+  public async send(config: SendConfig): Promise<Field> {
+    // not yet logged-in.
+    if (!this.channel || !this.chatClient) {
+      return undefined;
+    }
 
-    chatClient.onMessage((channel, user, message) => {
-      this.send({
+    await this.chatClient.say(this.channel, config.args.message);
+    return undefined;
+  }
+
+  async startReceiveThread(channel: string): Promise<void> {
+    this.chatClient = new ChatClient({
+      authProvider: this.authProvider,
+      channels: [channel],
+    });
+    await this.chatClient.connect();
+    this.channel = channel;
+
+    this.chatClient.onMessage((channel, user, message) => {
+      this.emit({
         event: 'twitch/message',
         channel: channel,
         user: user,

@@ -21,6 +21,9 @@ export type ComponentConfig = {
   // "when" field is an expression for conditional execution.
   // this expression don't need define with "$" prefix.
   when?: string;
+  // "instance" field is a unique identifier for component instance.
+  // if "instance" field is not defined, system generate default instance.
+  instance?: string;
   // "args" field is a list of arguments for component.
   args?: Arguments;
 };

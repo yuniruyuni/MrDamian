@@ -24,6 +24,13 @@ export type Arguments = Environment;
 // Parameters will filter a Arguments when it's applied to a module/component.
 export type Parameters = Environment;
 
+export function evaluateExpression(code: string, envs: Environment) {
+  const astFactory = new EvalAstFactory();
+  const expr = parse(code, astFactory);
+  // TODO: follow up the evaluate result was invalid case.
+  return expr?.evaluate(envs);
+}
+
 // evaluate function takes two arguments, target and envs.
 // target is the Parameters type that contains the expression string that starts with "$".
 // envs is the Environment type that contains the evaluated result of the Parameters type.
@@ -46,10 +53,7 @@ export function evaluate<T extends Arguments>(
       }
 
       const code = val.slice(1);
-      const astFactory = new EvalAstFactory();
-      const expr = parse(code, astFactory);
-      // TODO: follow up the evaluate result was invalid case.
-      const res = expr?.evaluate(envs);
+      const res = evaluateExpression(code, envs);
       return [key, res];
     }),
   );

@@ -18,19 +18,19 @@ const constructors: ComponentConstructors = {
 };
 
 async function run() {
-  const [sender, receiver] = eventChannel();
+  const [emitter, absorber] = eventChannel();
 
-  const factory = new ModuleFactory(constructors, sender);
+  const factory = new ModuleFactory(constructors, emitter);
   const params = await load("./config/main.json5");
   const mod = factory.constructModule(params);
 
   await mod.init({});
 
-  sender.send({
+  emitter.emit({
     event:  "system/initialize",
   });
 
-  for await (const event of receiver) {
+  for await (const event of absorber) {
     await mod.run(event);
   }
 }

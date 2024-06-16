@@ -59,12 +59,20 @@
       }
     },
     {
+      type: "periodic",
+      args: {
+        "interval": 3000,
+      },
+    },
+    {
       // when は一番よくあるargsの適用先
-      when: "$ panel.shoutout || (panel.auto_shoutout && periodic)",
-      type: "send",
+      // when: "$ panel.shoutout || (panel.auto_shoutout && periodic)",
+      type: "twitch",
+      action: "send",
+      instance: "main-channel",
 
       args: {
-        message: "'Discordチャンネルもあります！チャンネルポイント交換から！'"
+        message: "Discordチャンネルもあります！チャンネルポイント交換から！"
       }
     },
     {
