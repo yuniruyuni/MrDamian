@@ -1,3 +1,5 @@
+import deepmerge from 'deepmerge';
+
 import { type ModuleConfig } from './parameters';
 
 import { Environment, Parameters } from './variable';
@@ -40,8 +42,7 @@ export class Module {
       for (const key of keys.reverse()) {
         obj = { [key]: obj };
       }
-      // TODO: use deep merge.
-      return { ...env, ...(obj as Environment) };
+      return deepmerge(env, obj as Environment);
     }, Promise.resolve(filtered));
   }
 }
