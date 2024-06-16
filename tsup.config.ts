@@ -6,7 +6,9 @@ export default defineConfig({
   format: ['esm'],
   clean: true,
   sourcemap: true,
-  dts: true,
+  experimentalDts: {
+    entry: 'src/main.ts',
+  },
   bundle: true,
   noExternal:[ (/.*/)],
   banner(ctx) {

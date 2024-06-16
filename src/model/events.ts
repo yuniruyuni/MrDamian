@@ -1,4 +1,6 @@
-import Queue from 'in-queue';
+// importing src/queue for typechecking
+// refer: https://github.com/baji-ismail/in-queue/issues/3
+import Queue from 'in-queue/src/queue';
 import { Environment } from './variable';
 
 class EventChannel {

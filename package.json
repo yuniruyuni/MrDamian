@@ -15,6 +15,7 @@
     "prettier": "prettier --write --ignore-unknown src/**/*"
   },
   "devDependencies": {
+    "@microsoft/api-extractor": "^7.47.0",
     "@twurple/api": "^7.1.0",
     "@twurple/auth": "^7.1.0",
     "@twurple/chat": "^7.1.0",

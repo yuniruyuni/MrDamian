@@ -1,16 +1,16 @@
 import { expect, describe, it } from 'vitest';
-import { Parameters, Environment, evaluate } from './variable';
+import { Parameters, asParams, Arguments, asArgs, Environment, evaluate } from './variable';
 
 describe('Parameters', () => {
   it('can contains basic types', () => {
-    const params: Parameters = {
+    const params: Parameters = asParams({
       string: 'test',
       expression: '$ a < b',
       boolean: true,
       number: 1,
       array: [],
       object: {},
-    };
+    });
 
     for (const [k, v] of Object.entries(params)) {
       switch (k) {
@@ -40,16 +40,16 @@ describe('Parameters', () => {
   });
 });
 
-describe('Environment', {}, () => {
+describe('Arguments', {}, () => {
   it('can contains basic types', () => {
-    const params: Environment = {
+    const params: Arguments = asArgs({
       string: 'test',
       // "expression": "$ a < b", // Environment is already evaluated so expression type is not exists.
       boolean: true,
       number: 1,
       array: [],
       object: {},
-    };
+    });
 
     for (const [k, v] of Object.entries(params)) {
       switch (k) {
@@ -81,7 +81,7 @@ describe('Environment', {}, () => {
 
 describe('evaluate', {}, () => {
   it("transforms parameter's expression into environment value", () => {
-    const params: Parameters = {
+    const args: Arguments = asArgs({
       expression: '$ a < b',
       escaped_dollar: '$$a < b',
       spaced_dollar: ' $a < b',
@@ -90,12 +90,12 @@ describe('evaluate', {}, () => {
         string: 'a < b',
         expression: '$ a < b',
       },
-    };
+    });
     const envs: Environment = {
       a: 100,
       b: 200,
     };
-    const expected: Environment = {
+    const expected: Parameters = asParams({
       expression: true,
       escaped_dollar: '$a < b',
       spaced_dollar: ' $a < b',
@@ -104,9 +104,9 @@ describe('evaluate', {}, () => {
         string: 'a < b',
         expression: true,
       },
-    };
+    });
 
-    const actual = evaluate(params, envs);
+    const actual = evaluate(args, envs);
     expect(actual).toMatchObject(expected);
   });
 });

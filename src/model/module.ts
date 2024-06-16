@@ -1,6 +1,6 @@
 import { type ModuleConfig } from './parameters';
 
-import { Environment } from './variable';
+import { Environment, Parameters } from './variable';
 import { Pipeline } from './pipeline';
 
 export class Module {
@@ -21,7 +21,7 @@ export class Module {
   }
 
   async event(field: 'init' | 'run', init: Environment): Promise<Environment> {
-    const params = this.config.params ?? {};
+    const params: Parameters = this.config.params ?? {} as Parameters;
     // our component have default value as "params" in it's configuration file.
     const filled = { ...params, ...init };
     const filtered = this.config.main
