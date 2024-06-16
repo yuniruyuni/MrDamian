@@ -1,24 +1,29 @@
 {
+  // TODO: 親の側でinstance(twitchもdeeplも)を初期化したい。
+  // しかし本当はこのauto_translatorはどのインスタンスにも使えるようにしたい。
+  // この手の用法のことを考えると多分
+  // (インスタンス名を書き換えるために)初期化のときだけ取れて
+  // typeとかactionでも使えるようなjexpr構文を作らないといけない。
   params: {
-    message: "hello, world",
-    target: "ja",
+    target: "ja", // こっちはデフォルト値に意味があるけれど...
+    message: "hello, world", // こっちは適当なテキスト以外になり得ない...微妙かもしれない。
   },
   pipeline: [
     {
       type: "deepl",
-      action: "detect",
-      args: {
-        message: "$ message",
-      }
-    },
-    {
-      when: "deepl.detect !== 'ja'",
-      type: "deepl",
       action: "translate",
       args: {
         message: "$ message",
-        source: "$ deepl.detect",
         target: "$ target"
+      }
+    },
+    {
+      when: "deepl.source_lang !== 'ja'",
+      type: "twitch",
+      name: "main",
+      action: "send",
+      args: {
+        message: "$ deepl.text"
       }
     }
   ]

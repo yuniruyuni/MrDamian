@@ -152,8 +152,9 @@
         message: "Discordチャンネルもあります！チャンネルポイント交換から！"
       }
     },
-    // callコンポネント
     {
+      when: "twitch.main.message",
+      // callコンポネントはサブモジュールを呼び出すために使える
       type: "call",
       // ターゲットのサブモジュールの入ったjson5名を指定する
       path: "auto_translator.json5",
@@ -161,7 +162,7 @@
       // argsの内容が展開される。
       // paramsにないものは消える。
       args: {
-        message: "$ twitch.main.message",
+        message: "$ twitch.main.message.message",
       }
     },
     {

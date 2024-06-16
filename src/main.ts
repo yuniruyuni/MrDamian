@@ -4,6 +4,7 @@ import { eventChannel } from "./model/events";
 
 import { Twitch } from './component/twitch';
 import { Youtube } from './component/youtube';
+import { DeepL } from './component/deepl';
 import { Periodic } from './component/periodic';
 import { Datetime } from './component/datetime';
 import { Logger } from './component/logger';
@@ -13,6 +14,7 @@ import { Translate } from './component/translate';
 const constructors: ComponentConstructors = {
   twitch: Twitch,
   youtube: Youtube,
+  deepl: DeepL,
 
   periodic: Periodic,
   datetime: Datetime,
