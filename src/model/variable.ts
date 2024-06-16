@@ -46,10 +46,7 @@ export function evaluateExpression(code: string, envs: Environment) {
 // target is the Parameters type that contains the expression string that starts with "$".
 // envs is the Environment type that contains the evaluated result of the Parameters type.
 // evaluate function returns the Environment type that contains the evaluated result of the target.
-export function evaluate(
-  args: Arguments,
-  envs: Environment,
-): Environment {
+export function evaluate(args: Arguments, envs: Environment): Environment {
   return Object.fromEntries(
     Object.entries(args ?? {}).map(([key, val]) => {
       if (typeof val === 'object' && Array.isArray(val))

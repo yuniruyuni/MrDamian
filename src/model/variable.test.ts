@@ -1,5 +1,12 @@
 import { expect, describe, it } from 'vitest';
-import { Parameters, asParams, Arguments, asArgs, Environment, evaluate } from './variable';
+import {
+  Parameters,
+  asParams,
+  Arguments,
+  asArgs,
+  Environment,
+  evaluate,
+} from './variable';
 
 describe('Parameters', () => {
   it('can contains basic types', () => {
