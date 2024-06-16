@@ -4,13 +4,11 @@ import { Component } from '../../model/component';
 import fs from 'fs/promises';
 import path from 'path';
 
-type LoggerArgs = {
-  path: string;
-  output: Field;
-};
-
 type LoggerConfig = ComponentConfig & {
-  args: LoggerArgs;
+  args: {
+    path: string,
+    output: Field,
+  };
 };
 
 export class Logger extends Component<LoggerConfig> {

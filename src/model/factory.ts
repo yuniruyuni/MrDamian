@@ -84,12 +84,12 @@ class Call extends Component<CallConfig> {
     this.submodule = factory.constructModule(config.module);
   }
 
-  async init(env: Environment): Promise<Environment> {
-    return await this.submodule.init(env);
+  async init(config: CallConfig): Promise<Environment> {
+    return await this.submodule.init(config.args);
   }
 
-  async run(env: Environment): Promise<Environment> {
-    return await this.submodule.run(env);
+  async run(config: CallConfig): Promise<Environment> {
+    return await this.submodule.run(config.args);
   }
 }
 
