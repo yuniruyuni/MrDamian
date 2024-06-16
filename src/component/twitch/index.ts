@@ -24,16 +24,16 @@ type TwitchConfig = ComponentConfig & (LoginConfig | SendConfig);
 function isLoginConfig(
   config: TwitchConfig,
 ): config is ComponentConfig & LoginConfig {
-  switch (config.action) {
-    case 'login':
-      return true;
-    case '':
-      return true;
-    case undefined:
-      return true;
-    default:
-      return false;
-  }
+  if( config.action === undefined ) return true;
+  if( config.action === '' ) return true;
+  if( config.action === 'login' ) return true;
+  return false;
+}
+
+function isSendConfig(
+  config: TwitchConfig,
+): config is ComponentConfig & SendConfig {
+  return config.action === 'send';
 }
 
 export class Twitch extends Component<TwitchConfig> {
@@ -47,16 +47,15 @@ export class Twitch extends Component<TwitchConfig> {
   }
 
   async run(config: TwitchConfig): Promise<Field> {
-    switch (config.action) {
-      case 'login':
-      case '':
-      case undefined:
-        return undefined;
-      case 'send':
-        return await this.send(config);
-      default:
-        return undefined;
+    if( isLoginConfig(config) ) {
+      return undefined;
     }
+
+    if( isSendConfig(config) ) {
+      return await this.send(config);
+    }
+
+    return undefined;
   }
 
   authProvider: StaticAuthProvider;
