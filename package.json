@@ -46,6 +46,7 @@
   },
   "license": "MIT",
   "dependencies": {
+    "dayjs": "^1.11.11",
     "express": "^4.19.2",
     "in-queue": "^1.2.1",
     "jexpr": "^1.0.0-pre.9",

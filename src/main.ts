@@ -5,6 +5,7 @@ import { eventChannel } from "./model/events";
 import { Twitch } from './component/twitch';
 import { Youtube } from './component/youtube';
 import { Periodic } from './component/periodic';
+import { Datetime } from './component/datetime';
 import { Logger } from './component/logger';
 import { Panel } from './component/panel';
 import { Translate } from './component/translate';
@@ -14,6 +15,7 @@ const constructors: ComponentConstructors = {
   youtube: Youtube,
 
   periodic: Periodic,
+  datetime: Datetime,
   logger: Logger,
   panel: Panel,
   translate: Translate,

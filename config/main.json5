@@ -16,6 +16,7 @@
 
       // whenはコンポネントの実行条件を指定するフィールドで、
       // jexpr構文が常に適用される。そのため $ を指定する必要がない。
+      // しかしこの条件に関係なくinit()は実行されるので初期化は常に可能。
       when: "condition && condition2",
 
       // argsはコンポネントの実行時に渡る引数のオブジェクトで、
@@ -126,10 +127,8 @@
       // Componentの一般論として(type).(name) に trueが入るのだが
       // この場合はnameを持たないので、単に periodic に true が入る。
       type: "periodic",
-      args: {
-        // その実行時間。ミリ秒単位。この場合3秒。
-        "interval": 3000,
-      },
+      // その実行時間。ミリ秒単位。この場合3秒。
+      "interval": 3000,
     },
     {
       // 上記のようなperiodicの値が登録されるため
@@ -162,10 +161,11 @@
       // argsの内容が展開される。
       // paramsにないものは消える。
       args: {
-        message: "$ message",
+        message: "$ twitch.main.message",
       }
     },
     {
+      when: "twitch.main.message",
       type: "call",
       path: "logger.json5",
       args: {

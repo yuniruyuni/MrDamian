@@ -72,11 +72,6 @@ async function loadComponentConfig(
   path: string,
   config: ComponentConfig,
 ): Promise<ComponentConfig> {
-  // expand default name as type.
-  if (config.name === undefined) {
-    config.name = config.type;
-  }
-
   if (isCallConfig(config)) {
     const base_dir = dirname(path);
     const mpath = `${base_dir}/${config.path}`;

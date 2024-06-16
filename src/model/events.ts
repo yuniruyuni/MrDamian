@@ -65,7 +65,7 @@ export class NamedEventEmitter {
 
   emit(field: Field): void {
     let obj = field;
-    for (const key of this.keys) {
+    for (const key of this.keys.reverse()) {
       obj = { [key]: obj };
     }
     // key must not be 0-length, so obj will be always Environment.
