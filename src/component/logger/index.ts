@@ -6,8 +6,8 @@ import path from 'path';
 
 type LoggerConfig = ComponentConfig & {
   args: {
-    path: string,
-    output: Field,
+    path: string;
+    output: Field;
   };
 };
 
