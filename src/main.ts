@@ -4,6 +4,7 @@ import { eventChannel } from "./model/events";
 
 import { Twitch } from './component/twitch';
 import { Youtube } from './component/youtube';
+import { Periodic } from './component/periodic';
 import { Logger } from './component/logger';
 import { Panel } from './component/panel';
 import { Translate } from './component/translate';
@@ -12,6 +13,7 @@ const constructors: ComponentConstructors = {
   twitch: Twitch,
   youtube: Youtube,
 
+  periodic: Periodic,
   logger: Logger,
   panel: Panel,
   translate: Translate,
@@ -27,7 +29,9 @@ async function run() {
   await mod.init({});
 
   emitter.emit({
-    event:  "system/initialize",
+    system: {
+      initialied: true,
+    },
   });
 
   for await (const event of absorber) {

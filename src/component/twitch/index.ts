@@ -91,10 +91,11 @@ export class Twitch extends Component<TwitchConfig> {
 
     this.chatClient.onMessage((channel, user, message) => {
       this.emit({
-        event: 'twitch/message',
-        channel: channel,
-        user: user,
-        message: message,
+        message: {
+          channel: channel,
+          user: user,
+          message: message,
+        }
       });
     });
   }

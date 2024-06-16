@@ -1,13 +1,25 @@
 {
   params: {
-    path: "message.log",
+    // 引数はこのようにデフォルト値を設定したものを受け取る。
+    dir: "./log",
+    // 「すべてのオブジェクト(副階層を潰さない)」みたいな指定方法が
+    // 現状の方法だと存在していないのでどうしようかな？
     output: {},
   },
   pipeline: [
     {
+      type: "datetime",
+      args: {
+        format: "YYYY-MM-DD",
+      }
+    },
+    {
       type: "logger",
       args: {
-        path: "$ path",
+        path: "$ dir + '/' + datetime + '.log'",
+        // オブジェクト自体を渡すことができるので
+        // outputに指定されたオブジェクトを
+        // そのままJSONとして出力できる
         output: "$ output",
       }
     }

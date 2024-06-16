@@ -5,15 +5,19 @@
   },
   pipeline: [
     {
-      type: "detect_language",
-      message: "$ message",
-    },
-    {
-      when: "detect_language !== 'ja'",
-      type: "translate",
+      type: "deepl",
+      action: "detect",
       args: {
         message: "$ message",
-        source: "$ source",
+      }
+    },
+    {
+      when: "deepl.detect !== 'ja'",
+      type: "deepl",
+      action: "translate",
+      args: {
+        message: "$ message",
+        source: "$ deepl.detect",
         target: "$ target"
       }
     }

@@ -1,85 +1,166 @@
 {
   pipeline: [
-    // typeだけはjexprによる式を受け取ることができないが、
-    // それ以外はありとあらゆるフィールドがjexprを使える…というルール付けにしてしまおうと思う
-    // そして文字列の頭が$で始まる時のみjexprに渡るので普段はただの文字列に見える。
-    // $$で$をエスケープした文字列もいける
-    /*
     {
-      "type": "$ component_type", // typeにjexpr構文がきた場合は特別にエラーを発行する。つまりcomponent typeだけ固定値。
+      // typeはcomponentの種類を指定するフィールド
+      type: "non-exist-component",
+
+      // typeにjexpr構文がきた場合はエラーになる。
+      // type: "$ value", // つまりこれはエラーになる
+
+      // nameはコンポネントのインスタンスの名称で、
+      // パイプライン全体を通して同じnameを持つcomponentは
+      // すべて内部データを共有している。
+      // また出力データ(=Environment)のキーとしても使われる。
+      // nameにはjexpr構文を使うことができない。
+      name: "main",
+
+      // whenはコンポネントの実行条件を指定するフィールドで、
+      // jexpr構文が常に適用される。そのため $ を指定する必要がない。
+      when: "condition && condition2",
+
+      // argsはコンポネントの実行時に渡る引数のオブジェクトで、
+      // このオブジェクトの中身はjexpr構文が適用される。
+      args: {
+        // つまりこのように書いた場合、valueの中身が展開される。
+        key: "$ value",
+        recursive: {
+          // このように子ノードで書いた場合もvalueが展開される。
+          key: "$ value",
+          // jexpr構文なのでもちろん比較演算等も行うことができる
+          less: "$ value < 10",
+          // 文字列の結合や(システムで登録された)関数の適用なども行うことができる。
+          concat: "$ format('{}: {}', value1, value2)",
+        },
+      },
     },
-    */
     // twitchコンポネント例
     {
       type: "twitch",
-      // subtypeがないならコンポネントの初期化
-      instance: "main-channel", // 指定がなかったら空文字列がインスタンス名
-      // "client_id": "'xxxxxxxxxx'", // client_idは組み込みの値を使って構わないはずで不要にできる
+
+      // twitchコンポネントの場合
+      // actionがないならコンポネントの初期化
+      // "init"や""でも初期化。
+      // "send"など別の名称ならそのアクションを実行する。
+      // こういうふうに共通nameだとインスタンスが共通になるという性質をつかって
+      // ログインセッションなどの情報を複数のパイプライン内の処理で使い回すことができる。
+      // action: "init",
+
+      // { twitch: { main: (ここ) }} に値がアサインされる。
+      // 指定がなかったら { twitch: ここ } にアサインされる。
+      name: "main",
+
+      // client_idは組み込みの値があるので省略して構わない。
+      // ただユーザがどうしてもMrDamianを自前で作りたい場合のために
+      // 組み込んだものとは違うclient_idを指定できるようにするかな要検討。
+      // "client_id": "'xxxxxxxxxx'",
+
+      // channelは配信者のチャンネル名。
       channel: "yuniruyuni"
     },
     // youtubeコンポネント例
     {
+      // 多分twitchと使い心地は同じ感じにできる。
       // APIは https://developers.google.com/youtube/v3/live/docs?hl=ja が使える
       // OAuthのdevice code grant flowも存在する: https://developers.google.com/identity/protocols/oauth2/native-app?hl=ja
-      // 多分twitchと使い心地は同じ感じにできる。
       type: "youtube",
-      // subtypeがないならコンポネントの初期化
-      instance: "main-channel",
+      // actionがないならコンポネントの初期化
+
+      // nameでインスタンスをmain二設定
+      name: "main",
+
+      // channelは配信者のチャンネル名。
       channel: "yuniruyuni"
+    },
+    // deeplコンポネント
+    {
+      type: "deepl",
+      // actionがないのでこれもセッション初期化。
+      apikey: "DEEPL_API_KEY", // TODO: ここに値を書かせるかどうか...結構悩ましい
     },
     {
       type: "panel",
-      // subtypeがないならcomponentsの初期化
       // pipelineにおけるcomponent(これ自体)と被ってるからいい名称が必要。form?
       args: {
         components: [
           {
-            type: "toggle", // トグルボタン。クリック時イベント発生し、次のイベントからはずっと値が入っている。
+            // トグルボタン。
+            // ON/OFFに応じて、ここに入ってきたイベントに
+            // nameで与えたフィールドがtrue/falseで追加される。
+            // この場合は panel.auto_shoutout に true や false が入る
+            type: "toggle",
             name: "auto_shoutout",
             text: "Auto shoutout"
           },
           {
-            type: "button", // ボタン。クリックごとにイベント発生
+            // ボタン。この設定値の場合クリックごとに
+            // panel.shoutout = true
+            // という値を持ったイベントが発火
+            type: "button",
             name: "shoutout",
             text: "Send shoutout"
           },
           {
-            type: "text", // テキストラベル
+            // テキストラベル
+            // ユーザ画面上にテキストを表示する
+            type: "text",
             name: "latest_message",
             // 1文字目が $ で始まるので jexpr に渡る。
             // このようにオブジェクトの内側にあっても相変わらずjexprの呼び出しが可能である。
             text: "$ format('{}: {}', message.name, message.text)"
           },
           {
-            type: "$ hoge", // ここにtypeとかあってもjexprの展開を許すことになるだろうけれど
+            // ここにtypeとかあってもjexprの展開を許すことになるだろうけれど...
+            type: "$ hoge",
             name: "hoge_component",
-            hoge: "hogehoge", // こういうふうに引数が噛み合わなくなるのを回避できないのでは？とは思う。
+            // こういうふうに引数が噛み合わなくなるのを回避できない
+            // が、それはユーザの勝手に任せることにした。
+            // コンポネントの実装に応じて
+            // 実行時エラーになったり無視されるだろう。
+            hoge: "hogehoge",
           }
         ],
       }
     },
     {
+      // 定期的にイベントを発行するコンポネント
+      // Componentの一般論として(type).(name) に trueが入るのだが
+      // この場合はnameを持たないので、単に periodic に true が入る。
       type: "periodic",
       args: {
+        // その実行時間。ミリ秒単位。この場合3秒。
         "interval": 3000,
       },
     },
     {
-      // when は一番よくあるargsの適用先
+      // 上記のようなperiodicの値が登録されるため
+      // periodicイベントを受けて定期的なメッセージを送信するには
+      // 単にperiodicと書けばよいことになる
+      when: "periodic",
+      // TODO: panel.shoutoutとかpanel.auto_shoutoutが実現したら
+      //       以下のwhenを有効にしたサンプルに変えたい
       // when: "$ panel.shoutout || (panel.auto_shoutout && periodic)",
+
+      // 同じtwitchコンポネントのmainインスタンスなのだけれど
       type: "twitch",
+      name: "main",
+
+      // actionとしてsendを指定すると、
+      // 同じインスタンスの接続を使ってメッセージ送信を行える
       action: "send",
-      instance: "main-channel",
 
       args: {
+        // この部分はもちろんargsなのでjexprが使える(今回はただの定数)
         message: "Discordチャンネルもあります！チャンネルポイント交換から！"
       }
     },
+    // callコンポネント
     {
       type: "call",
+      // ターゲットのサブモジュールの入ったjson5名を指定する
       path: "auto_translator.json5",
-      // もし twitchの "instance" が空文字列なら何も指定しなくてよい。
-      instance: "main-channel",
+      // サブモジュール側のparamsで設定されている変数に
+      // argsの内容が展開される。
+      // paramsにないものは消える。
       args: {
         message: "$ message",
       }
@@ -88,11 +169,11 @@
       type: "call",
       path: "logger.json5",
       args: {
-        path: "./log/twitch/message.log",
+        dir: "./log/twitch/",
         output: {
-          name: "$ user",
-          message: "$ message",
-          channel: "$ channel",
+          channel: "$ twitch.main.message.channel",
+          user: "$ twitch.main.message.user",
+          message: "$ twitch.main.message.message",
         },
       }
     }

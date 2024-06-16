@@ -1,7 +1,7 @@
 // importing src/queue for typechecking
 // refer: https://github.com/baji-ismail/in-queue/issues/3
 import Queue from 'in-queue/src/queue';
-import { Environment } from './variable';
+import { Environment, Field } from './variable';
 
 class EventChannel {
   queue: Queue<Environment>;
@@ -51,4 +51,24 @@ export class EventEmitter {
 export function eventChannel(): [EventEmitter, EventAbsorber] {
   const channel = new EventChannel();
   return [new EventEmitter(channel), new EventAbsorber(channel)];
+}
+
+export class NamedEventEmitter {
+  emitter: EventEmitter;
+  keys: string[];
+  constructor(emitter: EventEmitter, keys: string[]) {
+    console.assert(keys.length > 0);
+
+    this.emitter = emitter;
+    this.keys = keys;
+  }
+
+  emit(field: Field): void {
+    let obj = field;
+    for (const key of this.keys) {
+      obj = { [key]: obj };
+    }
+    // key must not be 0-length, so obj will be always Environment.
+    this.emitter.emit(obj as Environment);
+  }
 }

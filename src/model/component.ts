@@ -1,7 +1,7 @@
 import { type ComponentConfig } from './parameters';
 
 import { Field, Environment, evaluate, evaluateExpression } from './variable';
-import { EventEmitter } from './events';
+import { NamedEventEmitter } from './events';
 
 export class ComponentWithConfig<C extends ComponentConfig> {
   readonly component: Component<C>;
@@ -36,13 +36,13 @@ export class ComponentWithConfig<C extends ComponentConfig> {
 }
 
 export abstract class Component<C extends ComponentConfig> {
-  private readonly emitter: EventEmitter;
+  private readonly emitter: NamedEventEmitter;
 
-  constructor(emitter: EventEmitter) {
+  constructor(emitter: NamedEventEmitter) {
     this.emitter = emitter;
   }
 
-  emit(event: Environment) {
+  emit(event: Field) {
     this.emitter.emit(event);
   }
 

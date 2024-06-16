@@ -7,13 +7,13 @@ import {
 } from './parameters';
 
 import { Environment } from './variable';
-import { EventEmitter } from './events';
+import { EventEmitter, NamedEventEmitter } from './events';
 import { Component, ComponentWithConfig } from './component';
 import { Pipeline } from './pipeline';
 import { Module } from './module';
 
 export interface ComponentConstructor<T extends ComponentConfig> {
-  new (emitter: EventEmitter): Component<T>;
+  new (emitter: NamedEventEmitter): Component<T>;
 }
 
 export type ComponentConstructors = {
@@ -44,30 +44,34 @@ export class ModuleFactory {
   constructComponentWithConfig(
     config: ComponentConfig,
   ): ComponentWithConfig<ComponentConfig> {
+    // filter if key is undefined.
+    const keys = [config.type, config.name].filter((v) => v);
+    const key = JSON.stringify(keys);
+    const emitter = new NamedEventEmitter(this.emitter, keys);
+
     // Call component should not be cached because Call is system component.
     if (isCallConfig(config)) {
       return new ComponentWithConfig(
-        new Call(config, this.emitter, this),
+        new Call(config, emitter, this),
         config,
       );
     }
 
-    const key = JSON.stringify([config.type, config.instance]);
     let component = this.instances.get(key);
     if (!component) {
-      component = this.constructComponent(config);
+      component = this.constructComponent(config, emitter);
       this.instances.set(key, component);
     }
     return new ComponentWithConfig(component, config);
   }
 
-  constructComponent(config: ComponentConfig): Component<ComponentConfig> {
+  constructComponent(config: ComponentConfig, emitter: NamedEventEmitter): Component<ComponentConfig> {
     const constructor = this.constructors[config.type];
     if (!constructor) {
       console.log(`Unsupported component: ${config.type}`);
-      return new Unsupported(this.emitter);
+      return new Unsupported(emitter);
     }
-    return new constructor(this.emitter);
+    return new constructor(emitter);
   }
 }
 
@@ -76,7 +80,7 @@ class Call extends Component<CallConfig> {
 
   constructor(
     config: CallConfig,
-    emitter: EventEmitter,
+    emitter: NamedEventEmitter,
     factory: ModuleFactory,
   ) {
     super(emitter);
