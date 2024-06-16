@@ -37,7 +37,7 @@ export class Module {
       // TODO: split this into some function...(it is as same as component.ts)
       const keys = [comp.config.type, comp.config.name].filter((v) => v);
       let obj = ret;
-      for(const key of keys.reverse()) {
+      for (const key of keys.reverse()) {
         obj = { [key]: obj };
       }
       // TODO: use deep merge.

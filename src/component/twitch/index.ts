@@ -24,9 +24,9 @@ type TwitchConfig = ComponentConfig & (LoginConfig | SendConfig);
 function isLoginConfig(
   config: TwitchConfig,
 ): config is ComponentConfig & LoginConfig {
-  if( config.action === undefined ) return true;
-  if( config.action === '' ) return true;
-  if( config.action === 'login' ) return true;
+  if (config.action === undefined) return true;
+  if (config.action === '') return true;
+  if (config.action === 'login') return true;
   return false;
 }
 
@@ -47,11 +47,11 @@ export class Twitch extends Component<TwitchConfig> {
   }
 
   async run(config: TwitchConfig): Promise<Field> {
-    if( isLoginConfig(config) ) {
+    if (isLoginConfig(config)) {
       return undefined;
     }
 
-    if( isSendConfig(config) ) {
+    if (isSendConfig(config)) {
       return await this.send(config);
     }
 
@@ -94,7 +94,7 @@ export class Twitch extends Component<TwitchConfig> {
           channel: channel,
           user: user,
           message: message,
-        }
+        },
       });
     });
   }

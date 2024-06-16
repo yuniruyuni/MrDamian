@@ -51,10 +51,7 @@ export class ModuleFactory {
 
     // Call component should not be cached because Call is system component.
     if (isCallConfig(config)) {
-      return new ComponentWithConfig(
-        new Call(config, emitter, this),
-        config,
-      );
+      return new ComponentWithConfig(new Call(config, emitter, this), config);
     }
 
     let component = this.instances.get(key);
@@ -65,7 +62,10 @@ export class ModuleFactory {
     return new ComponentWithConfig(component, config);
   }
 
-  constructComponent(config: ComponentConfig, emitter: NamedEventEmitter): Component<ComponentConfig> {
+  constructComponent(
+    config: ComponentConfig,
+    emitter: NamedEventEmitter,
+  ): Component<ComponentConfig> {
     const constructor = this.constructors[config.type];
     if (!constructor) {
       console.log(`Unsupported component: ${config.type}`);

@@ -7,7 +7,7 @@ import dayjs from 'dayjs';
 type DatetimeConfig = ComponentConfig & {
   args: {
     format: string;
-  }
+  };
 };
 
 export class Datetime extends Component<DatetimeConfig> {

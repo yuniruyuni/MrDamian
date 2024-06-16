@@ -17,7 +17,7 @@ export class Periodic extends Component<PeriodicConfig> {
     return undefined;
   }
   async start(config: PeriodicConfig): Promise<void> {
-    for( ; ; ) {
+    for (;;) {
       await setTimeout(config.interval);
       this.emit(true);
     }
