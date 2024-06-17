@@ -127,8 +127,8 @@
       // Componentの一般論として(type).(name) に trueが入るのだが
       // この場合はnameを持たないので、単に periodic に true が入る。
       type: "periodic",
-      // その実行時間。ミリ秒単位。この場合3秒。
-      "interval": 3000,
+      // その実行時間。ミリ秒単位。この場合3分。
+      "interval": 180000,
     },
     {
       // 上記のようなperiodicの値が登録されるため

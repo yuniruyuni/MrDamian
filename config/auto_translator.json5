@@ -25,6 +25,24 @@
       args: {
         message: "$ deepl.text"
       }
+    },
+    {
+      when: "deepl.source_lang === 'ja'",
+      type: "deepl",
+      action: "translate",
+      args: {
+        message: "$ message",
+        target: "en"
+      }
+    },
+    {
+      when: "deepl.source_lang === 'ja'",
+      type: "twitch",
+      name: "main",
+      action: "send",
+      args: {
+        message: "$ deepl.text"
+      }
     }
   ]
 }
