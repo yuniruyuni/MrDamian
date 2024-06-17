@@ -75,6 +75,8 @@ export class ModuleFactory {
   }
 }
 
+// TODO: rename as Submodule
+// TODO: allow direct definition submodule (not file path but configure object.)
 class Call extends Component<CallConfig> {
   submodule: Module;
 
