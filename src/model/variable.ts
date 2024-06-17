@@ -1,4 +1,4 @@
-import { parse, EvalAstFactory } from 'jexpr';
+import { EvalAstFactory, parse } from "jexpr";
 
 export type Field =
   | Environment
@@ -49,16 +49,16 @@ export function evaluateExpression(code: string, envs: Environment) {
 export function evaluate(args: Arguments, envs: Environment): Environment {
   return Object.fromEntries(
     Object.entries(args ?? {}).map(([key, val]) => {
-      if (typeof val === 'object' && Array.isArray(val))
+      if (typeof val === "object" && Array.isArray(val))
         return [key, val.map((v) => evaluate(v as Arguments, envs))];
-      if (typeof val === 'object')
+      if (typeof val === "object")
         return [key, evaluate(val as Arguments, envs)];
-      if (typeof val !== 'string') return [key, val];
+      if (typeof val !== "string") return [key, val];
 
       // check if it's an expression.
       if (val.length < 2) return [key, val];
-      if (val[0] !== '$') return [key, val];
-      if (val[0] === '$' && val[1] === '$') {
+      if (val[0] !== "$") return [key, val];
+      if (val[0] === "$" && val[1] === "$") {
         return [key, val.slice(1)];
       }
 

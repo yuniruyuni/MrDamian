@@ -1,8 +1,8 @@
-import { setTimeout } from 'timers/promises';
-import open from 'open';
-import { StaticAuthProvider } from '@twurple/auth';
+import { setTimeout } from "node:timers/promises";
+import { StaticAuthProvider } from "@twurple/auth";
+import open from "open";
 
-const clientId = 'vpqmjg81mnkdsu1llaconpz0oayuqt'; // MrDamian's client id.
+const clientId = "vpqmjg81mnkdsu1llaconpz0oayuqt"; // MrDamian's client id.
 
 type OAuth2DeviceResponse = {
   device_code: string;
@@ -33,7 +33,7 @@ export class DeviceCodeGrantFlow {
     const device_code = deviceRes.device_code;
 
     // TODO: add polling timeout.
-    let tokenRes;
+    let tokenRes: OAuth2TokenResponse | OAuth2TokenErrorResponse;
     do {
       tokenRes = await this.fetchTokenByDeviceCode(device_code);
       await setTimeout(1000); // 1second.
@@ -47,7 +47,10 @@ export class DeviceCodeGrantFlow {
       client_id: clientId,
       scopes: this.scopesstr(),
     };
-    return this.post('https://id.twitch.tv/oauth2/device', obj);
+    return (await this.post(
+      "https://id.twitch.tv/oauth2/device",
+      obj,
+    )) as OAuth2DeviceResponse;
   }
 
   async fetchTokenByDeviceCode(
@@ -57,50 +60,50 @@ export class DeviceCodeGrantFlow {
       client_id: clientId,
       scopes: this.scopesstr(),
       device_code,
-      grant_type: 'urn:ietf:params:oauth:grant-type:device_code',
+      grant_type: "urn:ietf:params:oauth:grant-type:device_code",
     };
-    return await this.post('https://id.twitch.tv/oauth2/token', obj);
+    return (await this.post("https://id.twitch.tv/oauth2/token", obj)) as
+      | OAuth2TokenResponse
+      | OAuth2TokenErrorResponse;
   }
 
-  // because json result is essentialy any, disable eslint for any type.
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  async post(url: string, obj: { [key: string]: string }): Promise<any> {
-    const method = 'POST';
+  async post(url: string, obj: { [key: string]: string }): Promise<unknown> {
+    const method = "POST";
     const body = Object.entries(obj)
       .map(
         ([key, value]) =>
           `${encodeURIComponent(key)}=${encodeURIComponent(value)}`,
       )
-      .join('&');
+      .join("&");
     const headers = {
-      Accept: 'application/json',
-      'Content-Type': 'application/x-www-form-urlencoded; charset=utf-8',
+      Accept: "application/json",
+      "Content-Type": "application/x-www-form-urlencoded; charset=utf-8",
     };
     const res = await fetch(url, { method, headers, body });
     return await res.json();
   }
 
   scopesstr(): string {
-    return this.scopes().join(' ');
+    return this.scopes().join(" ");
   }
 
   scopes(): string[] {
     return [
-      'moderator:manage:shoutouts',
-      'moderator:manage:announcements',
-      'user:manage:chat_color',
-      'chat:edit',
-      'chat:read',
-      'user:edit:broadcast',
-      'channel:manage:broadcast',
-      'channel_editor',
+      "moderator:manage:shoutouts",
+      "moderator:manage:announcements",
+      "user:manage:chat_color",
+      "chat:edit",
+      "chat:read",
+      "user:edit:broadcast",
+      "channel:manage:broadcast",
+      "channel_editor",
     ];
   }
 
   tokenReceiveSuccessful(
     res: OAuth2TokenResponse | OAuth2TokenErrorResponse,
   ): res is OAuth2TokenResponse {
-    if ('status' in res && res.status === 400) return false;
+    if ("status" in res && res.status === 400) return false;
     return true;
   }
 }

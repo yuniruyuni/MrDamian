@@ -1,30 +1,36 @@
-import { type Field } from '../../model/variable';
-import { type ComponentConfig } from '../../model/parameters';
-import { Component } from '../../model/component';
+import { Component } from "../../model/component";
+import type { ComponentConfig } from "../../model/parameters";
+import type { Field } from "../../model/variable";
 
-import { Translator, SourceLanguageCode, TargetLanguageCode } from 'deepl-node';
+import {
+  type SourceLanguageCode,
+  type TargetLanguageCode,
+  Translator,
+} from "deepl-node";
 
 type InitConfig = {
-  action: 'init' | '' | undefined;
+  action: "init" | "" | undefined;
   apikey: string;
 };
 
-function isInitConfig(config: DeepLConfig): config is ComponentConfig & InitConfig {
-  if( config.action === undefined ) return true;
-  if( config.action === '' ) return true;
-  if( config.action === 'init' ) return true;
+function isInitConfig(
+  config: DeepLConfig,
+): config is ComponentConfig & InitConfig {
+  if (config.action === undefined) return true;
+  if (config.action === "") return true;
+  if (config.action === "init") return true;
   return false;
 }
 
 type DetectConfig = {
-  action: 'detect';
+  action: "detect";
   args: {
     message: string;
   };
 };
 
 type TranslateConfig = {
-  action: 'translate';
+  action: "translate";
   args: {
     message: string;
     source?: string;
@@ -32,11 +38,8 @@ type TranslateConfig = {
   };
 };
 
-type DeepLConfig = ComponentConfig & (
-  | InitConfig
-  | DetectConfig
-  | TranslateConfig
-);
+type DeepLConfig = ComponentConfig &
+  (InitConfig | DetectConfig | TranslateConfig);
 
 export class DeepL extends Component<DeepLConfig> {
   translator: Translator;
@@ -49,17 +52,17 @@ export class DeepL extends Component<DeepLConfig> {
 
   async run(config: DeepLConfig): Promise<Field> {
     switch (config.action) {
-      case 'translate':
+      case "translate":
         return await this.translate(config);
     }
     return undefined;
   }
 
   async translate(config: TranslateConfig): Promise<Field> {
-    if( !this.translator ) return undefined;
+    if (!this.translator) return undefined;
     const results = await this.translator.translateText(
       config.args.message,
-      config.args.source ? config.args.source as SourceLanguageCode : null,
+      config.args.source ? (config.args.source as SourceLanguageCode) : null,
       config.args.target as TargetLanguageCode,
     );
     return {

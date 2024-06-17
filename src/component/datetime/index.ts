@@ -1,8 +1,8 @@
-import { type Field } from '../../model/variable';
-import { type ComponentConfig } from '../../model/parameters';
-import { Component } from '../../model/component';
+import { Component } from "../../model/component";
+import type { ComponentConfig } from "../../model/parameters";
+import type { Field } from "../../model/variable";
 
-import dayjs from 'dayjs';
+import dayjs from "dayjs";
 
 type DatetimeConfig = ComponentConfig & {
   args: {

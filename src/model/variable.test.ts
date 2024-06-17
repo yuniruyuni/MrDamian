@@ -1,18 +1,18 @@
-import { expect, describe, it } from 'vitest';
+import { describe, expect, it } from "vitest";
 import {
-  Parameters,
-  asParams,
-  Arguments,
+  type Arguments,
+  type Environment,
+  type Parameters,
   asArgs,
-  Environment,
+  asParams,
   evaluate,
-} from './variable';
+} from "./variable";
 
-describe('Parameters', () => {
-  it('can contains basic types', () => {
+describe("Parameters", () => {
+  it("can contains basic types", () => {
     const params: Parameters = asParams({
-      string: 'test',
-      expression: '$ a < b',
+      string: "test",
+      expression: "$ a < b",
       boolean: true,
       number: 1,
       array: [],
@@ -21,22 +21,22 @@ describe('Parameters', () => {
 
     for (const [k, v] of Object.entries(params)) {
       switch (k) {
-        case 'boolean':
+        case "boolean":
           expect(v).toMatchObject(true);
           break;
-        case 'number':
+        case "number":
           expect(v).toMatchObject(1);
           break;
-        case 'string':
-          expect(v).toMatchObject('test');
+        case "string":
+          expect(v).toMatchObject("test");
           break;
-        case 'expression':
-          expect(v).toMatchObject('$ a < b');
+        case "expression":
+          expect(v).toMatchObject("$ a < b");
           break;
-        case 'array':
+        case "array":
           expect(v).toMatchObject([]);
           break;
-        case 'object':
+        case "object":
           expect(v).toMatchObject({});
           break;
         default:
@@ -47,10 +47,10 @@ describe('Parameters', () => {
   });
 });
 
-describe('Arguments', {}, () => {
-  it('can contains basic types', () => {
+describe("Arguments", {}, () => {
+  it("can contains basic types", () => {
     const params: Arguments = asArgs({
-      string: 'test',
+      string: "test",
       // "expression": "$ a < b", // Environment is already evaluated so expression type is not exists.
       boolean: true,
       number: 1,
@@ -60,22 +60,22 @@ describe('Arguments', {}, () => {
 
     for (const [k, v] of Object.entries(params)) {
       switch (k) {
-        case 'boolean':
+        case "boolean":
           expect(v).toMatchObject(true);
           break;
-        case 'number':
+        case "number":
           expect(v).toMatchObject(1);
           break;
-        case 'string':
-          expect(v).toMatchObject('test');
+        case "string":
+          expect(v).toMatchObject("test");
           break;
-        case 'expression':
-          expect(v).toMatchObject('$ a < b');
+        case "expression":
+          expect(v).toMatchObject("$ a < b");
           break;
-        case 'array':
+        case "array":
           expect(v).toMatchObject([]);
           break;
-        case 'object':
+        case "object":
           expect(v).toMatchObject({});
           break;
         default:
@@ -86,16 +86,16 @@ describe('Arguments', {}, () => {
   });
 });
 
-describe('evaluate', {}, () => {
+describe("evaluate", {}, () => {
   it("transforms parameter's expression into environment value", () => {
     const args: Arguments = asArgs({
-      expression: '$ a < b',
-      escaped_dollar: '$$a < b',
-      spaced_dollar: ' $a < b',
-      string: 'a < b',
+      expression: "$ a < b",
+      escaped_dollar: "$$a < b",
+      spaced_dollar: " $a < b",
+      string: "a < b",
       recursive: {
-        string: 'a < b',
-        expression: '$ a < b',
+        string: "a < b",
+        expression: "$ a < b",
       },
     });
     const envs: Environment = {
@@ -104,11 +104,11 @@ describe('evaluate', {}, () => {
     };
     const expected: Parameters = asParams({
       expression: true,
-      escaped_dollar: '$a < b',
-      spaced_dollar: ' $a < b',
-      string: 'a < b',
+      escaped_dollar: "$a < b",
+      spaced_dollar: " $a < b",
+      string: "a < b",
       recursive: {
-        string: 'a < b',
+        string: "a < b",
         expression: true,
       },
     });

@@ -1,7 +1,7 @@
 // importing src/queue for typechecking
 // refer: https://github.com/baji-ismail/in-queue/issues/3
-import Queue from 'in-queue/src/queue';
-import { Environment, Field } from './variable';
+import Queue from "in-queue/src/queue";
+import type { Environment, Field } from "./variable";
 
 class EventChannel {
   queue: Queue<Environment>;

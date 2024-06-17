@@ -5,14 +5,14 @@
   "organizeImports": { "enabled": true },
   "formatter": {
     "enabled": true,
-	"formatWithErrors": false,
+    "formatWithErrors": false,
     "indentStyle": "space",
     "indentWidth": 2
   },
   "linter": {
     "enabled": true,
-	"rules": {
-		"recommended": true
-	}
+    "rules": {
+      "recommended": true
+    }
   }
 }

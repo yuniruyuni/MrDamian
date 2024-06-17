@@ -1,8 +1,8 @@
-import { type Field } from '../../model/variable';
-import { type ComponentConfig } from '../../model/parameters';
-import { Component } from '../../model/component';
-import fs from 'fs/promises';
-import path from 'path';
+import fs from "node:fs/promises";
+import path from "node:path";
+import { Component } from "../../model/component";
+import type { ComponentConfig } from "../../model/parameters";
+import type { Field } from "../../model/variable";
 
 type LoggerConfig = ComponentConfig & {
   args: {
@@ -17,7 +17,7 @@ export class Logger extends Component<LoggerConfig> {
     const dir = path.dirname(file);
 
     await fs.mkdir(dir, { recursive: true });
-    await fs.appendFile(file, JSON.stringify(config.args.output) + '\n');
+    await fs.appendFile(file, `${JSON.stringify(config.args.output)}\n`);
 
     return undefined;
   }

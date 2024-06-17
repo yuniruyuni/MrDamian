@@ -1,4 +1,4 @@
-import { type ComponentConfig } from './parameters';
-import { ComponentWithConfig } from './component';
+import type { ComponentWithConfig } from "./component";
+import type { ComponentConfig } from "./parameters";
 
 export type Pipeline = ComponentWithConfig<ComponentConfig>[];

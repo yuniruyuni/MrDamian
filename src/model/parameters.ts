@@ -1,8 +1,8 @@
-import { dirname } from 'path';
-import JSON5 from 'json5';
-import fs from 'fs/promises';
+import fs from "node:fs/promises";
+import { dirname } from "node:path";
+import JSON5 from "json5";
 
-import { Parameters, Arguments } from './variable';
+import type { Arguments, Parameters } from "./variable";
 
 export type ModuleConfig = {
   main: boolean;
@@ -39,7 +39,7 @@ export function isCallConfig(config: ComponentConfig): config is CallConfig {
   return (config as CallConfig).path !== undefined;
 }
 
-export const ConfigParseError = new Error('Failed to parse config file');
+export const ConfigParseError = new Error("Failed to parse config file");
 
 export async function load(path: string): Promise<ModuleConfig> {
   const config = await loadModuleConfig(path);
@@ -48,7 +48,7 @@ export async function load(path: string): Promise<ModuleConfig> {
 }
 
 async function loadModuleConfig(path: string): Promise<ModuleConfig> {
-  const content = await fs.readFile(path, { encoding: 'utf-8' });
+  const content = await fs.readFile(path, { encoding: "utf-8" });
   // TODO: add validation by some schema.
   const config = JSON5.parse(content) as ModuleConfig;
   config.main = false;

@@ -1,7 +1,12 @@
-import { type ComponentConfig } from './parameters';
+import type { ComponentConfig } from "./parameters";
 
-import { Field, Environment, evaluate, evaluateExpression } from './variable';
-import { NamedEventEmitter } from './events';
+import type { NamedEventEmitter } from "./events";
+import {
+  type Environment,
+  type Field,
+  evaluate,
+  evaluateExpression,
+} from "./variable";
 
 export class ComponentWithConfig<C extends ComponentConfig> {
   readonly component: Component<C>;

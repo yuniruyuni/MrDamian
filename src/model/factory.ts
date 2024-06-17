@@ -1,32 +1,32 @@
 import {
+  type CallConfig,
   type ComponentConfig,
   type ModuleConfig,
   type PipelineConfig,
-  type CallConfig,
   isCallConfig,
-} from './parameters';
+} from "./parameters";
 
-import { Environment } from './variable';
-import { EventEmitter, NamedEventEmitter } from './events';
-import { Component, ComponentWithConfig } from './component';
-import { Pipeline } from './pipeline';
-import { Module } from './module';
+import { Component, ComponentWithConfig } from "./component";
+import { type EventEmitter, NamedEventEmitter } from "./events";
+import { Module } from "./module";
+import type { Pipeline } from "./pipeline";
+import type { Environment } from "./variable";
 
-export interface ComponentConstructor<T extends ComponentConfig> {
+export interface ComponentGenerator<T extends ComponentConfig> {
   new (emitter: NamedEventEmitter): Component<T>;
 }
 
-export type ComponentConstructors = {
-  [key: string]: ComponentConstructor<ComponentConfig>;
+export type ComponentGenerators = {
+  [key: string]: ComponentGenerator<ComponentConfig>;
 };
 
 export class ModuleFactory {
-  readonly constructors: ComponentConstructors;
+  readonly constructors: ComponentGenerators;
   readonly emitter: EventEmitter;
 
   instances: Map<string, Component<ComponentConfig>>;
 
-  constructor(constructors: ComponentConstructors, emitter: EventEmitter) {
+  constructor(constructors: ComponentGenerators, emitter: EventEmitter) {
     this.constructors = constructors;
     this.emitter = emitter;
     this.instances = new Map();
@@ -66,12 +66,12 @@ export class ModuleFactory {
     config: ComponentConfig,
     emitter: NamedEventEmitter,
   ): Component<ComponentConfig> {
-    const constructor = this.constructors[config.type];
-    if (!constructor) {
+    const gen = this.constructors[config.type];
+    if (!gen) {
       console.log(`Unsupported component: ${config.type}`);
       return new Unsupported(emitter);
     }
-    return new constructor(emitter);
+    return new gen(emitter);
   }
 }
 

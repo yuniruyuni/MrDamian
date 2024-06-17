@@ -1,16 +1,16 @@
-import { defineConfig } from 'tsup';
+import { defineConfig } from "tsup";
 
 export default defineConfig({
   target: "node18",
-  entry: ['src/main.ts'],
-  format: ['esm'],
+  entry: ["src/main.ts"],
+  format: ["esm"],
   clean: true,
   sourcemap: true,
   experimentalDts: {
-    entry: 'src/main.ts',
+    entry: "src/main.ts",
   },
   bundle: true,
-  noExternal:[ (/.*/)],
+  noExternal: [/.*/],
   banner(ctx) {
     if (ctx.format === "esm") {
       return {

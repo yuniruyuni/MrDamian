@@ -1,10 +1,7 @@
-import { compile } from 'nexe';
+import { compile } from "nexe";
 
 await compile({
-  input: './dist/main.js',
+  input: "./dist/main.js",
   build: true,
-  resources: [
-    "package.json",
-    "./dist/main.js",
-  ],
-})
+  resources: ["package.json", "./dist/main.js"],
+});

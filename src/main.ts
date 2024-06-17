@@ -1,15 +1,15 @@
-import { load } from "./model/parameters";
-import { type ComponentConstructors, ModuleFactory } from "./model/factory";
 import { eventChannel } from "./model/events";
+import { type ComponentConstructors, ModuleFactory } from "./model/factory";
+import { load } from "./model/parameters";
 
-import { Twitch } from './component/twitch';
-import { Youtube } from './component/youtube';
-import { DeepL } from './component/deepl';
-import { Periodic } from './component/periodic';
-import { Datetime } from './component/datetime';
-import { Logger } from './component/logger';
-import { Panel } from './component/panel';
-import { Translate } from './component/translate';
+import { Datetime } from "./component/datetime";
+import { DeepL } from "./component/deepl";
+import { Logger } from "./component/logger";
+import { Panel } from "./component/panel";
+import { Periodic } from "./component/periodic";
+import { Translate } from "./component/translate";
+import { Twitch } from "./component/twitch";
+import { Youtube } from "./component/youtube";
 
 const constructors: ComponentConstructors = {
   twitch: Twitch,

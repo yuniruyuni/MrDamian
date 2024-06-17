@@ -1,19 +1,19 @@
-import { StaticAuthProvider } from '@twurple/auth';
-import { ChatClient } from '@twurple/chat';
+import type { StaticAuthProvider } from "@twurple/auth";
+import { ChatClient } from "@twurple/chat";
 
-import { type Field } from '../../model/variable';
-import { type ComponentConfig } from '../../model/parameters';
-import { Component } from '../../model/component';
+import { Component } from "../../model/component";
+import type { ComponentConfig } from "../../model/parameters";
+import type { Field } from "../../model/variable";
 
-import { DeviceCodeGrantFlow } from './oauth';
+import { DeviceCodeGrantFlow } from "./oauth";
 
 type LoginConfig = {
-  action: 'login' | '' | undefined;
+  action: "login" | "" | undefined;
   channel: string;
 };
 
 type SendConfig = {
-  action: 'send';
+  action: "send";
   args: {
     message: string;
   };
@@ -25,15 +25,15 @@ function isLoginConfig(
   config: TwitchConfig,
 ): config is ComponentConfig & LoginConfig {
   if (config.action === undefined) return true;
-  if (config.action === '') return true;
-  if (config.action === 'login') return true;
+  if (config.action === "") return true;
+  if (config.action === "login") return true;
   return false;
 }
 
 function isSendConfig(
   config: TwitchConfig,
 ): config is ComponentConfig & SendConfig {
-  return config.action === 'send';
+  return config.action === "send";
 }
 
 export class Twitch extends Component<TwitchConfig> {

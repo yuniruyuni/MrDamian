@@ -1,9 +1,9 @@
-import deepmerge from 'deepmerge';
+import deepmerge from "deepmerge";
 
-import { type ModuleConfig } from './parameters';
+import type { ModuleConfig } from "./parameters";
 
-import { Environment, Parameters } from './variable';
-import { Pipeline } from './pipeline';
+import type { Pipeline } from "./pipeline";
+import type { Environment, Parameters } from "./variable";
 
 export class Module {
   config: ModuleConfig;
@@ -15,14 +15,14 @@ export class Module {
   }
 
   async init(init: Environment): Promise<Environment> {
-    return await this.event('init', init);
+    return await this.event("init", init);
   }
 
   async run(init: Environment): Promise<Environment> {
-    return await this.event('run', init);
+    return await this.event("run", init);
   }
 
-  async event(field: 'init' | 'run', init: Environment): Promise<Environment> {
+  async event(field: "init" | "run", init: Environment): Promise<Environment> {
     const params: Parameters = this.config.params ?? ({} as Parameters);
     // our component have default value as "params" in it's configuration file.
     const filled = { ...params, ...init };
