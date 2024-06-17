@@ -14,8 +14,8 @@ export type Environment = {
   [key: string]: Field;
 };
 
-const argumentsSymbol = Symbol();
-const parametersSymbol = Symbol();
+declare const argumentsSymbol: unique symbol;
+declare const parametersSymbol: unique symbol;
 
 // Arguments is a recursive type that can be used to define a nested object structure.
 // Arguments contains expression string that starts with "$",
