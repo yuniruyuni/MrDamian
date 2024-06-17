@@ -1,4 +1,4 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, it } from "bun:test";
 import {
   type Arguments,
   type Environment,
@@ -18,38 +18,20 @@ describe("Parameters", () => {
       array: [],
       object: {},
     });
-
-    for (const [k, v] of Object.entries(params)) {
-      switch (k) {
-        case "boolean":
-          expect(v).toMatchObject(true);
-          break;
-        case "number":
-          expect(v).toMatchObject(1);
-          break;
-        case "string":
-          expect(v).toMatchObject("test");
-          break;
-        case "expression":
-          expect(v).toMatchObject("$ a < b");
-          break;
-        case "array":
-          expect(v).toMatchObject([]);
-          break;
-        case "object":
-          expect(v).toMatchObject({});
-          break;
-        default:
-          expect(false);
-          break;
-      }
-    }
+    expect(params).toMatchObject({
+      string: "test",
+      expression: "$ a < b",
+      boolean: true,
+      number: 1,
+      array: [],
+      object: {},
+    });
   });
 });
 
-describe("Arguments", {}, () => {
+describe("Arguments", () => {
   it("can contains basic types", () => {
-    const params: Arguments = asArgs({
+    const args: Arguments = asArgs({
       string: "test",
       // "expression": "$ a < b", // Environment is already evaluated so expression type is not exists.
       boolean: true,
@@ -58,35 +40,18 @@ describe("Arguments", {}, () => {
       object: {},
     });
 
-    for (const [k, v] of Object.entries(params)) {
-      switch (k) {
-        case "boolean":
-          expect(v).toMatchObject(true);
-          break;
-        case "number":
-          expect(v).toMatchObject(1);
-          break;
-        case "string":
-          expect(v).toMatchObject("test");
-          break;
-        case "expression":
-          expect(v).toMatchObject("$ a < b");
-          break;
-        case "array":
-          expect(v).toMatchObject([]);
-          break;
-        case "object":
-          expect(v).toMatchObject({});
-          break;
-        default:
-          expect(false);
-          break;
-      }
-    }
+    expect(args).toMatchObject({
+      string: "test",
+      // expression: "$ a < b",
+      boolean: true,
+      number: 1,
+      array: [],
+      object: {},
+    });
   });
 });
 
-describe("evaluate", {}, () => {
+describe("evaluate", () => {
   it("transforms parameter's expression into environment value", () => {
     const args: Arguments = asArgs({
       expression: "$ a < b",
