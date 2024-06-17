@@ -10,11 +10,12 @@
     "build": "tsup",
     "start": "npm run build && node --enable-source-maps dist/main.js",
     "package": "npm run build && node nexe.config.js",
-    "lint": "eslint --ext .ts,.tsx .",
     "test": "vitest",
-    "prettier": "prettier --write --ignore-unknown src/**/*"
+    "lint": "biome lint",
+    "check": "biome check --write"
   },
   "devDependencies": {
+    "@biomejs/biome": "1.8.1",
     "@microsoft/api-extractor": "^7.47.0",
     "@twurple/api": "^7.1.0",
     "@twurple/auth": "^7.1.0",
@@ -25,13 +26,8 @@
     "@types/node": "^20.14.2",
     "@types/react": "^18.3.3",
     "@types/react-dom": "^18.3.0",
-    "@typescript-eslint/eslint-plugin": "^5.62.0",
-    "@typescript-eslint/parser": "^5.62.0",
-    "eslint": "^8.57.0",
-    "eslint-plugin-import": "^2.29.1",
     "license-checker": "^25.0.1",
     "nexe": "^4.0.0-rc.6",
-    "prettier": "^3.3.2",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "ts-node": "^10.9.2",
