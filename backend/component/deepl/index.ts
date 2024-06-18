@@ -42,7 +42,7 @@ type DeepLConfig = ComponentConfig &
   (InitConfig | DetectConfig | TranslateConfig);
 
 export class DeepL extends Component<DeepLConfig> {
-  translator: Translator;
+  translator?: Translator;
   async init(config: DeepLConfig): Promise<Field> {
     if (isInitConfig(config)) {
       this.translator = new Translator(config.apikey);

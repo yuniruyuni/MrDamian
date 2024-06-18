@@ -4,6 +4,7 @@ import type { NamedEventEmitter } from "./events";
 import {
   type Environment,
   type Field,
+  asArgs,
   evaluate,
   evaluateExpression,
 } from "./variable";
@@ -20,7 +21,7 @@ export class ComponentWithConfig<C extends ComponentConfig> {
 
   evaluate(env: Environment): C {
     // TODO: validate args
-    const args = evaluate(this.config.args, env);
+    const args = evaluate(this.config.args ?? asArgs({}), env);
     return { ...this.config, args: args };
   }
 

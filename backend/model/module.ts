@@ -37,7 +37,9 @@ export class Module {
       const ret = await comp[field](env);
       if (ret === undefined) return env;
       // TODO: split this into some function...(it is as same as component.ts)
-      const keys = [comp.config.type, comp.config.name].filter((v) => v);
+      const keys: string[] = [comp.config.type, comp.config.name].filter(
+        (v): v is string => v !== undefined,
+      );
       let obj = ret;
       for (const key of keys.reverse()) {
         obj = { [key]: obj };

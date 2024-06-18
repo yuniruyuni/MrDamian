@@ -1,8 +1,11 @@
 import { Hono } from "hono";
-import open from 'open';
+import open from "open";
 
 import { eventChannel } from "~/backend/model/events";
-import { type ComponentGenerators, ModuleFactory } from "~/backend/model/factory";
+import {
+  type ComponentGenerators,
+  ModuleFactory,
+} from "~/backend/model/factory";
 import { load } from "~/backend/model/parameters";
 
 import { Datetime } from "~/backend/component/datetime";
@@ -50,7 +53,6 @@ async function run() {
     await mod.run(event);
   }
 }
-
 
 const app = new Hono();
 app.get("/", (c) => c.html(html));

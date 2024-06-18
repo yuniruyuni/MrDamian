@@ -58,8 +58,8 @@ export class Twitch extends Component<TwitchConfig> {
     return undefined;
   }
 
-  authProvider: StaticAuthProvider;
-  chatClient: ChatClient;
+  authProvider?: StaticAuthProvider;
+  chatClient?: ChatClient;
   channel?: string;
 
   async login(config: LoginConfig) {

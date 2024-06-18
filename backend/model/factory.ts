@@ -10,7 +10,7 @@ import { Component, ComponentWithConfig } from "./component";
 import { type EventEmitter, NamedEventEmitter } from "./events";
 import { Module } from "./module";
 import type { Pipeline } from "./pipeline";
-import type { Environment } from "./variable";
+import type { Field } from "./variable";
 
 export interface ComponentGenerator<T extends ComponentConfig> {
   new (emitter: NamedEventEmitter): Component<T>;
@@ -45,7 +45,9 @@ export class ModuleFactory {
     config: ComponentConfig,
   ): ComponentWithConfig<ComponentConfig> {
     // filter if key is undefined.
-    const keys = [config.type, config.name].filter((v) => v);
+    const keys: string[] = [config.type, config.name].filter(
+      (v): v is string => v !== undefined,
+    );
     const key = JSON.stringify(keys);
     const emitter = new NamedEventEmitter(this.emitter, keys);
 
@@ -90,17 +92,17 @@ class Call extends Component<CallConfig> {
     this.submodule = factory.constructModule(config.module);
   }
 
-  async init(config: CallConfig): Promise<Environment> {
-    return await this.submodule.init(config.args);
+  async init(config: CallConfig): Promise<Field> {
+    return await this.submodule.init(config.args ?? {});
   }
 
-  async run(config: CallConfig): Promise<Environment> {
-    return await this.submodule.run(config.args);
+  async run(config: CallConfig): Promise<Field> {
+    return await this.submodule.run(config.args ?? {});
   }
 }
 
 class Unsupported extends Component<ComponentConfig> {
-  async run(): Promise<Environment> {
+  async run(): Promise<Field> {
     // just ignore all things.
     return undefined;
   }
