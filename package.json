@@ -10,6 +10,7 @@
     "start": "run-p start:**",
     "start:frontend": "bun build  --watch --minify --outdir=./static/ frontend/index.tsx",
     "start:backend": "bun run --watch --bun bin/main.ts",
+    "start:test": "bun --watch test",
     "start:lint": "#biome lint --watch # non exists lint watch, find some solution.",
     "build": "run-s build:frontend build:backend",
     "build:frontend": "NODE_ENV=production bun build  --minify --outdir=./static/ frontend/index.tsx",
