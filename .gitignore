@@ -88,11 +88,11 @@ typings/
 # Vite
 .vite/
 
-# tsup
-dist/
+# ignore generated static files.
+static/**/*.js
 
-# nexe
+# bun build
 main
 
-# ignore auto generated files.
-resources/LICENSES.dependency.html
+# license generation
+LICENSES.dependency.html
