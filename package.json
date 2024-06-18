@@ -9,10 +9,11 @@
   "scripts": {
     "start": "run-p start:**",
     "start:frontend": "bun build  --watch --minify --outdir=./static/ frontend/index.tsx",
-    "start:backend": "bun run --watch --bun bin/main.ts",
+    "start:backend": "bun run --hot --bun bin/main.ts",
     "start:test": "bun --watch test",
-    "start:lint": "#biome lint --watch # non exists lint watch, find some solution.",
+    "start:lint": "bun run lint",
     "build": "run-s build:frontend build:backend",
+    "build:license": "NODE_ENV=production bun run bin/license.ts",
     "build:frontend": "NODE_ENV=production bun build  --minify --outdir=./static/ frontend/index.tsx",
     "build:backend": "NODE_ENV=production bun build  --compile --minify bin/main.ts",
     "test": "bun test",

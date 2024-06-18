@@ -13,23 +13,19 @@ export function checkDependency(): Promise<ModuleInfos> {
   });
 }
 
-const allowedLicenes = [
+const allowedLicenes: string[] = [
   "0BSD",
   "Apache-2.0",
   "BSD-2-Clause",
   "BSD-3-Clause",
   "BSD*",
-  "CC-BY-4.0",
   "CC-BY-3.0",
   "CC0-1.0",
   "ISC",
   "MIT",
-  "MIT*",
   "Python-2.0",
-  "Unlicense",
-  "Apache-2.0 AND MIT",
   "(MIT AND CC-BY-3.0)",
-  "(MIT OR CC0-1.0)",
+  "MIT OR Apache-2.0",
 ];
 
 function matchLicenses(licenses: string | string[] | undefined): boolean {
@@ -66,7 +62,8 @@ export async function generateDependencyLicenses(
         const data = await fs.readFile(licenseFile);
         license += `<div class="license_file"><pre>${data}</pre></div>`;
       } else {
-        if (pkg.licenses.includes("MIT")) {
+        const licenses = pkg.licenses ?? [];
+        if (licenses.includes("MIT")) {
           license += `<div class="license_file"><a href="https://opensource.org/license/mit">MIT License</a></pre></div>`;
         }
       }
@@ -106,3 +103,7 @@ export async function generateDependencyLicenses(
     </html>
   `;
 }
+
+const mods = await checkDependency();
+const licenses = await generateDependencyLicenses(mods);
+await fs.writeFile("LICENSES.dependency.html", licenses);
