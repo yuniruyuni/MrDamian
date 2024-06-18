@@ -2,7 +2,7 @@ import { Hono } from "hono";
 import open from 'open';
 
 import { eventChannel } from "~/backend/model/events";
-import { type ComponentConstructors, ModuleFactory } from "~/backend/model/factory";
+import { type ComponentGenerators, ModuleFactory } from "~/backend/model/factory";
 import { load } from "~/backend/model/parameters";
 
 import { Datetime } from "~/backend/component/datetime";
@@ -19,7 +19,7 @@ import html from "~/static/index.html" with { type: "text" };
 // @ts-ignore: refer https://github.com/oven-sh/bun/issues/9276
 import js from "~/static/index.js" with { type: "text" };
 
-const constructors: ComponentConstructors = {
+const gens: ComponentGenerators = {
   twitch: Twitch,
   youtube: Youtube,
   deepl: DeepL,
@@ -34,7 +34,7 @@ const constructors: ComponentConstructors = {
 async function run() {
   const [emitter, absorber] = eventChannel();
 
-  const factory = new ModuleFactory(constructors, emitter);
+  const factory = new ModuleFactory(gens, emitter);
   const params = await load("./config/main.json5");
   const mod = factory.constructModule(params);
 
