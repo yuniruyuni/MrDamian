@@ -4,7 +4,7 @@ import type { Field } from "../../model/variable";
 
 import dayjs from "dayjs";
 
-type DatetimeConfig = ComponentConfig & {
+export type DatetimeConfig = ComponentConfig & {
   args: {
     format: string;
   };
