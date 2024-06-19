@@ -2,10 +2,13 @@ import type { FC } from "react";
 import ReactDOM from "react-dom";
 
 import { Component } from "./component";
-const HomePage: FC = () => (
+const Root: FC = () => (
   <div>
     <Component />
+    <div className="text-3xl font-bold underline">
+      hogehoge
+    </div>
   </div>
 );
 
-ReactDOM.render(<HomePage />, document.getElementById("root"));
+ReactDOM.render(<Root />, document.getElementById("root"));

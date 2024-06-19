@@ -89,7 +89,7 @@ typings/
 .vite/
 
 # ignore generated static files.
-static/**/*.js
+static/
 
 # bun build
 main

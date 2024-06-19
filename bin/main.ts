@@ -1,4 +1,5 @@
 import { Hono } from "hono";
+import { serveStatic } from "hono/bun";
 import open from "open";
 
 import { eventChannel } from "~/backend/model/events";
@@ -16,11 +17,6 @@ import { Periodic } from "~/backend/component/periodic";
 import { Translate } from "~/backend/component/translate";
 import { Twitch } from "~/backend/component/twitch";
 import { Youtube } from "~/backend/component/youtube";
-
-// @ts-ignore: refer https://github.com/oven-sh/bun/issues/9276
-import html from "~/static/index.html" with { type: "text" };
-// @ts-ignore: refer https://github.com/oven-sh/bun/issues/9276
-import js from "~/static/index.js" with { type: "text" };
 
 const gens: ComponentGenerators = {
   twitch: Twitch,
@@ -55,10 +51,7 @@ async function run() {
 }
 
 const app = new Hono();
-app.get("/", (c) => c.html(html));
-app.get("/main.js", (c) =>
-  c.body(js, 200, { "Content-Type": "text/javascript" }),
-);
+app.use('/*', serveStatic({ root: './static' }));
 
 run();
 open("http://localhost:3000");
