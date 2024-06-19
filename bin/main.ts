@@ -30,11 +30,11 @@ const gens: ComponentGenerators = {
   translate: Translate,
 };
 
-async function run() {
-  const [emitter, absorber] = eventChannel();
+const [emitter, absorber] = eventChannel();
+const factory = new ModuleFactory(gens, emitter);
+const params = await load("./config/main.json5");
 
-  const factory = new ModuleFactory(gens, emitter);
-  const params = await load("./config/main.json5");
+async function run() {
   const mod = factory.constructModule(params);
 
   await mod.init({});
@@ -51,9 +51,15 @@ async function run() {
 }
 
 const app = new Hono();
+app.get("/api/module", async (c) => {
+  return c.json(params);
+});
+app.post("/api/module/run", async (c) => {
+  run();
+  c.json({ status: "ok" });
+});
 app.use("/*", serveStatic({ root: "./static" }));
 
-run();
 open("http://localhost:3000");
 
 export default {
