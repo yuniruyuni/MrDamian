@@ -51,7 +51,7 @@ async function run() {
 }
 
 const app = new Hono();
-app.use('/*', serveStatic({ root: './static' }));
+app.use("/*", serveStatic({ root: "./static" }));
 
 run();
 open("http://localhost:3000");
