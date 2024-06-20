@@ -4,10 +4,7 @@ import open from "open";
 
 import { load } from "~/backend/load_config";
 import { eventChannel } from "~/model/events";
-import {
-  type ComponentGenerators,
-  ModuleFactory,
-} from "~/model/factory";
+import { type ComponentGenerators, ModuleFactory } from "~/model/factory";
 
 import { Datetime } from "~/backend/component/datetime";
 import { DeepL } from "~/backend/component/deepl";

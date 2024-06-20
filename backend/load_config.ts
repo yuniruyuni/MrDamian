@@ -9,7 +9,6 @@ import {
   isCallConfig,
 } from "~/model/parameters";
 
-
 export const ConfigParseError = new Error("Failed to parse config file");
 
 export async function load(path: string): Promise<ModuleConfig> {
@@ -30,18 +29,18 @@ async function loadModuleConfig(path: string): Promise<ModuleConfig> {
 
 async function loadPipelineConfig(
   path: string,
-  config: PipelineConfig
+  config: PipelineConfig,
 ): Promise<PipelineConfig> {
   return await Promise.all(
     config.map(async (comp) => {
       return await loadComponentConfig(path, comp);
-    })
+    }),
   );
 }
 
 async function loadComponentConfig(
   path: string,
-  config: ComponentConfig
+  config: ComponentConfig,
 ): Promise<ComponentConfig> {
   if (isCallConfig(config)) {
     const base_dir = dirname(path);

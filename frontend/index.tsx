@@ -5,16 +5,14 @@ import ReactDOM from "react-dom/client";
 import type { ComponentConfig, ModuleConfig } from "~/model/parameters";
 import { type Environment, type Field, asParams } from "~/model/variable";
 
-const Container: FC<{children: React.ReactNode}> = ({ children }) => (
+const Container: FC<{ children: React.ReactNode }> = ({ children }) => (
   <div className="md:container md:mx-auto">{children}</div>
 );
 
 const Menu: FC = () => (
   <div className="navbar w-full bg-base-100">
     <div className="flex-1">
-      <h1 className="btn btn-ghost text-xl">
-        Mr.Damian
-      </h1>
+      <h1 className="btn btn-ghost text-xl">Mr.Damian</h1>
     </div>
 
     <div className="flex-none">
@@ -80,9 +78,8 @@ const ShowField: FC<{ name: string; value: Field }> = ({ name, value }) => (
         Array.isArray(value) &&
         value.map(
           // TODO: create unique key without index value.
-          (v) => <Config key="" args={v} />
-        )
-      }
+          (v) => <Config key="" args={v} />,
+        )}
       {typeof value === "object" && !Array.isArray(value) && (
         <Config args={value} />
       )}
@@ -154,5 +151,5 @@ const root = ReactDOM.createRoot(rootElm);
 root.render(
   <React.StrictMode>
     <Root />
-  </React.StrictMode>
+  </React.StrictMode>,
 );
