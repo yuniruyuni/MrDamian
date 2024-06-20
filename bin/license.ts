@@ -16,6 +16,7 @@ export function checkDependency(): Promise<ModuleInfos> {
 const allowedLicenes: string[] = [
   "0BSD",
   "Apache-2.0",
+  "BlueOak-1.0.0",
   "BSD-2-Clause",
   "BSD-3-Clause",
   "BSD*",
