@@ -67,6 +67,7 @@
     "in-queue": "^1.2.1",
     "jexpr": "^1.0.0-pre.9",
     "json5": "^2.2.3",
+    "live-plugin-manager": "^1.0.0",
     "open": "^10.1.0"
   },
   "optionalDependencies": {
