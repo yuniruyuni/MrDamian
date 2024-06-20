@@ -1,9 +1,9 @@
 import type { StaticAuthProvider } from "@twurple/auth";
 import { ChatClient } from "@twurple/chat";
 
-import { Component } from "../../model/component";
-import type { ComponentConfig } from "../../model/parameters";
-import type { Field } from "../../model/variable";
+import { Component } from "../../../model/component";
+import type { ComponentConfig } from "../../../model/parameters";
+import type { Field } from "../../../model/variable";
 
 import { DeviceCodeGrantFlow } from "./oauth";
 

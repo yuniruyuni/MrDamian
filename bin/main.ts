@@ -2,12 +2,12 @@ import { Hono } from "hono";
 import { serveStatic } from "hono/bun";
 import open from "open";
 
-import { eventChannel } from "~/backend/model/events";
+import { load } from "~/backend/load_config";
+import { eventChannel } from "~/model/events";
 import {
   type ComponentGenerators,
   ModuleFactory,
-} from "~/backend/model/factory";
-import { load } from "~/backend/model/parameters";
+} from "~/model/factory";
 
 import { Datetime } from "~/backend/component/datetime";
 import { DeepL } from "~/backend/component/deepl";

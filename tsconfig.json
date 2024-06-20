@@ -11,6 +11,7 @@
     "paths": {
       "~/backend/*": ["./backend/*"],
       "~/frontend/*": ["./frontend/*"],
+      "~/model/*": ["./model/*"],
       "~/static/*": ["./static/*"]
     },
 
@@ -31,5 +32,5 @@
     /* Debugging */
     "sourceMap": true
   },
-  "include": ["bin/**/*", "backend/**/*", "frontend/**/*"]
+  "include": ["bin/**/*", "backend/**/*", "frontend/**/*", "model/**/*"]
 }

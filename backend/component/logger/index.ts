@@ -1,8 +1,8 @@
 import fs from "node:fs/promises";
 import path from "node:path";
-import { Component } from "../../model/component";
-import type { ComponentConfig } from "../../model/parameters";
-import type { Field } from "../../model/variable";
+import { Component } from "../../../model/component";
+import type { ComponentConfig } from "../../../model/parameters";
+import type { Field } from "../../../model/variable";
 
 type LoggerConfig = ComponentConfig & {
   args: {

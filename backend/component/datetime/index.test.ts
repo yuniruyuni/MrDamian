@@ -1,6 +1,6 @@
 import { describe, expect, it } from "bun:test";
 import dayjs from "dayjs";
-import { NamedEventEmitter, eventChannel } from "~/backend/model/events";
+import { NamedEventEmitter, eventChannel } from "~/model/events";
 import { Datetime, type DatetimeConfig } from "./index";
 
 describe("Datetime", () => {

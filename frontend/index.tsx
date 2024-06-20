@@ -2,8 +2,8 @@ import type { FC } from "react";
 import React, { useEffect, useState } from "react";
 import ReactDOM from "react-dom/client";
 
-import type { ModuleConfig } from "~/backend/model/parameters";
-import { asParams } from "~/backend/model/variable";
+import type { ModuleConfig } from "~/model/parameters";
+import { asParams } from "~/model/variable";
 
 const Container: FC<{children: React.ReactNode}> = ({ children }) => (
   <div className="md:container md:mx-auto">{children}</div>
