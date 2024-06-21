@@ -59,7 +59,7 @@ app.get("/api/module", async (c) => {
 });
 app.post("/api/module/run", async (c) => {
   run();
-  c.json({ status: "ok" });
+  return c.json({ status: "ok" });
 });
 
 app.get("/api/plugin", async (c) => {
