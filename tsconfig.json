@@ -32,5 +32,6 @@
     /* Debugging */
     "sourceMap": true
   },
-  "include": ["bin/**/*", "backend/**/*", "frontend/**/*", "model/**/*"]
+  "include": ["bin/**/*", "backend/**/*", "frontend/**/*", "model/**/*"],
+  "exclude": [".plugins/**/*"]
 }

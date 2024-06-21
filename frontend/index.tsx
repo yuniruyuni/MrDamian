@@ -1,13 +1,95 @@
 import type { FC } from "react";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import ReactDOM from "react-dom/client";
 
 import type { ComponentConfig, ModuleConfig } from "~/model/parameters";
+import type { PluginInfo } from "~/model/plugin";
 import { type Environment, type Field, asParams } from "~/model/variable";
 
 const Container: FC<{ children: React.ReactNode }> = ({ children }) => (
   <div className="md:container md:mx-auto">{children}</div>
 );
+
+const Alert: FC<{ message: string }> = ({ message }) => (
+  <div role="alert" className="alert alert-success">
+    <svg
+      role="graphics-symbol"
+      xmlns="http://www.w3.org/2000/svg"
+      className="stroke-current shrink-0 h-6 w-6"
+      fill="none"
+      viewBox="0 0 24 24"
+    >
+      <path
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth="2"
+        d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+      />
+    </svg>
+    <span>{message}</span>
+  </div>
+);
+
+const Plugins: FC = () => {
+  const [plugins, setPlugins] = useState<PluginInfo[]>([]);
+  const [message, setAlertMessage] = useState("");
+  useEffect(() => {
+    (async () => {
+      const res = await fetch("/api/plugin");
+      const json = await res.json();
+      setPlugins(json as PluginInfo[]);
+    })();
+  });
+
+  const onInstall = useCallback(async (name: string) => {
+    const res = await fetch("/api/plugin", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ name }),
+    });
+    const json = await res.json();
+    if (json.status === "ok") {
+      setAlertMessage("Succeeded to install plugin");
+    } else {
+      setAlertMessage("Failed to install plugin");
+    }
+    await new Promise((resolve) => setTimeout(resolve, 3000));
+    setAlertMessage("");
+  }, []);
+
+  return (
+    <div className="overflow-x-auto">
+      {message !== "" && <Alert message={message} />}
+      <table className="table">
+        <tr>
+          <th>Name</th>
+          <th>Description</th>
+          <th>Version</th>
+        </tr>
+        <tbody>
+          {plugins.map((plugin) => (
+            <tr key={plugin.name}>
+              <th>{plugin.name}</th>
+              <td>{plugin.description}</td>
+              <td>{plugin.version}</td>
+              <td>
+                <button
+                  type="button"
+                  className="btn btn-primary"
+                  onClick={() => onInstall(plugin.name)}
+                >
+                  Install
+                </button>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  );
+};
 
 const Menu: FC = () => (
   <div className="navbar w-full bg-base-100">
@@ -140,6 +222,7 @@ const Root: FC = () => {
   return (
     <Container>
       <Menu />
+      <Plugins />
       <Modules modules={modules} />
     </Container>
   );

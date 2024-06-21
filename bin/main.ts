@@ -1,6 +1,12 @@
+import path from "node:path";
 import { Hono } from "hono";
 import { serveStatic } from "hono/bun";
+import search from "libnpmsearch";
+import { PluginManager } from "live-plugin-manager";
+
 import open from "open";
+
+import type { PluginInfo } from "~/model/plugin";
 
 import { load } from "~/backend/load_config";
 import { eventChannel } from "~/model/events";
@@ -55,6 +61,34 @@ app.post("/api/module/run", async (c) => {
   run();
   c.json({ status: "ok" });
 });
+
+app.get("/api/plugin", async (c) => {
+  const packages = await search("mrdamian-plugin");
+  return c.json(
+    packages.map(
+      (pkg) =>
+        ({
+          name: pkg.name,
+          description: pkg.description,
+          version: pkg.version,
+          installed: false,
+        }) as PluginInfo,
+    ),
+  );
+});
+
+app.post("/api/plugin", async (c) => {
+  const params = (await c.req.json()) as { name: string };
+  const name = params.name;
+
+  const manager = new PluginManager({
+    pluginsPath: path.join(process.cwd(), ".plugins"),
+  });
+  await manager.installFromNpm(name);
+
+  return c.json({ status: "ok" });
+});
+
 app.use("/*", serveStatic({ root: "./static" }));
 
 open("http://localhost:3000");
