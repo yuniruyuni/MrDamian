@@ -1,3 +1,4 @@
+import type { Route } from "~/model/server";
 import type { ComponentConfig } from "./parameters";
 
 import type { NamedEventEmitter } from "./events";
@@ -25,6 +26,10 @@ export class ComponentWithConfig<C extends ComponentConfig> {
     return { ...this.config, args: args };
   }
 
+  register(route: Route): void {
+    this.component.register(route);
+  }
+
   async init(env: Environment): Promise<Field> {
     return this.component.init(this.evaluate(env));
   }
@@ -50,6 +55,10 @@ export abstract class Component<C extends ComponentConfig> {
 
   emit(event: Field) {
     this.emitter.emit(event);
+  }
+
+  register(route: Route): void {
+    route.get("/", (ctx) => ctx.res.html("No configuration"));
   }
 
   async init(_config: C): Promise<Field> {

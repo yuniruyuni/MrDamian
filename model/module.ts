@@ -3,6 +3,7 @@ import deepmerge from "deepmerge";
 import type { ModuleConfig } from "./parameters";
 
 import type { Pipeline } from "./pipeline";
+import type { Server } from "./server";
 import type { Environment, Parameters } from "./variable";
 
 export class Module {
@@ -18,11 +19,25 @@ export class Module {
     return await this.event("init", init);
   }
 
+  register(server: Server) {
+    // TODO: make subroute for each component.
+    for( const comp of this.pipeline ){
+      const path = [comp.config.type, comp.config.name]
+        .filter((v): v is string => v !== undefined)
+        .join("/");
+      const route = server.route(`/${path}`);
+      comp.register(route);
+    }
+  }
+
   async run(init: Environment): Promise<Environment> {
     return await this.event("run", init);
   }
 
-  async event(field: "init" | "run", init: Environment): Promise<Environment> {
+  async event(
+    field: "init" | "run",
+    init: Environment,
+  ): Promise<Environment> {
     const params: Parameters = this.config.params ?? ({} as Parameters);
     // our component have default value as "params" in it's configuration file.
     const filled = { ...params, ...init };
