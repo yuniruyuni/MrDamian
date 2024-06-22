@@ -1,6 +1,6 @@
-import { Component } from "../../../model/component";
-import type { ComponentConfig } from "../../../model/parameters";
-import type { Field } from "../../../model/variable";
+import { Component } from "~/model/component";
+import type { ComponentConfig } from "~/model/parameters";
+import type { Field } from "~/model/variable";
 
 import dayjs from "dayjs";
 

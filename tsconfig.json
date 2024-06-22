@@ -12,7 +12,8 @@
       "~/backend/*": ["./backend/*"],
       "~/frontend/*": ["./frontend/*"],
       "~/model/*": ["./model/*"],
-      "~/static/*": ["./static/*"]
+      "~/static/*": ["./static/*"],
+      "~/component/*": ["./component/*"],
     },
 
     /* Bundler mode */
@@ -32,6 +33,6 @@
     /* Debugging */
     "sourceMap": true
   },
-  "include": ["bin/**/*", "backend/**/*", "frontend/**/*", "model/**/*"],
+  "include": ["bin/**/*", "backend/**/*", "frontend/**/*", "model/**/*","component/**/*"],
   "exclude": [".plugins/**/*"]
 }
