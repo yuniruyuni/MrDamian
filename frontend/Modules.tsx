@@ -3,7 +3,7 @@ import { type FC, useCallback, useRef, useState } from "react";
 import type { ComponentConfig, ModuleConfig } from "~/model/parameters";
 import type { Environment, Field } from "~/model/variable";
 
-const Config: FC<{ args: Environment; }> = ({ args }) => (
+const Config: FC<{ args: Environment }> = ({ args }) => (
   <dl className="divide-y divide-gray-100 grid grid-cols-[max-content,1fr] m-1">
     {args &&
       Object.entries(args as Environment).map(([key, value]) => (
@@ -12,7 +12,7 @@ const Config: FC<{ args: Environment; }> = ({ args }) => (
   </dl>
 );
 
-const ShowField: FC<{ name: string; value: Field; }> = ({ name, value }) => (
+const ShowField: FC<{ name: string; value: Field }> = ({ name, value }) => (
   <div key={name} className="contents">
     <dt className="font-medium text-md mr-4">{name}</dt>
     <dl className="text-md">
@@ -22,7 +22,7 @@ const ShowField: FC<{ name: string; value: Field; }> = ({ name, value }) => (
         Array.isArray(value) &&
         value.map(
           // TODO: create unique key without index value.
-          (v) => <Config key="" args={v} />
+          (v) => <Config key="" args={v} />,
         )}
       {typeof value === "object" && !Array.isArray(value) && (
         <Config args={value} />
@@ -55,7 +55,7 @@ const Component: FC<{ config: ComponentConfig }> = ({ config }) => {
   );
 };
 
-export const Modules: FC<{ modules: ModuleConfig; }> = ({ modules }) => (
+export const Modules: FC<{ modules: ModuleConfig }> = ({ modules }) => (
   <ul className="timeline timeline-vertical timeline-compact">
     {modules.pipeline.map((comp, index) => (
       // TODO: create unique key without index value.
@@ -72,7 +72,8 @@ export const Modules: FC<{ modules: ModuleConfig; }> = ({ modules }) => (
             <path
               fillRule="evenodd"
               d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.857-9.809a.75.75 0 00-1.214-.882l-3.483 4.79-1.88-1.88a.75.75 0 10-1.06 1.061l2.5 2.5a.75.75 0 001.137-.089l4-5.5z"
-              clipRule="evenodd" />
+              clipRule="evenodd"
+            />
           </svg>
         </div>
         <Component config={comp} />

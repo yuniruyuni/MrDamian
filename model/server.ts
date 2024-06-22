@@ -27,8 +27,8 @@ export type HandlerResponse = any | Promise<any>;
 export type Handler = (context: Context) => HandlerResponse;
 
 export type Context = {
-    req: Request;
-    res: Response;
+  req: Request;
+  res: Response;
 };
 
 export interface Request {

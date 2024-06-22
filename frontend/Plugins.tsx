@@ -1,7 +1,7 @@
 import type { FC } from "react";
 import { useCallback, useContext, useEffect, useState } from "react";
 import type { PluginInfo } from "~/model/plugin";
-import { AlertContext  } from "./Alert";
+import { AlertContext } from "./Alert";
 
 export const Plugins: FC = () => {
   const [plugins, setPlugins] = useState<PluginInfo[]>([]);
@@ -14,21 +14,24 @@ export const Plugins: FC = () => {
     })();
   });
 
-  const onInstall = useCallback(async (name: string) => {
-    const res = await fetch("/api/plugin", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ name }),
-    });
-    const json = await res.json();
-    if (json.status === "ok") {
-      pushAlert("Succeeded to install plugin", "success");
-    } else {
-      pushAlert("Failed to install plugin", "error");
-    }
-  }, [pushAlert]);
+  const onInstall = useCallback(
+    async (name: string) => {
+      const res = await fetch("/api/plugin", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ name }),
+      });
+      const json = await res.json();
+      if (json.status === "ok") {
+        pushAlert("Succeeded to install plugin", "success");
+      } else {
+        pushAlert("Failed to install plugin", "error");
+      }
+    },
+    [pushAlert],
+  );
 
   return (
     <div className="overflow-x-auto">

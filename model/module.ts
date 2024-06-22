@@ -21,7 +21,7 @@ export class Module {
 
   register(server: Server) {
     // TODO: make subroute for each component.
-    for( const comp of this.pipeline ){
+    for (const comp of this.pipeline) {
       const path = [comp.config.type, comp.config.name]
         .filter((v): v is string => v !== undefined)
         .join("/");
@@ -34,10 +34,7 @@ export class Module {
     return await this.event("run", init);
   }
 
-  async event(
-    field: "init" | "run",
-    init: Environment,
-  ): Promise<Environment> {
+  async event(field: "init" | "run", init: Environment): Promise<Environment> {
     const params: Parameters = this.config.params ?? ({} as Parameters);
     // our component have default value as "params" in it's configuration file.
     const filled = { ...params, ...init };

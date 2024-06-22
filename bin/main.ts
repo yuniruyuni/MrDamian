@@ -1,8 +1,5 @@
 import path from "node:path";
-import {
-  Hono,
-  type Context as HonoContext,
-} from "hono";
+import { Hono, type Context as HonoContext } from "hono";
 import { serveStatic } from "hono/bun";
 import search from "libnpmsearch";
 import { PluginManager } from "live-plugin-manager";
@@ -113,35 +110,35 @@ class RouteImpl implements Route {
     return {
       req: new RequestImpl(context),
       res: new ResponseImpl(context),
-    }
+    };
   }
 
   get(subpath: string, handler: Handler) {
-    return this.app.get(path.join('/', this.root, subpath), (c) => {
+    return this.app.get(path.join("/", this.root, subpath), (c) => {
       return handler(this.context(c));
     });
   }
 
   post(subpath: string, handler: Handler) {
-    return this.app.post(path.join('/', this.root, subpath), (c) => {
+    return this.app.post(path.join("/", this.root, subpath), (c) => {
       return handler(this.context(c));
     });
   }
 
-  put(subpath: string, handler: Handler)  {
-    return this.app.put(path.join('/', this.root, subpath), (c) => {
+  put(subpath: string, handler: Handler) {
+    return this.app.put(path.join("/", this.root, subpath), (c) => {
       return handler(this.context(c));
     });
   }
 
   patch(subpath: string, handler: Handler) {
-    return this.app.patch(path.join('/', this.root, subpath), (c) => {
+    return this.app.patch(path.join("/", this.root, subpath), (c) => {
       return handler(this.context(c));
     });
   }
 
   delete(subpath: string, handler: Handler) {
-    return this.app.delete(path.join('/', this.root, subpath), (c) => {
+    return this.app.delete(path.join("/", this.root, subpath), (c) => {
       return handler(this.context(c));
     });
   }
@@ -165,7 +162,6 @@ const mod = factory.constructModule(params);
 mod.register(server);
 
 async function run() {
-
   await mod.init({});
 
   emitter.emit({
@@ -179,7 +175,7 @@ async function run() {
   }
 }
 
-const route = server.route('')
+const route = server.route("");
 route.get("api/module", async (c) => {
   return c.res.json(params as JSONValue);
 });

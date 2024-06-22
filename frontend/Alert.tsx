@@ -2,20 +2,24 @@ import clsx from "clsx";
 import type { FC, ReactNode } from "react";
 import { createContext, useContext, useState } from "react";
 
-export type AlertType = 'info' | 'success' | 'warning' | 'error';
+export type AlertType = "info" | "success" | "warning" | "error";
 export type AlertParams = {
-  message: string,
-  type: AlertType,
+  message: string;
+  type: AlertType;
   active: boolean;
-  onTransitionEnd?: () => void,
+  onTransitionEnd?: () => void;
 };
 
 function toAlertClass(type: AlertType): string {
   switch (type) {
-    case 'info': return 'alert-info';
-    case 'success': return 'alert-success';
-    case 'warning': return 'alert-warning';
-    case 'error': return 'alert-error';
+    case "info":
+      return "alert-info";
+    case "success":
+      return "alert-success";
+    case "warning":
+      return "alert-warning";
+    case "error":
+      return "alert-error";
   }
 }
 
@@ -63,7 +67,7 @@ export const AlertContext = createContext<{
 });
 
 const ALERT_TIME = 3000;
-export const AlertProvider: FC<{children: ReactNode}> = ({ children }) => {
+export const AlertProvider: FC<{ children: ReactNode }> = ({ children }) => {
   const [state, setState] = useState({
     count: 0,
     actives: [] as { id: number; params: AlertParams }[],
@@ -85,7 +89,7 @@ export const AlertProvider: FC<{children: ReactNode}> = ({ children }) => {
     await new Promise((resolve) => setTimeout(resolve, ALERT_TIME));
 
     setState((state) => {
-      console.log("set state for timeout")
+      console.log("set state for timeout");
       const newobj = {
         count: state.count,
         actives: state.actives.map((a) => {
@@ -108,7 +112,7 @@ export const AlertProvider: FC<{children: ReactNode}> = ({ children }) => {
       };
       console.log(newobj);
       return newobj;
-  });
+    });
   };
 
   return (
@@ -119,21 +123,21 @@ export const AlertProvider: FC<{children: ReactNode}> = ({ children }) => {
 };
 
 export const AlertRegion: FC = () => {
-    const context = useContext(AlertContext);
+  const context = useContext(AlertContext);
 
-    return (
-      <div
-        className={clsx(
-          "md:container md:mx-auto",
-          "inset-x-0",
-          "grid gap-1",
-          "fixed",
-          "z-50",
-        )}
-      >
-        {context.actives.map((a) => (
-          <Alert key={a.id} {...a.params} />
-        ))}
-      </div>
-    );
+  return (
+    <div
+      className={clsx(
+        "md:container md:mx-auto",
+        "inset-x-0",
+        "grid gap-1",
+        "fixed",
+        "z-50",
+      )}
+    >
+      {context.actives.map((a) => (
+        <Alert key={a.id} {...a.params} />
+      ))}
+    </div>
+  );
 };
