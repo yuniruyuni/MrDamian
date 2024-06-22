@@ -1,11 +1,11 @@
 import type { FC } from "react";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useContext, useEffect, useState } from "react";
 import type { PluginInfo } from "~/model/plugin";
-import { Alert } from "./Alert";
+import { AlertContext  } from "./Alert";
 
 export const Plugins: FC = () => {
   const [plugins, setPlugins] = useState<PluginInfo[]>([]);
-  const [message, setAlertMessage] = useState("");
+  const { pushAlert } = useContext(AlertContext);
   useEffect(() => {
     (async () => {
       const res = await fetch("/api/plugin");
@@ -24,17 +24,14 @@ export const Plugins: FC = () => {
     });
     const json = await res.json();
     if (json.status === "ok") {
-      setAlertMessage("Succeeded to install plugin");
+      pushAlert("Succeeded to install plugin", "success");
     } else {
-      setAlertMessage("Failed to install plugin");
+      pushAlert("Failed to install plugin", "error");
     }
-    await new Promise((resolve) => setTimeout(resolve, 3000));
-    setAlertMessage("");
-  }, []);
+  }, [pushAlert]);
 
   return (
     <div className="overflow-x-auto">
-      {message !== "" && <Alert message={message} />}
       <table className="table">
         <tr>
           <th>Name</th>

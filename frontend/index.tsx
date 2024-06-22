@@ -4,6 +4,7 @@ import ReactDOM from "react-dom/client";
 
 import type { ModuleConfig } from "~/model/parameters";
 import { asParams } from "~/model/variable";
+import { AlertProvider, AlertRegion } from "./Alert";
 import { Menu } from "./Menu";
 import { Modules } from "./Modules";
 import { Plugins } from "./Plugins";
@@ -41,6 +42,9 @@ if (!rootElm) throw new Error("Failed to get root element");
 const root = ReactDOM.createRoot(rootElm);
 root.render(
   <React.StrictMode>
-    <Root />
+    <AlertProvider>
+      <AlertRegion />
+      <Root />
+    </AlertProvider>
   </React.StrictMode>,
 );
