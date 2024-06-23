@@ -1,5 +1,5 @@
 import clsx from "clsx";
-import { type FC, useCallback, useRef, useState } from "react";
+import type { FC } from "react";
 import type { ComponentConfig, ModuleConfig } from "~/model/parameters";
 import type { Environment, Field } from "~/model/variable";
 
@@ -31,29 +31,17 @@ const ShowField: FC<{ name: string; value: Field }> = ({ name, value }) => (
   </div>
 );
 
-const Component: FC<{ config: ComponentConfig }> = ({ config }) => {
-  const ref = useRef<HTMLIFrameElement>(null);
-  const [height, setHeight] = useState("0px");
-  const onLoad = useCallback(() => {
-    if (!ref.current) return;
-    if (!ref.current.contentWindow) return;
-    const h = ref.current.contentWindow.document.body.scrollHeight;
-    setHeight(`${h}px`);
-  }, []);
-  return (
-    <div className="timeline-end timeline-box w-full">
-      <h2 className="font-medium text-lg">{config.type}</h2>
-      <iframe
-        ref={ref}
-        className={clsx("w-full", "overflow-auto")}
-        src={`/${[config.type, config.name].filter((v) => v).join("/")}/`}
-        title={`${config.type} settings`}
-        height={height}
-        onLoad={onLoad}
-      />
-    </div>
-  );
-};
+const Component: FC<{ config: ComponentConfig }> = ({ config }) => (
+  <div className="timeline-end timeline-box w-full">
+    <h2 className="font-medium text-lg">{config.type}</h2>
+    <iframe
+      className={clsx("w-full", "overflow-auto")}
+      src={`/${[config.type, config.name].filter((v) => v).join("/")}/`}
+      title={`${config.type} settings`}
+      height={config.height}
+    />
+  </div>
+);
 
 export const Modules: FC<{ modules: ModuleConfig }> = ({ modules }) => (
   <ul className="timeline timeline-vertical timeline-compact">

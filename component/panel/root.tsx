@@ -19,13 +19,12 @@ const Root: FC = () => {
   }, []);
 
   return (
-    <div className="md:container md:mx-auto">
-      <h1>Panel configuration</h1>
+    <div>
       {panels.map((panel) => (
         <button
           type="button"
           key={panel.name}
-          className="md:btn md:btn-primary"
+          className="btn"
         >
           {panel.name}
         </button>

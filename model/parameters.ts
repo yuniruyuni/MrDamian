@@ -22,6 +22,10 @@ export type ComponentConfig = {
   when?: string;
   // "args" field is a list of arguments for component.
   args?: Arguments;
+  // "height" field is a height of display area for component.
+  // this size iframe will be acquired on component rendering in main screen.
+  // if this field is not defined, default is auto calculated from component implementation.
+  height?: number;
 };
 
 export type CallConfig = ComponentConfig & {

@@ -19,6 +19,7 @@ export class ComponentWithConfig<C extends ComponentConfig> {
     this.component = component;
     // TODO: implement some validator.
     this.config = config as C;
+    this.config.height ||= this.component.height();
   }
 
   evaluate(env: Environment): C {
@@ -55,6 +56,10 @@ export abstract class Component<C extends ComponentConfig> {
 
   emit(event: Field) {
     this.emitter.emit(event);
+  }
+
+  height(): number {
+    return 50;
   }
 
   get fetch(): Fetch {
