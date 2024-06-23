@@ -95,7 +95,7 @@ mod.mount(app);
 declare global {
   var alreadyRun: boolean;
 }
-globalThis.alreadyRun ??= true;
+globalThis.alreadyRun ??= false;
 if( !globalThis.alreadyRun ) {
   open("http://localhost:3000");
   globalThis.alreadyRun = true;
