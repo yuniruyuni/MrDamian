@@ -7,7 +7,7 @@
   "type": "module",
   "module": "es2022",
   "scripts": {
-    "start": "run-p start:**",
+    "start": "run-p 'start:**'",
     "start:backend": "bun run --hot --bun bin/main.ts",
     "start:frontend:html": "mkdir -p static/ && cp frontend/index.html static/index.html",
     "start:frontend:bundle": "bun build  --watch --minify --outdir=./static/ frontend/index.tsx",
@@ -19,7 +19,7 @@
     "start:lint": "bun run lint",
     "build": "run-s build:license build:frontend build:backend",
     "build:license": "NODE_ENV=production bun run --bun bin/license.ts",
-    "build:frontend": "run-p build:frontend:**",
+    "build:frontend": "run-p 'build:frontend:**'",
     "build:frontend:html": "mkdir -p static/ && cp frontend/index.html static/index.html",
     "build:frontend:bundle": "NODE_ENV=production bun build  --minify --outdir=./static/ frontend/index.tsx",
     "build:frontend:tailwind": "tailwindcss -i frontend/index.css -o ./static/index.css",
