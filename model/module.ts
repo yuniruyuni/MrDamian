@@ -1,7 +1,6 @@
 import deepmerge from "deepmerge";
 
 import type { ModuleConfig } from "./parameters";
-
 import type { Pipeline } from "./pipeline";
 import type { Server } from "./server";
 import type { Environment, Parameters } from "./variable";
@@ -19,15 +18,15 @@ export class Module {
     return await this.event("init", init);
   }
 
-  register(server: Server) {
-    // TODO: make subroute for each component.
+  mount(server: Server): Server {
+    let mountable = server;
     for (const comp of this.pipeline) {
       const path = [comp.config.type, comp.config.name]
         .filter((v): v is string => v !== undefined)
         .join("/");
-      const route = server.route(`/${path}`);
-      comp.register(route);
+      mountable = mountable.mount(`/${path}`, comp.fetch);
     }
+    return mountable;
   }
 
   async run(init: Environment): Promise<Environment> {

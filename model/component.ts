@@ -1,4 +1,3 @@
-import type { Route } from "~/model/server";
 import type { ComponentConfig } from "./parameters";
 
 import type { NamedEventEmitter } from "./events";
@@ -9,6 +8,8 @@ import {
   evaluate,
   evaluateExpression,
 } from "./variable";
+
+import type { Fetch } from "./server";
 
 export class ComponentWithConfig<C extends ComponentConfig> {
   readonly component: Component<C>;
@@ -26,8 +27,8 @@ export class ComponentWithConfig<C extends ComponentConfig> {
     return { ...this.config, args: args };
   }
 
-  register(route: Route): void {
-    this.component.register(route);
+  get fetch(): Fetch {
+    return this.component.fetch;
   }
 
   async init(env: Environment): Promise<Field> {
@@ -48,7 +49,6 @@ export class ComponentWithConfig<C extends ComponentConfig> {
 
 export abstract class Component<C extends ComponentConfig> {
   private readonly emitter: NamedEventEmitter;
-
   constructor(emitter: NamedEventEmitter) {
     this.emitter = emitter;
   }
@@ -57,8 +57,13 @@ export abstract class Component<C extends ComponentConfig> {
     this.emitter.emit(event);
   }
 
-  register(route: Route): void {
-    route.get("/", (ctx) => ctx.res.html("No configuration"));
+  get fetch(): Fetch {
+    return (_req: Request): Response | Promise<Response> => {
+      return new Response("No configuration", {
+        status: 200,
+        headers: { "Content-Type": "text/html" },
+      });
+    };
   }
 
   async init(_config: C): Promise<Field> {

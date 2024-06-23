@@ -59,10 +59,12 @@
   },
   "license": "MIT",
   "dependencies": {
+    "@elysiajs/static": "^1.0.3",
     "clsx": "^2.1.1",
     "dayjs": "^1.11.11",
     "deepl-node": "^1.13.0",
     "deepmerge": "^4.3.1",
+    "elysia": "^1.0.25",
     "express": "^4.19.2",
     "hono": "^4.4.6",
     "in-queue": "^1.2.1",
