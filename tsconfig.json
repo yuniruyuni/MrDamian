@@ -40,5 +40,5 @@
     "model/**/*",
     "component/**/*"
   ],
-  "exclude": [".plugins/**/*"]
+  "exclude": [".plugins/**/*", "static/**/*"]
 }

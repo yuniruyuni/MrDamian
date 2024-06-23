@@ -1,6 +1,7 @@
 import path from "node:path";
-import { staticPlugin } from "@elysiajs/static";
-import { Elysia } from "elysia";
+import type { Serve } from "bun";
+import { Hono } from "hono";
+import { serveStatic } from "hono/bun";
 
 import search from "libnpmsearch";
 import { PluginManager } from "live-plugin-manager";
@@ -53,17 +54,18 @@ async function run() {
   }
 }
 
-const app = new Elysia()
-  .get("/api/module", async () => {
-    return params;
-  })
-  .post("/api/module/run", async () => {
-    run();
-    return { status: "ok" };
-  })
-  .get("/api/plugin", async () => {
-    const packages = await search("mrdamian-plugin");
-    return packages.map(
+const app = new Hono();
+app.get("/api/module", async (c) => {
+  return c.json(params);
+});
+app.post("/api/module/run", async (c) => {
+  run();
+  return c.json({ status: "ok" });
+});
+app.get("/api/plugin", async (c) => {
+  const packages = await search("mrdamian-plugin");
+  return c.json(
+    packages.map(
       (pkg) =>
         ({
           name: pkg.name,
@@ -71,25 +73,35 @@ const app = new Elysia()
           version: pkg.version,
           installed: false,
         }) as PluginInfo,
-    );
-  })
-  .post("/api/plugin", async ({ body }) => {
-    const params = JSON.parse(body as string) as { name: string };
-    const name = params.name;
+    ),
+  );
+});
+app.post("/api/plugin", async (c) => {
+  const params = (await c.req.json()) as { name: string };
+  const name = params.name;
 
-    const manager = new PluginManager({
-      pluginsPath: path.join(process.cwd(), ".plugins"),
-    });
-    await manager.installFromNpm(name);
+  const manager = new PluginManager({
+    pluginsPath: path.join(process.cwd(), ".plugins"),
+  });
+  await manager.installFromNpm(name);
 
-    return { status: "ok" };
-  })
-  .use(staticPlugin({ prefix: "/", assets: "static" }));
-
+  return c.json({ status: "ok" });
+});
+app.use(serveStatic({ root: 'static' }));
 mod.mount(app);
-open("http://localhost:3000");
+
+// for once open browser.
+// refer: https://bun.sh/docs/runtime/hot
+declare global {
+  var alreadyRun: boolean;
+}
+globalThis.alreadyRun ??= true;
+if( !globalThis.alreadyRun ) {
+  open("http://localhost:3000");
+  globalThis.alreadyRun = true;
+}
 
 export default {
   port: 3000,
   fetch: app.fetch,
-};
+} satisfies Serve;

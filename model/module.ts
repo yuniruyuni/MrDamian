@@ -18,15 +18,14 @@ export class Module {
     return await this.event("init", init);
   }
 
-  mount(server: Server): Server {
-    let mountable = server;
+  mount<T extends Server<T>>(server: T): T {
     for (const comp of this.pipeline) {
       const path = [comp.config.type, comp.config.name]
         .filter((v): v is string => v !== undefined)
         .join("/");
-      mountable = mountable.mount(`/${path}`, comp.fetch);
+      server.mount(`/${path}/`, comp.fetch);
     }
-    return mountable;
+    return server;
   }
 
   async run(init: Environment): Promise<Environment> {

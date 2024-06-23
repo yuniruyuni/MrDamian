@@ -89,7 +89,6 @@ export const AlertProvider: FC<{ children: ReactNode }> = ({ children }) => {
     await new Promise((resolve) => setTimeout(resolve, ALERT_TIME));
 
     setState((state) => {
-      console.log("set state for timeout");
       const newobj = {
         count: state.count,
         actives: state.actives.map((a) => {
@@ -100,7 +99,6 @@ export const AlertProvider: FC<{ children: ReactNode }> = ({ children }) => {
               ...a.params,
               active: false,
               onTransitionEnd: () => {
-                console.log("onTransitionEnd");
                 setState((state) => ({
                   count: state.count,
                   actives: state.actives.filter((a) => a.id !== id),
@@ -110,7 +108,6 @@ export const AlertProvider: FC<{ children: ReactNode }> = ({ children }) => {
           };
         }),
       };
-      console.log(newobj);
       return newobj;
     });
   };
