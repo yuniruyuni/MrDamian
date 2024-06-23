@@ -3,7 +3,7 @@ import checker, { type ModuleInfos } from "license-checker";
 
 export function checkDependency(): Promise<ModuleInfos> {
   return new Promise((resolve, reject) => {
-    checker.init({ start: "./" }, (err, data) => {
+    checker.init({ start: "./", production: true }, (err, data) => {
       if (err) {
         reject(err);
       } else {

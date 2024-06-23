@@ -87,7 +87,7 @@ app.post("/api/plugin", async (c) => {
 
   return c.json({ status: "ok" });
 });
-app.use(serveStatic({ root: 'static' }));
+app.use(serveStatic({ root: "static" }));
 mod.mount(app);
 
 // for once open browser.
@@ -96,7 +96,7 @@ declare global {
   var alreadyRun: boolean;
 }
 globalThis.alreadyRun ??= false;
-if( !globalThis.alreadyRun ) {
+if (!globalThis.alreadyRun) {
   open("http://localhost:3000");
   globalThis.alreadyRun = true;
 }
