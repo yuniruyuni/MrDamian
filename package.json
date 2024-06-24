@@ -2,7 +2,7 @@
   "name": "mrdamian",
   "productName": "mrdamian",
   "license": "MIT",
-  "version": "1.0.0",
+  "version": "0.0.1",
   "description": "Mr.Damian is a platform for streaming assistant tool",
   "main": "src/main.ts",
   "type": "module",
