@@ -1,5 +1,10 @@
 # ドメイン用語集
 
+## Plugin
+- Pluginは、Mr.Damianの機能を拡張するためのプラグイン。
+- `mrdamian-plugin-` という接頭辞を持ったnpm packageとして公開されている
+- 1つのPluginには、1つのModuleつだけが入っている。
+
 ## Module
 - Moduleは、ModuleParametersとPiplineを持ったオブジェクト。
 
