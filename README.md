@@ -1,6 +1,8 @@
 [![npm version](https://badge.fury.io/js/mrdamian.svg)](https://badge.fury.io/js/mrdamian)
 [![code style: biome](https://img.shields.io/badge/code_style-biome-ff69b4.svg?style=flat-square)](https://github.com/biomejs/biome)
 
+# THIS PROJECT IS UNDER DEVELOPMENT
+
 # Mr.Damian
 
 - Mr.Damian is (mainly) twitch streamer assistance tool via configurable pipelines with various plugins.
