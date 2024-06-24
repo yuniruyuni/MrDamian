@@ -12,7 +12,9 @@ import { Module } from "./module";
 import type { Pipeline } from "./pipeline";
 import type { Field } from "./variable";
 
-export interface ComponentGenerator<T extends ComponentConfig> {
+export interface ComponentGenerator<
+  T extends ComponentConfig = ComponentConfig,
+> {
   new (emitter: NamedEventEmitter): Component<T>;
 }
 

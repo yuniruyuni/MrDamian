@@ -1,4 +1,4 @@
-# Mr.Damian
+# MrDamian
 
 ## これは何？
 
@@ -6,38 +6,54 @@
 - このツールは、配信者が自由にコンポネントを組み合わせてパイプラインを構成し、自分独自の配信支援ツールを組み立てることができます。
 - それらのパイプラインはモジュールファイルとして保存され、配布することもできます。
 
-# ドメイン用語集
+## 目次
 
-## Module
-- Moduleは、ModuleParametersとPiplineを持ったオブジェクト。
+- [MrDamian](#mrdamian)
+  - [目次](#目次)
+  - [インストール](#インストール)
+  - [使い方](#使い方)
+  - [コントリビュートするには](#コントリビュートするには)
+  - [使用スタック](#使用スタック)
+  - [バージョニング](#バージョニング)
+  - [開発者](#開発者)
+  - [ライセンス](#ライセンス)
 
-### MainModule
-- MainModuleは、Mr.Damianの全体で最初に呼び出されるModule。
+## インストール
 
-## Pipeline
-- パイプラインは、複数のComponentを組み合わせて構成される。
-    - `Pipeline = Component[]`
+(後で書く)
 
-## Component
-- Componentは、パイプラインの最小単位。
-- システム側で事前いろいろな種類のものが定義されている。
-- "when" というフィールドがある場合、そのComponentが実行されるのはwhenの条件が真のときだけ。
-- 関数とみなすなら `Component: Parameters -> (Arguments -> Field)` という形式をしている。
+## 使い方
 
-### ComponentName
-- Componentそれぞれにつけられたユーザ定義の名称。
-- ただし省略可能で、その場合はComponentのtypeと同じ名前が使われる。
+(後で書く)
 
-## Parameters
-- 各ModuleのConfigファイルの中で "params" に定義されるJSONオブジェクト。
-- "params" 各フィールドは、call側の呼び出すときに指定する引数のデフォルト値を持つ。
+## コントリビュートするには
 
-## Arguments
-- 各Componentの "args" というフィールドに定義されるJSONオブジェクト。
-- このオブジェクトの中で "$" で始まる文字列のフィールドは、実行時に `evaluate` される。
+ごめんなさい。現状はアーキテクチャデザインを決めるためのPoCフェーズなのでコントリビュートは受け付けていません。
+しばらくしてデザインがまとまってきたら、コントリビュートについての情報を追加します。
 
-## Environment
-- Pipelineの各々のComponentの出力を格納したオブジェクト
-- 各ModuleのPipelineのはじめの時点では、Argumentsが展開された状態で初期化される。
-- 各Componentの処理が終わるたびに、Environmentには、そのComponentの出力が格納される。
-- このときのフィールド名はComponentNameになる。
+ただし
+1. このリポジトリは[Bun](https://bun.sh/)を使っている
+2. LinuxやMac, WSLで開発しクロスコンパイルでWindows向けのバイナリを出力する
+という2点に注意すると取り扱いできるかと思います。
+
+またこのツールは[ゆにるユニの配信](https://twitch.tv/yuniruyuni)で開発していますので、そちらもチェックしてください。
+
+## バージョニング
+
+[SemVer](https://semver.org/)を使用してバージョニングしています。
+利用可能なバージョンは、[このリポジトリのタグ](https://github.com/yuniruyuni/mrdamian/tags)を見てください。
+
+## 使用スタック
+
+* [Bun](https://bun.sh/)
+* [React](https://reactjs.org/)
+* [Tailwind CSS](https://tailwindcss.com/)
+* [daisyUI](https://daisyui.com/)
+
+## 開発者
+
+* **Yuniru Yuni** - *初期開発者* - [yuniruyuni](https://github.com/yuniruyuni)
+
+## ライセンス
+
+[MIT License](https://andreasonny.mit-license.org/2019) © Yuniru Yuni

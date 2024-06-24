@@ -2,28 +2,48 @@ import path from "node:path";
 import type { Serve } from "bun";
 import { Hono } from "hono";
 import { serveStatic } from "hono/bun";
-
 import search from "libnpmsearch";
 import { PluginManager } from "live-plugin-manager";
-
 import open from "open";
 
 import type { PluginInfo } from "~/model/plugin";
 
 import { load } from "~/backend/load_config";
 import { eventChannel } from "~/model/events";
-import { type ComponentGenerators, ModuleFactory } from "~/model/factory";
+import {
+  type ComponentGenerator,
+  type ComponentGenerators,
+  ModuleFactory,
+} from "~/model/factory";
 
 import { Datetime } from "~/component/datetime";
 import { DeepL } from "~/component/deepl";
 import { Logger } from "~/component/logger";
-import { Panel } from "~/component/panel";
 import { Periodic } from "~/component/periodic";
 import { Translate } from "~/component/translate";
 import { Twitch } from "~/component/twitch";
 import { Youtube } from "~/component/youtube";
 
+const manager = new PluginManager({
+  pluginsPath: path.join(process.cwd(), ".plugins"),
+});
+
+const installed: ComponentGenerators = Object.fromEntries(
+  manager
+    .list()
+    .flatMap((pkg) => {
+      const pattern = /^mrdamian-plugin-(.*)$/;
+      const found = pkg.name.match(pattern);
+      if (!found) return [];
+      const type = found[1] as string;
+      const required = manager.require(pkg.name);
+
+      return [[type, required as ComponentGenerator]];
+    }),
+);
+
 const gens: ComponentGenerators = {
+  ...installed,
   twitch: Twitch,
   youtube: Youtube,
   deepl: DeepL,
@@ -31,7 +51,6 @@ const gens: ComponentGenerators = {
   periodic: Periodic,
   datetime: Datetime,
   logger: Logger,
-  panel: Panel,
   translate: Translate,
 };
 
@@ -63,7 +82,7 @@ app.post("/api/module/run", async (c) => {
   return c.json({ status: "ok" });
 });
 app.get("/api/plugin", async (c) => {
-  const packages = await search("mrdamian-plugin");
+  const packages = await search("mrdamian-plugin-");
   return c.json(
     packages.map(
       (pkg) =>

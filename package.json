@@ -1,19 +1,24 @@
 {
   "name": "mrdamian",
   "productName": "mrdamian",
+  "license": "MIT",
   "version": "1.0.0",
   "description": "Mr.Damian is a platform for streaming assistant tool",
   "main": "src/main.ts",
   "type": "module",
   "module": "es2022",
+  "keywords": [],
+  "author": {
+    "name": "yuniruyuni",
+    "email": "yuniruyuni@gmail.com"
+  },
   "scripts": {
+    "prepublishOnly": "bun run build",
     "start": "run-p 'start:**'",
     "start:backend": "bun run --hot --bun bin/main.ts",
     "start:frontend:static": "bun run --bun bin/build/static.ts",
     "start:frontend:bundle": "bun build  --watch --sourcemap=inline --outdir=static/ frontend/index.tsx",
     "start:frontend:tailwind": "tailwindcss --watch -o static/index.css -i frontend/index.css",
-    "start:frontend:tmp_panel_js": "bun build  --watch --sourcemap=inline --outdir=./static/component/panel component/panel/root.tsx # it will be omit after split component into sub-projects",
-    "start:frontend:tmp_panel_tw": "tailwindcss --watch -o static/component/panel/index.css -i component/panel/index.css # it will be omit after split component into sub-projects",
     "start:test": "bun --watch test",
     "start:type": "tsc --noEmit --watch",
     "start:lint": "bun run lint",
@@ -23,8 +28,6 @@
     "build:frontend:html": "bun run bin/build/static.ts",
     "build:frontend:bundle": "NODE_ENV=production bun build --minify --outdir=./static/ frontend/index.tsx",
     "build:frontend:tailwind": "tailwindcss -i frontend/index.css -o ./static/index.css",
-    "build:frontend:tmp_panel_js": "bun build --outdir=./static/component/panel component/panel/root.tsx # it will be omit after split component into sub-projects",
-    "build:frontend:tmp_panel_tw": "tailwindcss -o static/component/panel/index.css -i component/panel/index.css # it will be omit after split component into sub-projects",
     "build:backend": "run-p 'build:backend:**'",
     "build:backend:windows-x64": "NODE_ENV=production bun build  --compile --minify --target=bun-windows-x64 --outfile=build/windows-x64.exe bin/main.ts",
     "build:backend:windows-arm64": "echo 'there are no building method for windows-arm64 target yet'",
@@ -38,6 +41,21 @@
     "lint": "biome lint",
     "format": "biome format --write",
     "check": "biome check --write"
+  },
+  "dependencies": {
+    "clsx": "^2.1.1",
+    "dayjs": "^1.11.11",
+    "deepl-node": "^1.13.0",
+    "deepmerge": "^4.3.1",
+    "hono": "^4.4.7",
+    "in-queue": "^1.2.1",
+    "jexpr": "^1.0.0-pre.9",
+    "json5": "^2.2.3",
+    "libnpmsearch": "^7.0.6",
+    "live-plugin-manager": "^1.0.0",
+    "open": "^10.1.0",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1"
   },
   "devDependencies": {
     "@biomejs/biome": "1.8.1",
@@ -58,31 +76,7 @@
     "daisyui": "^4.12.2",
     "license-checker": "^25.0.1",
     "npm-run-all2": "^6.2.0",
-    "react": "^18.3.1",
-    "react-dom": "^18.3.1",
     "tailwindcss": "^3.4.4",
     "typescript": "^5.4.5"
-  },
-  "keywords": [],
-  "author": {
-    "name": "yuniruyuni",
-    "email": "yuniruyuni@gmail.com"
-  },
-  "license": "MIT",
-  "dependencies": {
-    "clsx": "^2.1.1",
-    "dayjs": "^1.11.11",
-    "deepl-node": "^1.13.0",
-    "deepmerge": "^4.3.1",
-    "hono": "^4.4.7",
-    "in-queue": "^1.2.1",
-    "jexpr": "^1.0.0-pre.9",
-    "json5": "^2.2.3",
-    "libnpmsearch": "^7.0.6",
-    "live-plugin-manager": "^1.0.0",
-    "open": "^10.1.0"
-  },
-  "optionalDependencies": {
-    "@rollup/rollup-linux-x64-gnu": "^4.18.0"
   }
 }
