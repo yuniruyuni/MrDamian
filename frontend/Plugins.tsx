@@ -12,7 +12,7 @@ export const Plugins: FC = () => {
       const json = await res.json();
       setPlugins(json as PluginInfo[]);
     })();
-  });
+  }, []);
 
   const onInstall = useCallback(
     async (name: string) => {

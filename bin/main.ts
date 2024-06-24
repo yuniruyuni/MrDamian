@@ -2,19 +2,34 @@ import path from "node:path";
 import type { Serve } from "bun";
 import { Hono } from "hono";
 import { serveStatic } from "hono/bun";
+import JSON5 from "json5";
 import search from "libnpmsearch";
 import { PluginManager } from "live-plugin-manager";
 import open from "open";
 
+import { load } from "~/backend/load_config";
+import { PluginLoader } from "~/backend/load_plugin";
+import { eventChannel } from "~/model/events";
+import { type ComponentGenerators, ModuleFactory } from "~/model/factory";
 import type { PluginInfo } from "~/model/plugin";
 
-import { load } from "~/backend/load_config";
-import { eventChannel } from "~/model/events";
-import {
-  type ComponentGenerator,
-  type ComponentGenerators,
-  ModuleFactory,
-} from "~/model/factory";
+const pluginsFile = Bun.file("config/plugins.json5");
+const installedPlugins = (
+  (await pluginsFile.exists()) ? JSON5.parse(await pluginsFile.text()) : []
+) as { name: string; version: string }[];
+
+const pluginsPath = path.join(process.cwd(), ".plugins");
+const manager = new PluginManager({ pluginsPath });
+const loader = new PluginLoader(pluginsPath);
+const loaded: ComponentGenerators = Object.fromEntries(
+  (await Promise.all(installedPlugins.map(async (pkg) => {
+    const info = await manager.install(pkg.name, pkg.version);
+    const plugin = await loader.load(info.location);
+    if( !plugin ) return [];
+    if( !plugin.type ) return [];
+    return [[plugin.type, plugin.gen]];
+  }))).flat()
+);
 
 import { Datetime } from "~/component/datetime";
 import { DeepL } from "~/component/deepl";
@@ -24,25 +39,8 @@ import { Translate } from "~/component/translate";
 import { Twitch } from "~/component/twitch";
 import { Youtube } from "~/component/youtube";
 
-const manager = new PluginManager({
-  pluginsPath: path.join(process.cwd(), ".plugins"),
-});
-
-const installed: ComponentGenerators = Object.fromEntries(
-  manager
-    .list()
-    .flatMap((pkg) => {
-      const pattern = /^mrdamian-plugin-(.*)$/;
-      const found = pkg.name.match(pattern);
-      if (!found) return [];
-      const type = found[1] as string;
-      const required = manager.require(`${pkg.name}/dist/index.js`);
-      return [[type, required as ComponentGenerator]];
-    }),
-);
-
 const gens: ComponentGenerators = {
-  ...installed,
+  ...loaded,
   twitch: Twitch,
   youtube: Youtube,
   deepl: DeepL,
@@ -89,7 +87,7 @@ app.get("/api/plugin", async (c) => {
           name: pkg.name,
           description: pkg.description,
           version: pkg.version,
-          installed: !!manager.list().find((p) => p.name === pkg.name),
+          installed: installedPlugins.some((p) => p.name === pkg.name),
         }) as PluginInfo,
     ),
   );
@@ -97,7 +95,9 @@ app.get("/api/plugin", async (c) => {
 app.post("/api/plugin", async (c) => {
   const params = (await c.req.json()) as { name: string };
   const name = params.name;
-  await manager.installFromNpm(name);
+  const plugin = await manager.installFromNpm(name);
+  installedPlugins.push({name: plugin.name, version: plugin.version});
+  Bun.write(pluginsFile, JSON5.stringify(installedPlugins, null, 2));
 
   return c.json({ status: "ok" });
 });
