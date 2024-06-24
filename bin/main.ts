@@ -36,8 +36,7 @@ const installed: ComponentGenerators = Object.fromEntries(
       const found = pkg.name.match(pattern);
       if (!found) return [];
       const type = found[1] as string;
-      const required = manager.require(pkg.name);
-
+      const required = manager.require(`${pkg.name}/dist/index.js`);
       return [[type, required as ComponentGenerator]];
     }),
 );
@@ -90,7 +89,7 @@ app.get("/api/plugin", async (c) => {
           name: pkg.name,
           description: pkg.description,
           version: pkg.version,
-          installed: false,
+          installed: !!manager.list().find((p) => p.name === pkg.name),
         }) as PluginInfo,
     ),
   );
@@ -98,10 +97,6 @@ app.get("/api/plugin", async (c) => {
 app.post("/api/plugin", async (c) => {
   const params = (await c.req.json()) as { name: string };
   const name = params.name;
-
-  const manager = new PluginManager({
-    pluginsPath: path.join(process.cwd(), ".plugins"),
-  });
   await manager.installFromNpm(name);
 
   return c.json({ status: "ok" });
