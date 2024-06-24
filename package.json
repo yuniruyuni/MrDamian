@@ -74,7 +74,6 @@
     "dayjs": "^1.11.11",
     "deepl-node": "^1.13.0",
     "deepmerge": "^4.3.1",
-    "express": "^4.19.2",
     "hono": "^4.4.7",
     "in-queue": "^1.2.1",
     "jexpr": "^1.0.0-pre.9",
