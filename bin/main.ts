@@ -35,7 +35,6 @@ import { Datetime } from "~/component/datetime";
 import { DeepL } from "~/component/deepl";
 import { Logger } from "~/component/logger";
 import { Periodic } from "~/component/periodic";
-import { Translate } from "~/component/translate";
 import { Twitch } from "~/component/twitch";
 import { Youtube } from "~/component/youtube";
 
@@ -48,7 +47,6 @@ const gens: ComponentGenerators = {
   periodic: Periodic,
   datetime: Datetime,
   logger: Logger,
-  translate: Translate,
 };
 
 const [emitter, absorber] = eventChannel();
