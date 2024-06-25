@@ -48,13 +48,20 @@ export const Plugins: FC = () => {
               <td>{plugin.description}</td>
               <td>{plugin.version}</td>
               <td>
-                <button
-                  type="button"
-                  className="btn btn-primary"
-                  onClick={() => onInstall(plugin.name)}
-                >
-                  Install
-                </button>
+                {plugin.installed && (
+                  <button type="button" className="btn btn-disabled">
+                    Installed
+                  </button>
+                )}
+                {!plugin.installed && (
+                  <button
+                    type="button"
+                    className="btn btn-primary"
+                    onClick={() => onInstall(plugin.name)}
+                  >
+                    Install
+                  </button>
+                )}
               </td>
             </tr>
           ))}
