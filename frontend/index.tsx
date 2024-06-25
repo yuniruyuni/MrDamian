@@ -13,6 +13,16 @@ const Container: FC<{ children: React.ReactNode }> = ({ children }) => (
   <div className="md:container md:mx-auto">{children}</div>
 );
 
+type TabID = "plugins" | "modules";
+
+const useTabs = (defaults: TabID) => {
+  const [selected, setSelected] = useState(defaults);
+  const onClickTab = (tab: TabID) => {
+    setSelected(tab);
+  };
+  return {selected, onClickTab};
+};
+
 const Root: FC = () => {
   const [modules, setModules] = useState<ModuleConfig>({
     main: true,
@@ -28,11 +38,42 @@ const Root: FC = () => {
     })();
   }, []);
 
+  const tabs = useTabs("modules");
+
+  console.log(tabs);
+
   return (
     <Container>
       <Menu />
-      <Plugins />
-      <Modules modules={modules} />
+      <div role="tablist" className="tabs tabs-lifted">
+        <input
+          type="radio"
+          name="modules"
+          role="tab"
+          className="tab"
+          aria-label="modules tab"
+          onClick={() => tabs.onClickTab("modules")}
+          onKeyUp={() => tabs.onClickTab("modules")}
+          checked={tabs.selected === "modules"}
+        />
+        <div role="tabpanel" className="tab-content bg-base-100 border-base-300 rounded-box p-6">
+          <Modules modules={modules} />
+        </div>
+
+        <input
+          type="radio"
+          name="plugins"
+          role="tab"
+          className="tab"
+          aria-label="plugins tab"
+          onClick={() => tabs.onClickTab("plugins")}
+          onKeyUp={() => tabs.onClickTab("plugins")}
+          checked={tabs.selected === "plugins"}
+        />
+        <div role="tabpanel" className="tab-content bg-base-100 border-base-300 rounded-box p-6">
+          <Plugins />
+        </div>
+      </div>
     </Container>
   );
 };
