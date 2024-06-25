@@ -18,10 +18,11 @@ const installedPlugins = (
   (await pluginsFile.exists()) ? JSON5.parse(await pluginsFile.text()) : []
 ) as { name: string; version: string }[];
 
-const pluginsPath = path.join(process.cwd(), ".plugins");
+// TODO: find a better way for resolving plugin-dependency pacakge import path.
+const pluginsPath = path.join(process.cwd(), "node_modules");
 const manager = new PluginManager({ pluginsPath });
 const loader = new PluginLoader(pluginsPath);
-const loaded: ComponentGenerators = Object.fromEntries(
+const gens: ComponentGenerators = Object.fromEntries(
   (await Promise.all(installedPlugins.map(async (pkg) => {
     const info = await manager.install(pkg.name, pkg.version);
     const plugin = await loader.load(info.location);
@@ -30,24 +31,6 @@ const loaded: ComponentGenerators = Object.fromEntries(
     return [[plugin.type, plugin.gen]];
   }))).flat()
 );
-
-import { Datetime } from "~/component/datetime";
-import { DeepL } from "~/component/deepl";
-import { Logger } from "~/component/logger";
-import { Periodic } from "~/component/periodic";
-import { Twitch } from "~/component/twitch";
-import { Youtube } from "~/component/youtube";
-
-const gens: ComponentGenerators = {
-  ...loaded,
-  twitch: Twitch,
-  youtube: Youtube,
-  deepl: DeepL,
-
-  periodic: Periodic,
-  datetime: Datetime,
-  logger: Logger,
-};
 
 const [emitter, absorber] = eventChannel();
 const factory = new ModuleFactory(gens, emitter);
