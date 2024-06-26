@@ -1,5 +1,3 @@
-import deepmerge from "deepmerge";
-
 import type { EventEmitter } from "./events";
 import type { ModuleConfig } from "./parameters";
 import type { Pipeline } from "./pipeline";
@@ -47,17 +45,7 @@ export class Module {
 
     return await this.pipeline.reduce(async (penv, comp) => {
       const env: Environment = await penv;
-      const ret = await comp.run(env);
-      if (ret === undefined) return env;
-      // TODO: split this into some function...(it is as same as component.ts)
-      const keys: string[] = [comp.config.type, comp.config.name].filter(
-        (v): v is string => v !== undefined,
-      );
-      let obj = ret;
-      for (const key of keys.reverse()) {
-        obj = { [key]: obj };
-      }
-      return deepmerge(env, obj as Environment);
+      return await comp.run(env);
     }, Promise.resolve(filtered));
   }
 }

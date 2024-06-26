@@ -1,6 +1,7 @@
-import type { ComponentConfig } from "./parameters";
+import deepmerge from "deepmerge";
 
 import type { NamedEventEmitter } from "./events";
+import type { ComponentConfig } from "./parameters";
 import {
   type Environment,
   type Field,
@@ -36,15 +37,25 @@ export class ComponentWithConfig<C extends ComponentConfig> {
     return this.component.init(this.evaluate(env));
   }
 
-  async run(env: Environment): Promise<Field> {
+  async run(env: Environment): Promise<Environment> {
     // skip if when condition is not met.
     if (this.config.when) {
       const res = evaluateExpression(this.config.when, env);
       if (!res) {
-        return undefined;
+        return env;
       }
     }
-    return this.component.run(this.evaluate(env));
+
+    const ret = await this.component.run(this.evaluate(env));
+
+    const keys: string[] = [this.config.type, this.config.name].filter(
+      (v): v is string => v !== undefined,
+    );
+    let obj = ret;
+    for (const key of keys.reverse()) {
+      obj = { [key]: obj };
+    }
+    return deepmerge(env, obj as Environment);
   }
 }
 
