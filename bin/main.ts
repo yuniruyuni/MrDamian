@@ -9,7 +9,6 @@ import open from "open";
 
 import { load } from "~/backend/load_config";
 import { PluginLoader } from "~/backend/load_plugin";
-import { eventChannel } from "~/model/events";
 import { type ComponentGenerators, ModuleFactory } from "~/model/factory";
 import type { PluginInfo } from "~/model/plugin";
 
@@ -36,16 +35,15 @@ const gens: ComponentGenerators = Object.fromEntries(
   ).flat(),
 );
 
-const [emitter, absorber] = eventChannel();
-const factory = new ModuleFactory(gens, emitter);
+const factory = new ModuleFactory(gens);
 const params = await load("./config/main.json5");
 const mod = factory.constructModule(params);
 
 async function run() {
   await mod.init({});
 
-  for await (const event of absorber) {
-    await mod.run(event);
+  for (;;) {
+    await mod.receive();
   }
 }
 

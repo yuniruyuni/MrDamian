@@ -1,26 +1,22 @@
-import type { EventEmitter } from "./events";
+import type { EventAbsorber } from "./events";
 import type { ModuleConfig } from "./parameters";
 import type { Pipeline } from "./pipeline";
 import type { Server } from "./server";
 import type { Environment, Parameters } from "./variable";
 
 export class Module {
-  emitter: EventEmitter;
+  absorber: EventAbsorber;
   config: ModuleConfig;
   pipeline: Pipeline;
 
-  constructor(config: ModuleConfig, pipeline: Pipeline, emitter: EventEmitter) {
+  constructor(config: ModuleConfig, pipeline: Pipeline, absorber: EventAbsorber) {
     this.config = config;
     this.pipeline = pipeline;
-    this.emitter = emitter;
+    this.absorber = absorber;
   }
 
   async init(init: Environment): Promise<void> {
     await Promise.all(this.pipeline.map(async (comp) => comp.init(init)));
-  }
-
-  emit(event: Environment): void {
-    this.emitter.emit(event);
   }
 
   mount<T extends Server<T>>(server: T): T {
@@ -31,6 +27,21 @@ export class Module {
       server.mount(`/${path}/`, comp.fetch);
     }
     return server;
+  }
+
+  async receive(): Promise<void> {
+    const awaits = this.pipeline.map(async (c) => c.receive());
+
+    await Promise.all([
+      ...awaits,
+      (async () => {
+        const event = this.absorber.absorb();
+        await this.pipeline.reduce(async (penv, comp) => {
+          const env: Environment = await penv;
+          return await comp.run(env);
+        }, Promise.resolve(event));
+      })(),
+    ])
   }
 
   async run(init: Environment): Promise<Environment> {

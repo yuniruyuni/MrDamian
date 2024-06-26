@@ -37,6 +37,10 @@ export class ComponentWithConfig<C extends ComponentConfig> {
     return this.component.init(this.evaluate(env));
   }
 
+  async receive(): Promise<void> {
+    return this.component.receive();
+  }
+
   async run(env: Environment): Promise<Environment> {
     // skip if when condition is not met.
     if (this.config.when) {
@@ -84,4 +88,5 @@ export abstract class Component<C extends ComponentConfig> {
 
   async init(_config: C): Promise<void> {}
   abstract run(config: C): Promise<Field>;
+  async receive(): Promise<void> {}
 }

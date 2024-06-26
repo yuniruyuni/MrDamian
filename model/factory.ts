@@ -7,7 +7,7 @@ import {
 } from "./parameters";
 
 import { Component, ComponentWithConfig } from "./component";
-import { type EventEmitter, NamedEventEmitter } from "./events";
+import { type EventAbsorber, type EventEmitter, NamedEventEmitter, eventChannel } from "./events";
 import { Module } from "./module";
 import type { Pipeline } from "./pipeline";
 import type { Field } from "./variable";
@@ -23,20 +23,24 @@ export type ComponentGenerators = {
 };
 
 export class ModuleFactory {
-  readonly constructors: ComponentGenerators;
+  readonly gens: ComponentGenerators;
   readonly emitter: EventEmitter;
+  readonly absorber: EventAbsorber;
 
   instances: Map<string, Component<ComponentConfig>>;
 
-  constructor(constructors: ComponentGenerators, emitter: EventEmitter) {
-    this.constructors = constructors;
-    this.emitter = emitter;
+  constructor(gens: ComponentGenerators) {
+    this.gens = gens;
     this.instances = new Map();
+
+    const [emitter, absorber] = eventChannel();
+    this.emitter = emitter;
+    this.absorber = absorber;
   }
 
   constructModule(params: ModuleConfig): Module {
     const pipeline = this.constructPipeline(params.pipeline);
-    return new Module(params, pipeline, this.emitter);
+    return new Module(params, pipeline, this.absorber);
   }
 
   constructPipeline(pipeline: PipelineConfig): Pipeline {
@@ -55,7 +59,7 @@ export class ModuleFactory {
 
     // Call component should not be cached because Call is system component.
     if (isCallConfig(config)) {
-      return new ComponentWithConfig(new Call(config, emitter, this), config);
+      return new ComponentWithConfig(new Call(config, emitter, this.gens), config);
     }
 
     let component = this.instances.get(key);
@@ -70,7 +74,7 @@ export class ModuleFactory {
     config: ComponentConfig,
     emitter: NamedEventEmitter,
   ): Component<ComponentConfig> {
-    const gen = this.constructors[config.type];
+    const gen = this.gens[config.type];
     if (!gen) {
       console.log(`Unsupported component: ${config.type}`);
       return new Unsupported(emitter);
@@ -82,16 +86,18 @@ export class ModuleFactory {
 // TODO: rename as Submodule
 // TODO: allow direct definition submodule (not file path but configure object.)
 class Call extends Component<CallConfig> {
+  factory: ModuleFactory;
   submodule: Module;
 
   constructor(
     config: CallConfig,
     emitter: NamedEventEmitter,
-    factory: ModuleFactory,
+    gens: ComponentGenerators,
   ) {
-    super(emitter);
     // TODO: validate params with some schema.
-    this.submodule = factory.constructModule(config.module);
+    super(emitter);
+    this.factory = new ModuleFactory(gens);
+    this.submodule = this.factory.constructModule(config.module);
   }
 
   async init(config: CallConfig): Promise<void> {
@@ -100,6 +106,10 @@ class Call extends Component<CallConfig> {
 
   async run(config: CallConfig): Promise<Field> {
     return this.submodule.run(config.args ?? {});
+  }
+
+  async receive(): Promise<void> {
+    return this.submodule.receive();
   }
 }
 

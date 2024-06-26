@@ -16,7 +16,7 @@ class EventChannel {
   }
 
   async absorb(timeout?: number): Promise<Environment> {
-    return await this.queue.get(timeout);
+    return this.queue.get(timeout);
   }
 }
 
@@ -27,13 +27,7 @@ export class EventAbsorber {
   }
 
   async absorb(timeout?: number): Promise<Environment> {
-    return await this.channel.absorb(timeout);
-  }
-
-  async *[Symbol.asyncIterator](): AsyncIterableIterator<Environment> {
-    while (true) {
-      yield await this.absorb();
-    }
+    return this.channel.absorb(timeout);
   }
 }
 
