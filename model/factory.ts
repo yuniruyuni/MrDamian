@@ -36,7 +36,7 @@ export class ModuleFactory {
 
   constructModule(params: ModuleConfig): Module {
     const pipeline = this.constructPipeline(params.pipeline);
-    return new Module(params, pipeline);
+    return new Module(params, pipeline, this.emitter);
   }
 
   constructPipeline(pipeline: PipelineConfig): Pipeline {

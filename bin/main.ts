@@ -40,7 +40,7 @@ const mod = factory.constructModule(params);
 async function run() {
   await mod.init({});
 
-  emitter.emit({
+  mod.emit({
     system: {
       initialied: true,
     },

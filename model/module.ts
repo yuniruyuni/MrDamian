@@ -1,21 +1,28 @@
 import deepmerge from "deepmerge";
 
+import type { EventEmitter } from "./events";
 import type { ModuleConfig } from "./parameters";
 import type { Pipeline } from "./pipeline";
 import type { Server } from "./server";
 import type { Environment, Parameters } from "./variable";
 
 export class Module {
+  emitter: EventEmitter;
   config: ModuleConfig;
   pipeline: Pipeline;
 
-  constructor(config: ModuleConfig, pipeline: Pipeline) {
+  constructor(config: ModuleConfig, pipeline: Pipeline, emitter: EventEmitter) {
     this.config = config;
     this.pipeline = pipeline;
+    this.emitter = emitter;
   }
 
   async init(init: Environment): Promise<Environment> {
     return await this.event("init", init);
+  }
+
+  emit(event: Environment): void {
+    this.emitter.emit(event);
   }
 
   mount<T extends Server<T>>(server: T): T {
