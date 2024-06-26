@@ -19,8 +19,12 @@ export class Module {
     this.absorber = absorber;
   }
 
-  async init(init: Environment): Promise<void> {
-    await Promise.all(this.pipeline.map(async (comp) => comp.init(init)));
+  async initialize(init: Environment): Promise<void> {
+    await Promise.all(this.pipeline.map(async (comp) => comp.initialize(init)));
+  }
+
+  async finalize(init: Environment): Promise<void> {
+    await Promise.all(this.pipeline.map(async (comp) => comp.finalize(init)));
   }
 
   mount<T extends Server<T>>(server: T): T {
@@ -39,28 +43,26 @@ export class Module {
     await Promise.all([
       ...awaits,
       (async () => {
-        const event = this.absorber.absorb();
-        await this.pipeline.reduce(async (penv, comp) => {
-          const env: Environment = await penv;
-          return await comp.run(env);
-        }, Promise.resolve(event));
+        const event = await this.absorber.absorb();
+        await this.reduce(event);
       })(),
     ]);
   }
 
-  async run(init: Environment): Promise<Environment> {
+  async reduce(init: Environment): Promise<Environment> {
+    return await this.pipeline.reduce(async (penv, comp) => {
+      const env: Environment = await penv;
+      return await comp.process(env);
+    }, Promise.resolve(init));
+  }
+
+  async process(init: Environment): Promise<Environment> {
     const params: Parameters = this.config.params ?? ({} as Parameters);
     // our component have default value as "params" in it's configuration file.
     const filled = { ...params, ...init };
-    const filtered = this.config.main
-      ? filled
-      : Object.fromEntries(
-          Object.entries(params).map(([key, _value]) => [key, filled[key]]),
-        );
-
-    return await this.pipeline.reduce(async (penv, comp) => {
-      const env: Environment = await penv;
-      return await comp.run(env);
-    }, Promise.resolve(filtered));
+    const filtered = Object.fromEntries(
+      Object.entries(params).map(([key, _value]) => [key, filled[key]]),
+    );
+    return this.reduce(filtered);
   }
 }

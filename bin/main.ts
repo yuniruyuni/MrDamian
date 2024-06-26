@@ -40,11 +40,13 @@ const params = await load("./config/main.json5");
 const mod = factory.constructModule(params);
 
 async function run() {
-  await mod.init({});
+  await mod.initialize({});
 
   for (;;) {
     await mod.receive();
   }
+
+  // TOOD: finalize and destruct all components.
 }
 
 const app = new Hono();

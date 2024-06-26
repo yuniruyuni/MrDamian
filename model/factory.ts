@@ -93,7 +93,7 @@ export class ModuleFactory {
 
 // TODO: rename as Submodule
 // TODO: allow direct definition submodule (not file path but configure object.)
-class Call extends Component<CallConfig> {
+export class Call extends Component<CallConfig> {
   factory: ModuleFactory;
   submodule: Module;
 
@@ -108,12 +108,16 @@ class Call extends Component<CallConfig> {
     this.submodule = this.factory.constructModule(config.module);
   }
 
-  async init(config: CallConfig): Promise<void> {
-    return this.submodule.init(config.args ?? {});
+  async initialize(config: CallConfig): Promise<void> {
+    return this.submodule.initialize(config.args ?? {});
   }
 
-  async run(config: CallConfig): Promise<Field> {
-    return this.submodule.run(config.args ?? {});
+  async process(config: CallConfig): Promise<Field> {
+    return this.submodule.process(config.args ?? {});
+  }
+
+  async finalize(config: CallConfig): Promise<void> {
+    return this.submodule.finalize(config.args ?? {});
   }
 
   async receive(): Promise<void> {
@@ -122,7 +126,7 @@ class Call extends Component<CallConfig> {
 }
 
 class Unsupported extends Component<ComponentConfig> {
-  async run(): Promise<Field> {
+  async process(): Promise<Field> {
     // just ignore all things.
     return undefined;
   }

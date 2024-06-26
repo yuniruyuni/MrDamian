@@ -1,6 +1,7 @@
 import deepmerge from "deepmerge";
 
 import type { NamedEventEmitter } from "./events";
+import type { Call } from "./factory";
 import type { ComponentConfig } from "./parameters";
 import {
   type Environment,
@@ -33,15 +34,18 @@ export class ComponentWithConfig<C extends ComponentConfig> {
     return this.component.fetch;
   }
 
-  async init(env: Environment): Promise<void> {
-    return this.component.init(this.evaluate(env));
+  async initialize(env: Environment): Promise<void> {
+    return this.component.initialize(this.evaluate(env));
   }
 
   async receive(): Promise<void> {
-    return this.component.receive();
+    if (this.config.type === "call") {
+      const call = this.component as unknown as Call;
+      call.receive();
+    }
   }
 
-  async run(env: Environment): Promise<Environment> {
+  async process(env: Environment): Promise<Environment> {
     // skip if when condition is not met.
     if (this.config.when) {
       const res = evaluateExpression(this.config.when, env);
@@ -50,7 +54,7 @@ export class ComponentWithConfig<C extends ComponentConfig> {
       }
     }
 
-    const ret = await this.component.run(this.evaluate(env));
+    const ret = await this.component.process(this.evaluate(env));
 
     const keys: string[] = [this.config.type, this.config.name].filter(
       (v): v is string => v !== undefined,
@@ -60,6 +64,10 @@ export class ComponentWithConfig<C extends ComponentConfig> {
       obj = { [key]: obj };
     }
     return deepmerge(env, obj as Environment);
+  }
+
+  async finalize(env: Environment): Promise<void> {
+    return this.component.finalize(this.evaluate(env));
   }
 }
 
@@ -86,7 +94,7 @@ export abstract class Component<C extends ComponentConfig> {
     };
   }
 
-  async init(_config: C): Promise<void> {}
-  abstract run(config: C): Promise<Field>;
-  async receive(): Promise<void> {}
+  async initialize(_config: C): Promise<void> {}
+  abstract process(config: C): Promise<Field>;
+  async finalize(_config: C): Promise<void> {}
 }
