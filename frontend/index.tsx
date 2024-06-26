@@ -51,7 +51,7 @@ const Root: FC = () => {
           name="modules"
           role="tab"
           className="tab"
-          aria-label="modules tab"
+          aria-label="modules"
           onClick={() => tabs.onClickTab("modules")}
           onKeyUp={() => tabs.onClickTab("modules")}
           checked={tabs.selected === "modules"}
@@ -65,7 +65,7 @@ const Root: FC = () => {
           name="plugins"
           role="tab"
           className="tab"
-          aria-label="plugins tab"
+          aria-label="plugins"
           onClick={() => tabs.onClickTab("plugins")}
           onKeyUp={() => tabs.onClickTab("plugins")}
           checked={tabs.selected === "plugins"}
