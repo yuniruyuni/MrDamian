@@ -9,7 +9,11 @@ export class Module {
   config: ModuleConfig;
   pipeline: Pipeline;
 
-  constructor(config: ModuleConfig, pipeline: Pipeline, absorber: EventAbsorber) {
+  constructor(
+    config: ModuleConfig,
+    pipeline: Pipeline,
+    absorber: EventAbsorber,
+  ) {
     this.config = config;
     this.pipeline = pipeline;
     this.absorber = absorber;
@@ -41,7 +45,7 @@ export class Module {
           return await comp.run(env);
         }, Promise.resolve(event));
       })(),
-    ])
+    ]);
   }
 
   async run(init: Environment): Promise<Environment> {

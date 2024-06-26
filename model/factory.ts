@@ -7,7 +7,12 @@ import {
 } from "./parameters";
 
 import { Component, ComponentWithConfig } from "./component";
-import { type EventAbsorber, type EventEmitter, NamedEventEmitter, eventChannel } from "./events";
+import {
+  type EventAbsorber,
+  type EventEmitter,
+  NamedEventEmitter,
+  eventChannel,
+} from "./events";
 import { Module } from "./module";
 import type { Pipeline } from "./pipeline";
 import type { Field } from "./variable";
@@ -59,7 +64,10 @@ export class ModuleFactory {
 
     // Call component should not be cached because Call is system component.
     if (isCallConfig(config)) {
-      return new ComponentWithConfig(new Call(config, emitter, this.gens), config);
+      return new ComponentWithConfig(
+        new Call(config, emitter, this.gens),
+        config,
+      );
     }
 
     let component = this.instances.get(key);
