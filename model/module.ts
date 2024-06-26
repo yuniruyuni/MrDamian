@@ -17,8 +17,8 @@ export class Module {
     this.emitter = emitter;
   }
 
-  async init(init: Environment): Promise<Environment> {
-    return await this.event("init", init);
+  async init(init: Environment): Promise<void> {
+    await Promise.all(this.pipeline.map(async (comp) => comp.init(init)));
   }
 
   emit(event: Environment): void {
@@ -36,10 +36,6 @@ export class Module {
   }
 
   async run(init: Environment): Promise<Environment> {
-    return await this.event("run", init);
-  }
-
-  async event(field: "init" | "run", init: Environment): Promise<Environment> {
     const params: Parameters = this.config.params ?? ({} as Parameters);
     // our component have default value as "params" in it's configuration file.
     const filled = { ...params, ...init };
@@ -51,7 +47,7 @@ export class Module {
 
     return await this.pipeline.reduce(async (penv, comp) => {
       const env: Environment = await penv;
-      const ret = await comp[field](env);
+      const ret = await comp.run(env);
       if (ret === undefined) return env;
       // TODO: split this into some function...(it is as same as component.ts)
       const keys: string[] = [comp.config.type, comp.config.name].filter(

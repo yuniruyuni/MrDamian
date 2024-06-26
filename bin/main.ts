@@ -23,13 +23,17 @@ const pluginsPath = path.join(process.cwd(), "node_modules");
 const manager = new PluginManager({ pluginsPath });
 const loader = new PluginLoader(pluginsPath);
 const gens: ComponentGenerators = Object.fromEntries(
-  (await Promise.all(installedPlugins.map(async (pkg) => {
-    const info = await manager.install(pkg.name, pkg.version);
-    const plugin = await loader.load(info.location);
-    if( !plugin ) return [];
-    if( !plugin.type ) return [];
-    return [[plugin.type, plugin.gen]];
-  }))).flat()
+  (
+    await Promise.all(
+      installedPlugins.map(async (pkg) => {
+        const info = await manager.install(pkg.name, pkg.version);
+        const plugin = await loader.load(info.location);
+        if (!plugin) return [];
+        if (!plugin.type) return [];
+        return [[plugin.type, plugin.gen]];
+      }),
+    )
+  ).flat(),
 );
 
 const [emitter, absorber] = eventChannel();
@@ -39,12 +43,6 @@ const mod = factory.constructModule(params);
 
 async function run() {
   await mod.init({});
-
-  mod.emit({
-    system: {
-      initialied: true,
-    },
-  });
 
   for await (const event of absorber) {
     await mod.run(event);
@@ -77,7 +75,7 @@ app.post("/api/plugin", async (c) => {
   const params = (await c.req.json()) as { name: string };
   const name = params.name;
   const plugin = await manager.installFromNpm(name);
-  installedPlugins.push({name: plugin.name, version: plugin.version});
+  installedPlugins.push({ name: plugin.name, version: plugin.version });
   Bun.write(pluginsFile, JSON5.stringify(installedPlugins, null, 2));
 
   return c.json({ status: "ok" });

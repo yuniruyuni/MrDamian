@@ -20,7 +20,7 @@ const useTabs = (defaults: TabID) => {
   const onClickTab = (tab: TabID) => {
     setSelected(tab);
   };
-  return {selected, onClickTab};
+  return { selected, onClickTab };
 };
 
 const Root: FC = () => {
@@ -56,7 +56,10 @@ const Root: FC = () => {
           onKeyUp={() => tabs.onClickTab("modules")}
           checked={tabs.selected === "modules"}
         />
-        <div role="tabpanel" className="tab-content bg-base-100 border-base-300 rounded-box p-6">
+        <div
+          role="tabpanel"
+          className="tab-content bg-base-100 border-base-300 rounded-box p-6"
+        >
           <Modules modules={modules} />
         </div>
 
@@ -70,7 +73,10 @@ const Root: FC = () => {
           onKeyUp={() => tabs.onClickTab("plugins")}
           checked={tabs.selected === "plugins"}
         />
-        <div role="tabpanel" className="tab-content bg-base-100 border-base-300 rounded-box p-6">
+        <div
+          role="tabpanel"
+          className="tab-content bg-base-100 border-base-300 rounded-box p-6"
+        >
           <Plugins />
         </div>
       </div>

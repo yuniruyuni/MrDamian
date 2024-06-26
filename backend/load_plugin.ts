@@ -1,6 +1,6 @@
-import fs from 'node:fs/promises';
-import path from 'node:path';
-import type { ComponentGenerator } from '~/model/factory';
+import fs from "node:fs/promises";
+import path from "node:path";
+import type { ComponentGenerator } from "~/model/factory";
 
 export class Plugin {
   name: string;
@@ -15,7 +15,7 @@ export class Plugin {
     const pattern = /^mrdamian-plugin-(?<type>.*)$/;
     const found = this.name.match(pattern);
     if (!found) return "";
-    if( !found.groups?.type ) return "";
+    if (!found.groups?.type) return "";
     return found.groups?.type;
   }
 }
@@ -33,13 +33,13 @@ export class PluginLoader {
     const plugins = [];
     for (const dir in dirs) {
       const plugin = await this.load(dir);
-      if( !plugin ) continue;
+      if (!plugin) continue;
       plugins.push(plugin);
     }
     return plugins;
   }
 
-  async load(dir: string): Promise<Plugin|undefined> {
+  async load(dir: string): Promise<Plugin | undefined> {
     const f = Bun.file(path.join(dir, "package.json"));
     if (!f.exists()) {
       return undefined;

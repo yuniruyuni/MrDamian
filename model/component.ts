@@ -32,7 +32,7 @@ export class ComponentWithConfig<C extends ComponentConfig> {
     return this.component.fetch;
   }
 
-  async init(env: Environment): Promise<Field> {
+  async init(env: Environment): Promise<void> {
     return this.component.init(this.evaluate(env));
   }
 
@@ -71,8 +71,6 @@ export abstract class Component<C extends ComponentConfig> {
     };
   }
 
-  async init(_config: C): Promise<Field> {
-    return undefined;
-  }
+  async init(_config: C): Promise<void> {}
   abstract run(config: C): Promise<Field>;
 }

@@ -94,12 +94,12 @@ class Call extends Component<CallConfig> {
     this.submodule = factory.constructModule(config.module);
   }
 
-  async init(config: CallConfig): Promise<Field> {
-    return await this.submodule.init(config.args ?? {});
+  async init(config: CallConfig): Promise<void> {
+    return this.submodule.init(config.args ?? {});
   }
 
   async run(config: CallConfig): Promise<Field> {
-    return await this.submodule.run(config.args ?? {});
+    return this.submodule.run(config.args ?? {});
   }
 }
 
