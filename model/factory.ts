@@ -87,7 +87,18 @@ export class ModuleFactory {
       console.log(`Unsupported component: ${config.type}`);
       return new Unsupported(emitter);
     }
-    return new gen(emitter);
+    const comp = new gen(emitter);
+    if( comp.initialize === undefined ) {
+      console.warn(`component '${config.type}' doesn't have initialize method`);
+    }
+    if( comp.process === undefined ) {
+      console.warn(`component '${config.type}' doesn't have process method`);
+    }
+    if( comp.finalize === undefined ) {
+      console.warn(`component '${config.type}' doesn't have finalize method`);
+    }
+
+    return comp;
   }
 }
 
