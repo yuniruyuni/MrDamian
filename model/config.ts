@@ -1,7 +1,6 @@
 import type { Arguments, Parameters } from "./variable";
 
 export type ModuleConfig = {
-  main: boolean;
   params: Parameters;
   pipeline: PipelineConfig;
 };

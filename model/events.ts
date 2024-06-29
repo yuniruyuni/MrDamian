@@ -47,11 +47,15 @@ export function eventChannel(): [EventEmitter, EventAbsorber] {
   return [new EventEmitter(channel), new EventAbsorber(channel)];
 }
 
+export const KeyNotExistError = new Error("keys length should not be zero");
+
 export class NamedEventEmitter {
   emitter: EventEmitter;
   keys: string[];
   constructor(emitter: EventEmitter, keys: string[]) {
-    console.assert(keys.length > 0);
+    if( keys.length <= 0 ) {
+      throw KeyNotExistError;
+    }
 
     this.emitter = emitter;
     this.keys = keys;
