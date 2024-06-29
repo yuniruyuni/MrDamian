@@ -1,6 +1,8 @@
 import deepmerge from "deepmerge";
 
+import type { Component } from "./component";
 import { type ComponentConfig, isSubmoduleConfig } from "./config";
+import type { Fetch } from "./server";
 import type { Submodule } from "./submodule";
 import {
   type Environment,
@@ -8,10 +10,6 @@ import {
   evaluate,
   evaluateExpression,
 } from "./variable";
-
-import type { Fetch } from "./server";
-
-import type { Component } from "./component";
 
 export class Evaluator<C extends ComponentConfig> {
   readonly component: Component<C>;
