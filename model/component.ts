@@ -1,75 +1,7 @@
-import deepmerge from "deepmerge";
-
 import type { NamedEventEmitter } from "./events";
-import type { Call } from "./factory";
 import type { ComponentConfig } from "./parameters";
-import {
-  type Environment,
-  type Field,
-  asArgs,
-  evaluate,
-  evaluateExpression,
-} from "./variable";
-
 import type { Fetch } from "./server";
-
-export class ComponentWithConfig<C extends ComponentConfig> {
-  readonly component: Component<C>;
-  readonly config: C;
-
-  constructor(component: Component<C>, config: ComponentConfig) {
-    this.component = component;
-    // TODO: implement some validator.
-    this.config = config as C;
-    this.config.height ||= this.component.height();
-  }
-
-  evaluate(env: Environment): C {
-    // TODO: validate args
-    const args = evaluate(this.config.args ?? asArgs({}), env);
-    return { ...this.config, args: args };
-  }
-
-  get fetch(): Fetch {
-    return this.component.fetch;
-  }
-
-  async initialize(env: Environment): Promise<void> {
-    return this.component.initialize(this.evaluate(env));
-  }
-
-  async receive(): Promise<void> {
-    if (this.config.type === "call") {
-      const call = this.component as unknown as Call;
-      call.receive();
-    }
-  }
-
-  async process(env: Environment): Promise<Environment> {
-    // skip if when condition is not met.
-    if (this.config.when) {
-      const res = evaluateExpression(this.config.when, env);
-      if (!res) {
-        return env;
-      }
-    }
-
-    const ret = await this.component.process(this.evaluate(env));
-
-    const keys: string[] = [this.config.type, this.config.name].filter(
-      (v): v is string => v !== undefined,
-    );
-    let obj = ret;
-    for (const key of keys.reverse()) {
-      obj = { [key]: obj };
-    }
-    return deepmerge(env, obj as Environment);
-  }
-
-  async finalize(env: Environment): Promise<void> {
-    return this.component.finalize(this.evaluate(env));
-  }
-}
+import type { Field } from "./variable";
 
 export abstract class Component<C extends ComponentConfig> {
   private readonly emitter: NamedEventEmitter;
@@ -85,6 +17,10 @@ export abstract class Component<C extends ComponentConfig> {
     return 50;
   }
 
+  async initialize(_config: C): Promise<void> {}
+  abstract process(config: C): Promise<Field>;
+  async finalize(_config: C): Promise<void> {}
+
   get fetch(): Fetch {
     return (_req: Request): Response | Promise<Response> => {
       return new Response("No configuration", {
@@ -93,8 +29,4 @@ export abstract class Component<C extends ComponentConfig> {
       });
     };
   }
-
-  async initialize(_config: C): Promise<void> {}
-  abstract process(config: C): Promise<Field>;
-  async finalize(_config: C): Promise<void> {}
 }

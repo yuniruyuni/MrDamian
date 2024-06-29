@@ -6,7 +6,8 @@ import {
   isCallConfig,
 } from "./parameters";
 
-import { Component, ComponentWithConfig } from "./component";
+import { Component } from "./component";
+import { Evaluator } from "./evaluator";
 import {
   type EventAbsorber,
   type EventEmitter,
@@ -49,12 +50,12 @@ export class ModuleFactory {
   }
 
   constructPipeline(pipeline: PipelineConfig): Pipeline {
-    return pipeline.map((params) => this.constructComponentWithConfig(params));
+    return pipeline.map((params) => this.constructEvaluator(params));
   }
 
-  constructComponentWithConfig(
+  constructEvaluator(
     config: ComponentConfig,
-  ): ComponentWithConfig<ComponentConfig> {
+  ): Evaluator<ComponentConfig> {
     // filter if key is undefined.
     const keys: string[] = [config.type, config.name].filter(
       (v): v is string => v !== undefined,
@@ -64,7 +65,7 @@ export class ModuleFactory {
 
     // Call component should not be cached because Call is system component.
     if (isCallConfig(config)) {
-      return new ComponentWithConfig(
+      return new Evaluator(
         new Call(config, emitter, this.gens),
         config,
       );
@@ -75,7 +76,7 @@ export class ModuleFactory {
       component = this.constructComponent(config, emitter);
       this.instances.set(key, component);
     }
-    return new ComponentWithConfig(component, config);
+    return new Evaluator(component, config);
   }
 
   constructComponent(

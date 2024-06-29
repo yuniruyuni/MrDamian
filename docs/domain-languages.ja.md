@@ -38,3 +38,7 @@
 - 各ModuleのPipelineのはじめの時点では、Argumentsが展開された状態で初期化される。
 - 各Componentの処理が終わるたびに、Environmentには、そのComponentの出力が格納される。
 - このときのフィールド名はComponentNameになる。
+
+## Evaluator
+- ArgumentsをParametersを用いて展開しComponentに渡すオブジェクト
+- つまりArgumentsをEvaluateするからEvaluator。
