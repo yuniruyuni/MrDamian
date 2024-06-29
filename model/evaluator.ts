@@ -1,7 +1,7 @@
 import deepmerge from "deepmerge";
 
-import type { Call } from "./factory";
-import { type ComponentConfig, isCallConfig } from "./parameters";
+import type { Submodule } from "./factory";
+import { type ComponentConfig, isSubmoduleConfig } from "./parameters";
 import {
   type Environment,
   asArgs,
@@ -39,10 +39,10 @@ export class Evaluator<C extends ComponentConfig> {
   }
 
   async receive(): Promise<void> {
-    if (!isCallConfig(this.config)) return;
+    if (!isSubmoduleConfig(this.config)) return;
 
-    const call = this.component as unknown as Call;
-    call.receive();
+    const submodule = this.component as unknown as Submodule;
+    submodule.receive();
   }
 
   async process(env: Environment): Promise<Environment> {

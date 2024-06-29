@@ -1,9 +1,9 @@
 import {
-  type CallConfig,
   type ComponentConfig,
   type ModuleConfig,
   type PipelineConfig,
-  isCallConfig,
+  type SubmoduleConfig,
+  isSubmoduleConfig,
 } from "./parameters";
 
 import { Component } from "./component";
@@ -65,9 +65,9 @@ export class ModuleFactory {
     const emitter = new NamedEventEmitter(this.emitter, keys);
 
     // Call component should not be cached because Call is system component.
-    if (isCallConfig(config)) {
+    if (isSubmoduleConfig(config)) {
       return new Evaluator(
-        new Call(config, emitter, this.gens),
+        new Submodule(config, emitter, this.gens),
         config,
       );
     }
@@ -104,14 +104,13 @@ export class ModuleFactory {
   }
 }
 
-// TODO: rename as Submodule
 // TODO: allow direct definition submodule (not file path but configure object.)
-export class Call extends Component<CallConfig> {
+export class Submodule extends Component<SubmoduleConfig> {
   factory: ModuleFactory;
   submodule: Module;
 
   constructor(
-    config: CallConfig,
+    config: SubmoduleConfig,
     emitter: NamedEventEmitter,
     gens: ComponentGenerators,
   ) {
@@ -121,15 +120,15 @@ export class Call extends Component<CallConfig> {
     this.submodule = this.factory.constructModule(config.module);
   }
 
-  async initialize(config: CallConfig): Promise<void> {
+  async initialize(config: SubmoduleConfig): Promise<void> {
     return this.submodule.initialize(config.args ?? {});
   }
 
-  async process(config: CallConfig): Promise<Field> {
+  async process(config: SubmoduleConfig): Promise<Field> {
     return this.submodule.process(config.args ?? {});
   }
 
-  async finalize(config: CallConfig): Promise<void> {
+  async finalize(config: SubmoduleConfig): Promise<void> {
     return this.submodule.finalize(config.args ?? {});
   }
 

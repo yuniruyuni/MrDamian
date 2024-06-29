@@ -154,8 +154,8 @@
     },
     {
       when: "twitch.main.message",
-      // callコンポネントはサブモジュールを呼び出すために使える
-      type: "call",
+      // Submoduleコンポネントはサブモジュールを呼び出すために使える
+      type: "submodule",
       // ターゲットのサブモジュールの入ったjson5名を指定する
       path: "auto_translator.json5",
       // サブモジュール側のparamsで設定されている変数に
@@ -167,7 +167,7 @@
     },
     {
       when: "twitch.main.message",
-      type: "call",
+      type: "submodule",
       path: "logger.json5",
       args: {
         dir: "./log/twitch/",

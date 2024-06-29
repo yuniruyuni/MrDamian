@@ -28,14 +28,14 @@ export type ComponentConfig = {
   height?: number;
 };
 
-export type CallConfig = ComponentConfig & {
+export type SubmoduleConfig = ComponentConfig & {
   // "path" field is a path to module file.
   // All modules are defined as json5 files.
   path: string;
   module: ModuleConfig;
 };
 
-export function isCallConfig(config: ComponentConfig): config is CallConfig {
-  if( config.type !== "call" ) return false;
-  return (config as CallConfig).path !== undefined;
+export function isSubmoduleConfig(config: ComponentConfig): config is SubmoduleConfig {
+  if( config.type !== "submodule" ) return false;
+  return (config as SubmoduleConfig).path !== undefined;
 }

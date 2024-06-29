@@ -1,0 +1,30 @@
+[
+  {
+    name: 'mrdamian-plugin-panel',
+    version: '0.0.10',
+  },
+  {
+    name: 'mrdamian-plugin-datetime',
+    version: '0.0.6',
+  },
+  {
+    name: 'mrdamian-plugin-logger',
+    version: '0.0.3',
+  },
+  {
+    name: 'mrdamian-plugin-periodic',
+    version: '0.0.3',
+  },
+  {
+    name: 'mrdamian-plugin-youtube',
+    version: '0.0.2',
+  },
+  {
+    name: 'mrdamian-plugin-deepl',
+    version: '0.0.5',
+  },
+  {
+    name: 'mrdamian-plugin-twitch',
+    version: '0.0.2',
+  },
+]

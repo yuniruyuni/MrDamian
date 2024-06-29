@@ -2,11 +2,11 @@ import fs from "node:fs/promises";
 import { dirname } from "node:path";
 import JSON5 from "json5";
 import {
-  type CallConfig,
   type ComponentConfig,
   type ModuleConfig,
   type PipelineConfig,
-  isCallConfig,
+  type SubmoduleConfig,
+  isSubmoduleConfig,
 } from "~/model/parameters";
 
 export const ConfigParseError = new Error("Failed to parse config file");
@@ -42,11 +42,11 @@ async function loadComponentConfig(
   path: string,
   config: ComponentConfig,
 ): Promise<ComponentConfig> {
-  if (isCallConfig(config)) {
+  if (isSubmoduleConfig(config)) {
     const base_dir = dirname(path);
     const mpath = `${base_dir}/${config.path}`;
     const mparams = await loadModuleConfig(mpath);
-    (config as CallConfig).module = mparams;
+    (config as SubmoduleConfig).module = mparams;
   }
   return config;
 }

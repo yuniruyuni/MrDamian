@@ -3,7 +3,7 @@
 ## Plugin
 - Pluginは、Mr.Damianの機能を拡張するためのプラグイン。
 - `mrdamian-plugin-` という接頭辞を持ったnpm packageとして公開されている
-- 1つのPluginには、1つのModuleつだけが入っている。
+- 1つのPluginからは、1つのComponentを生成するComponentConstructorがdefault exportされる。
 
 ## Module
 - Moduleは、ModuleParametersとPiplineを持ったオブジェクト。
@@ -11,15 +11,21 @@
 ### MainModule
 - MainModuleは、Mr.Damianの全体で最初に呼び出されるModule。
 
+### SubModule
+- SubmoduleはあるModuleから呼び出されるModule。
+- 全体を通して1つのComponentと見做せるように振る舞う。
+
 ## Pipeline
 - パイプラインは、複数のComponentを組み合わせて構成される。
     - `Pipeline = Component[]`
+
+## ComponentConstructor
+- Componentを生成するためのコンストラクタのインタフェイス
 
 ## Component
 - Componentは、パイプラインの最小単位。
 - システム側で事前いろいろな種類のものが定義されている。
 - "when" というフィールドがある場合、そのComponentが実行されるのはwhenの条件が真のときだけ。
-- 関数とみなすなら `Component: Parameters -> (Arguments -> Field)` という形式をしている。
 
 ### ComponentName
 - Componentそれぞれにつけられたユーザ定義の名称。
