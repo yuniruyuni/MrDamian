@@ -1,7 +1,7 @@
 import deepmerge from "deepmerge";
 
 import { type ComponentConfig, isSubmoduleConfig } from "./config";
-import type { Submodule } from "./factory";
+import type { Submodule } from "./submodule";
 import {
   type Environment,
   asArgs,

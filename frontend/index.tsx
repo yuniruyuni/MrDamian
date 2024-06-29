@@ -25,7 +25,6 @@ const useTabs = (defaults: TabID) => {
 
 const Root: FC = () => {
   const [modules, setModules] = useState<ModuleConfig>({
-    main: true,
     params: asParams({}),
     pipeline: [],
   });

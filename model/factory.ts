@@ -1,9 +1,8 @@
-import { Component } from "./component";
+import type { Component } from "./component";
 import {
   type ComponentConfig,
   type ModuleConfig,
   type PipelineConfig,
-  type SubmoduleConfig,
   isSubmoduleConfig,
 } from "./config";
 import { Evaluator } from "./evaluator";
@@ -15,8 +14,8 @@ import {
 } from "./events";
 import { Module } from "./module";
 import type { Pipeline } from "./pipeline";
+import { Submodule } from "./submodule";
 import { Unsupported } from "./unsupported";
-import type { Field } from "./variable";
 
 export interface ComponentGenerator<
   T extends ComponentConfig = ComponentConfig,
@@ -100,38 +99,5 @@ export class ModuleFactory {
     }
 
     return comp;
-  }
-}
-
-// TODO: allow direct definition submodule (not file path but configure object.)
-export class Submodule extends Component<SubmoduleConfig> {
-  factory: ModuleFactory;
-  submodule: Module;
-
-  constructor(
-    config: SubmoduleConfig,
-    emitter: NamedEventEmitter,
-    gens: ComponentGenerators,
-  ) {
-    // TODO: validate params with some schema.
-    super(emitter);
-    this.factory = new ModuleFactory(gens);
-    this.submodule = this.factory.constructModule(config.module);
-  }
-
-  async initialize(config: SubmoduleConfig): Promise<void> {
-    return this.submodule.initialize(config.args ?? {});
-  }
-
-  async process(config: SubmoduleConfig): Promise<Field> {
-    return this.submodule.process(config.args ?? {});
-  }
-
-  async finalize(config: SubmoduleConfig): Promise<void> {
-    return this.submodule.finalize(config.args ?? {});
-  }
-
-  async receive(): Promise<void> {
-    return this.submodule.receive();
   }
 }
