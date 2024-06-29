@@ -1,9 +1,14 @@
 {
-  // TODO: 親の側でinstance(twitchもdeeplも)を初期化したい。
-  // しかし本当はこのauto_translatorはどのインスタンスにも使えるようにしたい。
-  // この手の用法のことを考えると多分
-  // (インスタンス名を書き換えるために)初期化のときだけ取れて
-  // typeとかactionでも使えるようなjexpr構文を作らないといけない。
+  // 外側でinitializeされたtwitchモジュールのnameがargsに指定されると
+  // そのinstanceを使う(イベント受信やactionの発動)ことができる
+  // jexprを使って外部側で動的に名称が指定されても評価せずにただの文字列としてとりあつかう
+  // もしその名称のインスタンスが存在しない場合は
+  // そのようなsubmoduleの呼び出しでの該当コンポネントインスタンスの利用は無視される
+  // 外部で何もインスタンスを指定しない場合、デフォルトインスタンスが指定されたものと判定する
+  inherit: {
+    // "name": "type",
+    main: "twitch",
+  },
   params: {
     target: "ja", // こっちはデフォルト値に意味があるけれど...
     message: "hello, world", // こっちは適当なテキスト以外になり得ない...微妙かもしれない。
@@ -20,7 +25,7 @@
     {
       when: "deepl.source_lang !== 'ja'",
       type: "twitch",
-      name: "main",
+      name: "main", // これはinheritしたものが使われる
       action: "send",
       args: {
         message: "$ deepl.text"
@@ -38,7 +43,7 @@
     {
       when: "deepl.source_lang === 'ja'",
       type: "twitch",
-      name: "main",
+      name: "main", // これはinheritしたものが使われる
       action: "send",
       args: {
         message: "$ deepl.text"
