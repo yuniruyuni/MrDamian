@@ -20,6 +20,7 @@ describe("Factory", () => {
 
     const mod = factory.construct({
       params: asParams({}),
+      inherit: {},
       pipeline: [
         {
           type: "dummy",

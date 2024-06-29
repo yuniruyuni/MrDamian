@@ -27,6 +27,7 @@ const Root: FC = () => {
   const [modules, setModules] = useState<ModuleConfig>({
     params: asParams({}),
     pipeline: [],
+    inherit: {},
   });
 
   useEffect(() => {

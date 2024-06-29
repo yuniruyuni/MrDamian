@@ -1,5 +1,5 @@
 import { Component } from "./component";
-import type { SubmoduleConfig, } from "./config";
+import type { ComponentConfig, SubmoduleConfig } from "./config";
 import type { NamedEventEmitter, } from "./events";
 import { type ComponentGenerators, ModuleFactory } from "./factory";
 import type { Module } from "./module";
@@ -14,11 +14,21 @@ export class Submodule extends Component<SubmoduleConfig> {
     config: SubmoduleConfig,
     emitter: NamedEventEmitter,
     gens: ComponentGenerators,
+    instances: Map<string, Component<ComponentConfig>>,
   ) {
     // TODO: validate params with some schema.
     super(emitter);
     this.factory = new ModuleFactory(gens);
-    this.submodule = this.factory.construct(config.module);
+    const inherited = new Map();
+
+    for (const [name, type] of Object.entries(config.module.inherit)) {
+      const iname = config.inherit[name];
+      const instance = instances.get(`${type}/${iname}`);
+      if (instance) { continue; }
+      inherited.set(name, instance);
+    }
+
+    this.submodule = this.factory.construct(config.module, inherited);
   }
 
   async initialize(config: SubmoduleConfig): Promise<void> {

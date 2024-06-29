@@ -1,6 +1,11 @@
 import type { Arguments, Parameters } from "./variable";
 
+type Inheritance = {
+  [key: string]: string;
+};
+
 export type ModuleConfig = {
+  inherit: Inheritance;
   params: Parameters;
   pipeline: PipelineConfig;
 };
@@ -31,6 +36,7 @@ export type SubmoduleConfig = ComponentConfig & {
   // "path" field is a path to module file.
   // All modules are defined as json5 files.
   path: string;
+  inherit: Inheritance;
   module: ModuleConfig;
 };
 

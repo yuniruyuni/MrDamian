@@ -43,7 +43,11 @@ export class ModuleFactory {
     this.absorber = absorber;
   }
 
-  public construct(params: ModuleConfig): Module {
+  public construct(
+    params: ModuleConfig,
+    inherited: Map<string, Component<ComponentConfig>> = new Map(),
+  ): Module {
+    this.instances = inherited;
     const pipeline = this.constructPipeline(params.pipeline);
     return new Module(params, pipeline, this.absorber);
   }
@@ -65,7 +69,7 @@ export class ModuleFactory {
     // Call component should not be cached because Call is system component.
     if (isSubmoduleConfig(config)) {
       return new Evaluator(
-        new Submodule(config, emitter, this.gens),
+        new Submodule(config, emitter, this.gens, this.instances),
         config,
       );
     }
@@ -88,13 +92,13 @@ export class ModuleFactory {
       return new Unsupported(emitter);
     }
     const comp = new gen(emitter);
-    if( comp.initialize === undefined ) {
+    if (comp.initialize === undefined) {
       console.warn(`component '${config.type}' doesn't have initialize method`);
     }
-    if( comp.process === undefined ) {
+    if (comp.process === undefined) {
       console.warn(`component '${config.type}' doesn't have process method`);
     }
-    if( comp.finalize === undefined ) {
+    if (comp.finalize === undefined) {
       console.warn(`component '${config.type}' doesn't have finalize method`);
     }
 

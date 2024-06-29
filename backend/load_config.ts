@@ -21,6 +21,7 @@ async function loadModuleConfig(path: string): Promise<ModuleConfig> {
   // TODO: add validation by some schema.
   const config = JSON5.parse(content) as ModuleConfig;
   config.pipeline = await loadPipelineConfig(path, config.pipeline);
+  config.inherit ||= {}; // default is empty object.
 
   return config;
 }
@@ -45,6 +46,7 @@ async function loadComponentConfig(
     const mpath = `${base_dir}/${config.path}`;
     const mparams = await loadModuleConfig(mpath);
     (config as SubmoduleConfig).module = mparams;
+    (config as SubmoduleConfig).inherit ||= {};
   }
   return config;
 }

@@ -158,6 +158,18 @@
       type: "submodule",
       // ターゲットのサブモジュールの入ったjson5名を指定する
       path: "auto_translator.json5",
+      // サブモジュールに対して接続するコンポネントインスタンスを指定できる
+      // 何も指定していない場合はデフォルトのインスタンスが使われる
+      // つまり基本的にmain側ではこれを指定する必要はないという形だけど
+      // たまに複数のインスタンスをつかいたかったりmain側で色々とインスタンスを使っている場合は
+      // ここの指定が必要になる……という仕組み。
+      inherit: {
+        "main": "main",
+        // ここもjexprを使って外部側で動的に名称が指定されても
+        // 式を評価せずにただの文字列としてとりあつかう。
+        // つまり以下のような式を使っても評価されない。
+        // "main": "$ twitch.main.message.channel",
+      },
       // サブモジュール側のparamsで設定されている変数に
       // argsの内容が展開される。
       // paramsにないものは消える。
@@ -169,13 +181,6 @@
       when: "twitch.main.message",
       type: "submodule",
       path: "logger.json5",
-      inherit: {
-        "main": "main",
-        // jexprを使って外部側で動的に名称が指定されても
-        // 式を評価せずにただの文字列としてとりあつかう。
-        // つまり以下のような式を使っても評価されない。
-        // "main": "$ twitch.main.message.channel",
-      },
       args: {
         dir: "./log/twitch/",
         output: {

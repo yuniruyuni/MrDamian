@@ -1,7 +1,7 @@
 import deepmerge from "deepmerge";
 
 import type { Component } from "./component";
-import { type ComponentConfig, isSubmoduleConfig } from "./config";
+import { type ComponentConfig, type SubmoduleConfig, isSubmoduleConfig } from "./config";
 import type { Fetch } from "./server";
 import type { Submodule } from "./submodule";
 import {
@@ -20,12 +20,6 @@ export class Evaluator<C extends ComponentConfig> {
     // TODO: implement some validator.
     this.config = config as C;
     this.config.height ||= this.component.height();
-  }
-
-  evaluate(env: Environment): C {
-    // TODO: validate args
-    const args = evaluate(this.config.args ?? asArgs({}), env);
-    return { ...this.config, args: args };
   }
 
   get fetch(): Fetch {
@@ -66,5 +60,41 @@ export class Evaluator<C extends ComponentConfig> {
 
   async finalize(env: Environment): Promise<void> {
     return this.component.finalize(this.evaluate(env));
+  }
+
+  private evaluate(env: Environment): C {
+    // TODO: validate args
+    const args = evaluate(this.config.args ?? asArgs({}), env);
+    const inherited = this.inherit(env);
+
+    return { ...this.config, args: deepmerge(args, inherited) };
+  }
+
+  private inherit(env: Environment): Environment {
+    if (!isSubmoduleConfig(this.config)) return {};
+    if (!this.config.module.inherit) return {};
+
+    const config: SubmoduleConfig = this.config;
+    return Object.entries(config.module.inherit).reduce((inherited, [name, type]) =>{
+      const iname = config.inherit[name];
+      const keys = [type, iname].filter((v): v is string => v !== undefined);
+      return deepmerge(inherited, {
+        [type]: {
+          [name]: this.dig(env, ...keys),
+        },
+      });
+    }, {});
+  }
+
+  private dig(env: Environment, ...keys: string[]): Environment | undefined{
+    let cursor: Environment = env;
+    for( const key of keys) {
+      const field = cursor[key];
+      if (!field) return undefined;
+      if (typeof field !== "object") return undefined;
+      if (Array.isArray(field)) return undefined;
+      cursor = field;
+    }
+    return cursor;
   }
 }

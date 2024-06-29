@@ -10,8 +10,10 @@ describe("Submodule", () => {
     const config: SubmoduleConfig = {
       type: "submodule",
       path: "./dummy.json5", // actually this file is not found, but in this test it doesn't used so ok.
+      inherit: {},
       module: {
         params: asParams({}),
+        inherit: {},
         pipeline: [
           {
             type: "dummy",
@@ -28,7 +30,7 @@ describe("Submodule", () => {
     const [emitter, absorber] = eventChannel();
     const named: NamedEventEmitter = new NamedEventEmitter(emitter, ["key"]);
     const gens: ComponentGenerators = {};
-    const submodule = new Submodule(config, named, gens);
+    const submodule = new Submodule(config, named, gens, new Map());
 
     submodule.emit("abc");
 
