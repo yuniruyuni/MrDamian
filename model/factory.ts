@@ -28,13 +28,13 @@ export type ComponentGenerators = {
 };
 
 export class ModuleFactory {
-  readonly gens: ComponentGenerators;
-  readonly emitter: EventEmitter;
-  readonly absorber: EventAbsorber;
+  private readonly gens: ComponentGenerators;
+  private readonly emitter: EventEmitter;
+  private readonly absorber: EventAbsorber;
 
-  instances: Map<string, Component<ComponentConfig>>;
+  private instances: Map<string, Component<ComponentConfig>>;
 
-  constructor(gens: ComponentGenerators) {
+  public constructor(gens: ComponentGenerators) {
     this.gens = gens;
     this.instances = new Map();
 
@@ -43,16 +43,16 @@ export class ModuleFactory {
     this.absorber = absorber;
   }
 
-  constructModule(params: ModuleConfig): Module {
+  public construct(params: ModuleConfig): Module {
     const pipeline = this.constructPipeline(params.pipeline);
     return new Module(params, pipeline, this.absorber);
   }
 
-  constructPipeline(pipeline: PipelineConfig): Pipeline {
+  private constructPipeline(pipeline: PipelineConfig): Pipeline {
     return pipeline.map((params) => this.constructEvaluator(params));
   }
 
-  constructEvaluator(
+  private constructEvaluator(
     config: ComponentConfig,
   ): Evaluator<ComponentConfig> {
     // filter if key is undefined.
@@ -78,7 +78,7 @@ export class ModuleFactory {
     return new Evaluator(component, config);
   }
 
-  constructComponent(
+  private constructComponent(
     config: ComponentConfig,
     emitter: NamedEventEmitter,
   ): Component<ComponentConfig> {

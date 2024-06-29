@@ -37,7 +37,7 @@ const gens: ComponentGenerators = Object.fromEntries(
 
 const factory = new ModuleFactory(gens);
 const params = await load("./config/main.json5");
-const mod = factory.constructModule(params);
+const mod = factory.construct(params);
 
 async function run() {
   await mod.initialize({});

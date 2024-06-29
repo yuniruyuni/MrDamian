@@ -18,7 +18,7 @@ describe("Factory", () => {
     const gens = {dummy: DummyComponent};
     const factory = new ModuleFactory(gens);
 
-    const mod = factory.constructModule({
+    const mod = factory.construct({
       params: asParams({}),
       pipeline: [
         {

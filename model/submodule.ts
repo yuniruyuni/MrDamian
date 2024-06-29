@@ -18,7 +18,7 @@ export class Submodule extends Component<SubmoduleConfig> {
     // TODO: validate params with some schema.
     super(emitter);
     this.factory = new ModuleFactory(gens);
-    this.submodule = this.factory.constructModule(config.module);
+    this.submodule = this.factory.construct(config.module);
   }
 
   async initialize(config: SubmoduleConfig): Promise<void> {
