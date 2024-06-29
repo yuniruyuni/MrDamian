@@ -16,6 +16,7 @@ import {
 } from "./events";
 import { Module } from "./module";
 import type { Pipeline } from "./pipeline";
+import { Unsupported } from "./unsupported";
 import type { Field } from "./variable";
 
 export interface ComponentGenerator<
@@ -134,12 +135,5 @@ export class Call extends Component<CallConfig> {
 
   async receive(): Promise<void> {
     return this.submodule.receive();
-  }
-}
-
-class Unsupported extends Component<ComponentConfig> {
-  async process(): Promise<Field> {
-    // just ignore all things.
-    return undefined;
   }
 }
