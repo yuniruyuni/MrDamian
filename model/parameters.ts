@@ -36,5 +36,6 @@ export type CallConfig = ComponentConfig & {
 };
 
 export function isCallConfig(config: ComponentConfig): config is CallConfig {
+  if( config.type !== "call" ) return false;
   return (config as CallConfig).path !== undefined;
 }
