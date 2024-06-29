@@ -1,6 +1,6 @@
 import clsx from "clsx";
 import type { FC } from "react";
-import type { ComponentConfig, ModuleConfig } from "~/model/parameters";
+import type { ComponentConfig, ModuleConfig } from "~/model/config";
 import type { Environment, Field } from "~/model/variable";
 
 const Config: FC<{ args: Environment }> = ({ args }) => (

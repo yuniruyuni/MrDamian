@@ -1,5 +1,5 @@
+import type { ComponentConfig } from "./config";
 import type { NamedEventEmitter } from "./events";
-import type { ComponentConfig } from "./parameters";
 import type { Fetch } from "./server";
 import type { Field } from "./variable";
 

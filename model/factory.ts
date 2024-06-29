@@ -1,12 +1,11 @@
+import { Component } from "./component";
 import {
   type ComponentConfig,
   type ModuleConfig,
   type PipelineConfig,
   type SubmoduleConfig,
   isSubmoduleConfig,
-} from "./parameters";
-
-import { Component } from "./component";
+} from "./config";
 import { Evaluator } from "./evaluator";
 import {
   type EventAbsorber,

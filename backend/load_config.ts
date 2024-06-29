@@ -7,7 +7,7 @@ import {
   type PipelineConfig,
   type SubmoduleConfig,
   isSubmoduleConfig,
-} from "~/model/parameters";
+} from "~/model/config";
 
 export const ConfigParseError = new Error("Failed to parse config file");
 

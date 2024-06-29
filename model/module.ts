@@ -1,5 +1,5 @@
+import type { ModuleConfig } from "./config";
 import type { EventAbsorber } from "./events";
-import type { ModuleConfig } from "./parameters";
 import type { Pipeline } from "./pipeline";
 import type { Server } from "./server";
 import type { Environment, Parameters } from "./variable";

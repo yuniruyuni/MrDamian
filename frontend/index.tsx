@@ -2,7 +2,7 @@ import type { FC } from "react";
 import React, { useEffect, useState } from "react";
 import ReactDOM from "react-dom/client";
 
-import type { ModuleConfig } from "~/model/parameters";
+import type { ModuleConfig } from "~/model/config";
 import { asParams } from "~/model/variable";
 import { AlertProvider, AlertRegion } from "./Alert";
 import { Menu } from "./Menu";
