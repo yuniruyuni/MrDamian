@@ -1,6 +1,4 @@
-// importing src/queue for typechecking
-// refer: https://github.com/baji-ismail/in-queue/issues/3
-import Queue from "in-queue/src/queue";
+import { Queue } from './queue';
 import type { Environment, Field } from "./variable";
 
 class EventChannel {
@@ -10,13 +8,19 @@ class EventChannel {
     this.queue = new Queue();
   }
 
+  abort() {
+    this.queue.abort();
+  }
+
   emit(item: Environment) {
     // our queue length is infinite so this method never fail.
     this.queue.push(item);
   }
 
-  async absorb(timeout?: number): Promise<Environment> {
-    return this.queue.get(timeout);
+  async absorb(): Promise<Environment> {
+    const val = await this.queue.pop();
+    if( val === undefined ) return {};
+    return val;
   }
 }
 
@@ -26,8 +30,8 @@ export class EventAbsorber {
     this.channel = channel;
   }
 
-  async absorb(timeout?: number): Promise<Environment> {
-    return this.channel.absorb(timeout);
+  async absorb(): Promise<Environment> {
+    return this.channel.absorb();
   }
 }
 
