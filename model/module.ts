@@ -19,11 +19,16 @@ export class Module {
     this.absorber = absorber;
   }
 
+  get aborted(): boolean {
+    return this.absorber.aborted;
+  }
+
   async initialize(init: Environment): Promise<void> {
     await Promise.all(this.pipeline.map(async (comp) => comp.initialize(init)));
   }
 
   async finalize(init: Environment): Promise<void> {
+    this.absorber.abort();
     await Promise.all(this.pipeline.map(async (comp) => comp.finalize(init)));
   }
 

@@ -1,13 +1,20 @@
-import fs from "node:fs/promises";
 import path from "node:path";
-import type { ComponentGenerator } from "~/model/factory";
+import JSON5 from "json5";
+import { PluginManager } from "live-plugin-manager";
+import type { ComponentGenerator, ComponentGenerators  } from "~/model/factory";
 
 export class Plugin {
   name: string;
+  version: string;
   gen: ComponentGenerator;
 
-  constructor(name: string, gen: ComponentGenerator) {
+  constructor(
+    name: string,
+    version: string,
+    gen: ComponentGenerator,
+  ) {
     this.name = name;
+    this.version = version;
     this.gen = gen;
   }
 
@@ -20,23 +27,62 @@ export class Plugin {
   }
 }
 
+export type InstalledPlugin = {
+  name:string;
+  version: string;
+};
+
 export class PluginLoader {
   base: string;
-  plugins: Plugin[];
+  plugins: InstalledPlugin[];
+  manager: PluginManager;
+
   constructor(base: string) {
     this.base = base;
     this.plugins = [];
+    this.manager = new PluginManager({ pluginsPath: base });
   }
 
-  async scan(): Promise<Plugin[]> {
-    const dirs = await fs.readdir(this.base);
-    const plugins = [];
-    for (const dir in dirs) {
-      const plugin = await this.load(dir);
-      if (!plugin) continue;
-      plugins.push(plugin);
-    }
-    return plugins;
+  isInstalled(name: string): boolean {
+    return this.plugins.some((p) => p.name === name);
+  }
+
+  async loadConfig(path: string): Promise<void> {
+    const pluginsFile = Bun.file(path);
+    this.plugins = (await pluginsFile.exists())
+      ? JSON5.parse(await pluginsFile.text())
+      : [];
+  }
+
+  async saveConfig(path: string): Promise<void> {
+    const pluginsFile = Bun.file(path);
+    Bun.write(pluginsFile, JSON5.stringify(this.plugins, null, 2));
+  }
+
+  async installFromNpm(name: string, version?: string): Promise<void> {
+    const res = await this.manager.installFromNpm(name, version);
+
+    this.plugins.push({
+      name: res.name,
+      version: res.version,
+    });
+  }
+
+  async loadAll(): Promise<ComponentGenerators> {
+    // TODO: find a better way for resolving plugin-dependency pacakge import path.
+    return Object.fromEntries(
+      (
+        await Promise.all(
+          this.plugins.map(async (pkg) => {
+            const info = await this.manager.install(pkg.name, pkg.version);
+            const plugin = await this.load(info.location);
+            if (!plugin) return [];
+            if (!plugin.type) return [];
+            return [[plugin.type, plugin.gen]];
+          }),
+        )
+      ).flat(),
+    );
   }
 
   async load(dir: string): Promise<Plugin | undefined> {
@@ -45,13 +91,11 @@ export class PluginLoader {
       return undefined;
     }
     const metadata = JSON.parse(await f.text()) as {
-      name?: string;
+      name: string;
+      version: string;
       main?: string;
       dependencies?: Record<string, string>;
     };
-    if (!metadata.name) {
-      return undefined;
-    }
     if (!metadata.main) {
       return undefined;
     }
@@ -61,6 +105,6 @@ export class PluginLoader {
 
     const gen = await import(path.join(dir, metadata.main));
 
-    return new Plugin(metadata.name, gen.default);
+    return new Plugin(metadata.name, metadata.version, gen.default);
   }
 }

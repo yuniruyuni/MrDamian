@@ -8,6 +8,10 @@ class EventChannel {
     this.queue = new Queue();
   }
 
+  get aborted(): boolean {
+    return this.queue.aborted;
+  }
+
   abort() {
     this.queue.abort();
   }
@@ -32,6 +36,14 @@ export class EventAbsorber {
 
   async absorb(): Promise<Environment> {
     return this.channel.absorb();
+  }
+
+  abort() {
+    this.channel.abort();
+  }
+
+  get aborted(): boolean {
+    return this.channel.aborted;
   }
 }
 
