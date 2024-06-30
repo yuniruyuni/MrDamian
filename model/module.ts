@@ -49,6 +49,7 @@ export class Module {
       ...awaits,
       (async () => {
         const event = await this.absorber.absorb();
+        if (event === undefined) return;
         await this.reduce(event);
       })(),
     ]);

@@ -1,7 +1,9 @@
 import path from "node:path";
 import JSON5 from "json5";
+import search from "libnpmsearch";
 import { PluginManager } from "live-plugin-manager";
 import type { ComponentGenerator, ComponentGenerators  } from "~/model/factory";
+import type { PluginInfo } from "~/model/plugin";
 
 export class Plugin {
   name: string;
@@ -41,6 +43,19 @@ export class PluginLoader {
     this.base = base;
     this.plugins = [];
     this.manager = new PluginManager({ pluginsPath: base });
+  }
+
+  async search(name: string): Promise<PluginInfo[]> {
+    const packages = await search(name);
+    return packages.map(
+      (pkg) =>
+        ({
+          name: pkg.name,
+          description: pkg.description,
+          version: pkg.version,
+          installed: this.isInstalled(pkg.name),
+        }) as PluginInfo,
+    );
   }
 
   isInstalled(name: string): boolean {

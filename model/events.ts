@@ -21,10 +21,8 @@ class EventChannel {
     this.queue.push(item);
   }
 
-  async absorb(): Promise<Environment> {
-    const val = await this.queue.pop();
-    if( val === undefined ) return {};
-    return val;
+  async absorb(): Promise<Environment | undefined> {
+    return await this.queue.pop();
   }
 }
 
@@ -34,7 +32,7 @@ export class EventAbsorber {
     this.channel = channel;
   }
 
-  async absorb(): Promise<Environment> {
+  async absorb(): Promise<Environment | undefined> {
     return this.channel.absorb();
   }
 

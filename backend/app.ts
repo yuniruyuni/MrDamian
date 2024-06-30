@@ -1,0 +1,107 @@
+import path from "node:path";
+import { Hono } from "hono";
+import { serveStatic } from "hono/bun";
+
+import { load } from "~/backend/load_config";
+import { PluginLoader } from "~/backend/load_plugin";
+
+import type { ModuleConfig } from "~/model/config";
+import { ModuleFactory } from "~/model/factory";
+import type { Module } from "~/model/module";
+import { asParams } from "~/model/variable";
+
+const mainModulePath = "./config/main.json5";
+
+export class App {
+  route: Hono;
+  params: ModuleConfig;
+  module?: Module;
+  loader: PluginLoader;
+  pluginConfigPath: string;
+  running: boolean;
+
+  constructor() {
+    this.route = new Hono();
+    this.params = {
+      inherit: {},
+      params: asParams({}),
+      pipeline: [],
+    };
+
+    this.pluginConfigPath = path.join(process.cwd(), "config/plugins.json5");
+    const pluginsPath = path.join(process.cwd(), "node_modules");
+    this.loader = new PluginLoader(pluginsPath);
+    this.running = false;
+  }
+
+  fetch(req: Request): Promise<Response> | Response {
+    return this.route.fetch(req);
+  }
+
+  async run() {
+    if (!this.module) return;
+    if (this.running) return;
+    this.running = true;
+
+    await this.module.initialize({});
+
+    while (!this.module.aborted) {
+      await this.module.receive();
+    }
+  }
+
+  async reload() {
+    await this.loader.loadConfig(this.pluginConfigPath);
+    const gens = await this.loader.loadAll();
+    const factory = new ModuleFactory(gens);
+    this.params = await load(mainModulePath);
+    this.module = factory.construct(this.params);
+
+    const route = new Hono();
+    this.constructRoutes(route);
+    this.route = route;
+  }
+
+  async stop() {
+    if (this.module !== undefined) {
+      await this.module.finalize({});
+    }
+    this.module = undefined;
+    this.running = false;
+  }
+
+  constructRoutes(route: Hono) {
+    route.get("/api/module", async (c) => {
+      return c.json(this.params);
+    });
+
+    route.post("/api/module/run", async (c) => {
+      if (this.running) return c.json({ status: "running" });
+      this.run();
+      return c.json({ status: "ok" });
+    });
+
+    route.get("/api/plugin", async (c) => {
+      const packages = await this.loader.search("mrdamian-plugin-");
+      return c.json(packages);
+    });
+
+    route.post("/api/plugin", async (c) => {
+      const params = (await c.req.json()) as { name: string };
+      await this.loader.installFromNpm(params.name);
+      await this.loader.saveConfig(this.pluginConfigPath);
+
+      await this.stop();
+      await this.reload();
+      this.run();
+
+      return c.json({ status: "ok" });
+    });
+
+    route.use(serveStatic({ root: "static" }));
+
+    if (this.module !== undefined) {
+      this.module.mount(route);
+    }
+  }
+}

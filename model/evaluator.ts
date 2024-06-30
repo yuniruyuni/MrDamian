@@ -34,7 +34,7 @@ export class Evaluator<C extends ComponentConfig> {
     if (!isSubmoduleConfig(this.config)) return;
 
     const submodule = this.component as unknown as Submodule;
-    submodule.receive();
+    return submodule.receive();
   }
 
   async process(env: Environment): Promise<Environment> {
