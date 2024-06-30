@@ -36,7 +36,12 @@ export type SubmoduleConfig = ComponentConfig & {
   // "path" field is a path to module file.
   // All modules are defined as json5 files.
   path: string;
+  // "inherit" field is an object of inherited copmonent instance name.
+  // submodule can use component instances if specified in this field.
+  // when event process, specified component's event will be merged into current environment.
   inherit: Inheritance;
+  // "module" field is a module's configuration contained with this submodule.
+  // this configuration will be used to create a module instance.
   module: ModuleConfig;
 };
 
