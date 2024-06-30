@@ -45,7 +45,7 @@
   "dependencies": {
     "clsx": "^2.1.1",
     "deepmerge": "^4.3.1",
-    "hono": "^4.4.9",
+    "hono": "^4.4.10",
     "in-queue": "^1.2.1",
     "jexpr": "^1.0.0-pre.9",
     "json5": "^2.2.3",
