@@ -1,8 +1,8 @@
-import type { ModuleConfig } from "./config";
+import type { ModuleConfig, Parameters } from "./config";
+import type { Environment } from "./environment";
 import type { EventAbsorber } from "./events";
 import type { Pipeline } from "./pipeline";
 import type { Server } from "./server";
-import type { Environment, Parameters } from "./variable";
 
 export class Module {
   absorber: EventAbsorber;

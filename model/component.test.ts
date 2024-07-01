@@ -1,8 +1,8 @@
 import { describe, expect, it } from "bun:test";
 import { Component } from "./component";
-import type { ComponentConfig } from "./config";
+import type { ComponentConfig } from "./component";
+import type { Field } from "./environment";
 import { NamedEventEmitter, eventChannel } from "./events";
-import type { Field } from "./variable";
 
 type DummyConfig = ComponentConfig;
 

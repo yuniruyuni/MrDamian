@@ -1,9 +1,10 @@
 import { Component } from "./component";
-import type { ComponentConfig, SubmoduleConfig } from "./config";
+import type { ComponentConfig } from "./component";
+import type { SubmoduleConfig } from "./config";
+import type { Field } from "./environment";
 import type { NamedEventEmitter, } from "./events";
 import { type ComponentGenerators, ModuleFactory } from "./factory";
 import type { Module } from "./module";
-import type { Field } from "./variable";
 
 // TODO: allow direct definition submodule (not file path but configure object.)
 export class Submodule extends Component<SubmoduleConfig> {

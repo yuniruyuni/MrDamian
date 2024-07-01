@@ -1,15 +1,10 @@
 import deepmerge from "deepmerge";
+import { EvalAstFactory, parse } from "jexpr";
 
-import type { Component } from "./component";
-import { type ComponentConfig, type SubmoduleConfig, isSubmoduleConfig } from "./config";
-import type { Fetch } from "./server";
+import type { Component, ComponentConfig, Fetch  } from "./component";
+import { type SubmoduleConfig, isSubmoduleConfig } from "./config";
 import type { Submodule } from "./submodule";
-import {
-  type Environment,
-  asArgs,
-  evaluate,
-  evaluateExpression,
-} from "./variable";
+import { type Arguments, type Environment, asArgs } from "./variable";
 
 export class Evaluator<C extends ComponentConfig> {
   readonly component: Component<C>;
@@ -19,7 +14,6 @@ export class Evaluator<C extends ComponentConfig> {
     this.component = component;
     // TODO: implement some validator.
     this.config = config as C;
-    this.config.height ||= this.component.height();
   }
 
   get fetch(): Fetch {
@@ -97,4 +91,38 @@ export class Evaluator<C extends ComponentConfig> {
     }
     return cursor;
   }
+}
+
+export function evaluateExpression(code: string, envs: Environment) {
+  const astFactory = new EvalAstFactory();
+  const expr = parse(code, astFactory);
+  // TODO: follow up the evaluate result was invalid case.
+  return expr?.evaluate(envs);
+}
+
+// evaluate function takes two arguments, target and envs.
+// target is the Parameters type that contains the expression string that starts with "$".
+// envs is the Environment type that contains the evaluated result of the Parameters type.
+// evaluate function returns the Environment type that contains the evaluated result of the target.
+export function evaluate(args: Arguments, envs: Environment): Environment {
+  return Object.fromEntries(
+    Object.entries(args ?? {}).map(([key, val]) => {
+      if (typeof val === "object" && Array.isArray(val))
+        return [key, val.map((v) => evaluate(v as Arguments, envs))];
+      if (typeof val === "object")
+        return [key, evaluate(val as Arguments, envs)];
+      if (typeof val !== "string") return [key, val];
+
+      // check if it's an expression.
+      if (val.length < 2) return [key, val];
+      if (val[0] !== "$") return [key, val];
+      if (val[0] === "$" && val[1] === "$") {
+        return [key, val.slice(1)];
+      }
+
+      const code = val.slice(1);
+      const res = evaluateExpression(code, envs);
+      return [key, res];
+    }),
+  );
 }

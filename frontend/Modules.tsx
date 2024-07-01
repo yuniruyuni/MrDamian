@@ -1,6 +1,7 @@
 import clsx from "clsx";
 import type { FC } from "react";
-import type { ComponentConfig, ModuleConfig } from "~/model/config";
+import type { ComponentConfig } from "~/model/component";
+import type { ModuleConfig } from "~/model/config";
 import type { Environment, Field } from "~/model/variable";
 
 const Config: FC<{ args: Environment }> = ({ args }) => (
@@ -38,7 +39,7 @@ const Component: FC<{ config: ComponentConfig }> = ({ config }) => (
       className={clsx("w-full", "overflow-auto")}
       src={`/${[config.type, config.name].filter((v) => v).join("/")}/`}
       title={`${config.type} settings`}
-      height={config.height}
+      height={50 /* TODO: deprecate contant and will make it as enough height. */ }
     />
   </div>
 );
