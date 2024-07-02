@@ -110,7 +110,7 @@ export class PluginLoader {
     if (!metadata.main) {
       return undefined;
     }
-    if (!metadata.dependencies?.mrdamian) {
+    if (!metadata.dependencies?.["mrdamian-plugin"]) {
       return undefined;
     }
 
