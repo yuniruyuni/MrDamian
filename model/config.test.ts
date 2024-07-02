@@ -1,5 +1,5 @@
 import { describe, expect, it } from "bun:test";
-import { type Parameters, asParams } from "./config";
+import { type Parameters, asParams } from "~/model/config";
 
 describe("Parameters", () => {
   it("can contains basic types", () => {

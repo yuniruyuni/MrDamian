@@ -1,8 +1,7 @@
 import clsx from "clsx";
+import type { ComponentConfig, Environment, Field } from "mrdamian-plugin";
 import type { FC } from "react";
-import type { ComponentConfig } from "~/model/component";
 import type { ModuleConfig } from "~/model/config";
-import type { Environment, Field } from "~/model/variable";
 
 const Config: FC<{ args: Environment }> = ({ args }) => (
   <dl className="divide-y divide-gray-100 grid grid-cols-[max-content,1fr] m-1">
@@ -39,7 +38,9 @@ const Component: FC<{ config: ComponentConfig }> = ({ config }) => (
       className={clsx("w-full", "overflow-auto")}
       src={`/${[config.type, config.name].filter((v) => v).join("/")}/`}
       title={`${config.type} settings`}
-      height={50 /* TODO: deprecate contant and will make it as enough height. */ }
+      height={
+        50 /* TODO: deprecate contant and will make it as enough height. */
+      }
     />
   </div>
 );

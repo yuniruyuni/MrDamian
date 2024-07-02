@@ -1,5 +1,6 @@
-import { Queue } from './queue';
-import type { Environment, Field } from "./variable";
+import type { Environment, Field } from "mrdamian-plugin";
+
+import { Queue } from "~/model/queue";
 
 class EventChannel {
   queue: Queue<Environment>;
@@ -67,7 +68,7 @@ export class NamedEventEmitter {
   emitter: EventEmitter;
   keys: string[];
   constructor(emitter: EventEmitter, keys: string[]) {
-    if( keys.length <= 0 ) {
+    if (keys.length <= 0) {
       throw KeyNotExistError;
     }
 

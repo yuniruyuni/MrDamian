@@ -1,9 +1,10 @@
 import { describe, expect, it } from "bun:test";
-import type { SubmoduleConfig } from "./config";
-import { NamedEventEmitter, eventChannel } from "./events";
-import type { ComponentGenerators } from "./factory";
-import { Submodule } from "./submodule";
-import { asArgs, asParams } from "./variable";
+
+import { asArgs } from "~/model/arguments";
+import { type SubmoduleConfig, asParams } from "~/model/config";
+import { NamedEventEmitter, eventChannel } from "~/model/events";
+import type { ComponentGenerators } from "~/model/factory";
+import { Submodule } from "~/model/submodule";
 
 describe("Submodule", () => {
   it("can emit message", async () => {
@@ -22,7 +23,6 @@ describe("Submodule", () => {
             args: asArgs({
               hoge: "fuga",
             }),
-            height: 100,
           },
         ],
       },

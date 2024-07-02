@@ -1,22 +1,38 @@
 import deepmerge from "deepmerge";
 import { EvalAstFactory, parse } from "jexpr";
+import type {
+  Component,
+  ComponentConfig,
+  Environment,
+  Fetch,
+} from "mrdamian-plugin";
 
-import type { Component, ComponentConfig, Fetch  } from "./component";
-import { type SubmoduleConfig, isSubmoduleConfig } from "./config";
-import type { Submodule } from "./submodule";
-import { type Arguments, type Environment, asArgs } from "./variable";
+import { type Arguments, asArgs } from "~/model/arguments";
+import { type SubmoduleConfig, isSubmoduleConfig } from "~/model/config";
+import type { Submodule } from "~/model/submodule";
 
 export class Evaluator<C extends ComponentConfig> {
   readonly component: Component<C>;
-  readonly config: C;
+  readonly config: C & { args: Arguments };
 
-  constructor(component: Component<C>, config: ComponentConfig) {
+  constructor(
+    component: Component<C>,
+    config: ComponentConfig & { args: Arguments },
+  ) {
     this.component = component;
     // TODO: implement some validator.
-    this.config = config as C;
+    this.config = config as C & { args: Arguments };
   }
 
   get fetch(): Fetch {
+    if (this.component.fetch === undefined) {
+      return (_req: Request): Response | Promise<Response> => {
+        return new Response("No configuration", {
+          status: 200,
+          headers: { "Content-Type": "text/html" },
+        });
+      };
+    }
     return this.component.fetch;
   }
 
@@ -69,20 +85,23 @@ export class Evaluator<C extends ComponentConfig> {
     if (!this.config.module.inherit) return {};
 
     const config: SubmoduleConfig = this.config;
-    return Object.entries(config.module.inherit).reduce((inherited, [name, type]) =>{
-      const iname = config.inherit[name];
-      const keys = [type, iname].filter((v): v is string => v !== undefined);
-      return deepmerge(inherited, {
-        [type]: {
-          [name]: this.dig(env, ...keys),
-        },
-      });
-    }, {});
+    return Object.entries(config.module.inherit).reduce(
+      (inherited, [name, type]) => {
+        const iname = config.inherit[name];
+        const keys = [type, iname].filter((v): v is string => v !== undefined);
+        return deepmerge(inherited, {
+          [type]: {
+            [name]: this.dig(env, ...keys),
+          },
+        });
+      },
+      {},
+    );
   }
 
-  private dig(env: Environment, ...keys: string[]): Environment | undefined{
+  private dig(env: Environment, ...keys: string[]): Environment | undefined {
     let cursor: Environment = env;
-    for( const key of keys) {
+    for (const key of keys) {
       const field = cursor[key];
       if (!field) return undefined;
       if (typeof field !== "object") return undefined;

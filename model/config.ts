@@ -1,7 +1,8 @@
-import type { ComponentConfig } from "~/model/component";
-import type { Environment } from "~/model/environment";
+import type { ComponentConfig, Environment } from "mrdamian-plugin";
 
-export type { Environment } from "~/model/environment";
+import type { Arguments } from "~/model/arguments";
+
+export type RawComponentConfig = ComponentConfig & { args: Arguments };
 
 declare const parametersSymbol: unique symbol;
 
@@ -20,7 +21,7 @@ export type ModuleConfig = {
   pipeline: PipelineConfig;
 };
 
-export type PipelineConfig = ComponentConfig[];
+export type PipelineConfig = RawComponentConfig[];
 
 // Inheritance expresses submodule's component instance inheritance.
 type Inheritance = {
@@ -40,7 +41,9 @@ export type SubmoduleConfig = ComponentConfig & {
   module: ModuleConfig;
 };
 
-export function isSubmoduleConfig(config: ComponentConfig): config is SubmoduleConfig {
-  if( config.type !== "submodule" ) return false;
+export function isSubmoduleConfig(
+  config: ComponentConfig,
+): config is SubmoduleConfig {
+  if (config.type !== "submodule") return false;
   return (config as SubmoduleConfig).path !== undefined;
 }

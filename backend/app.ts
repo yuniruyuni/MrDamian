@@ -5,10 +5,9 @@ import { serveStatic } from "hono/bun";
 import { load } from "~/backend/load_config";
 import { PluginLoader } from "~/backend/load_plugin";
 
-import type { ModuleConfig } from "~/model/config";
+import { type ModuleConfig, asParams } from "~/model/config";
 import { ModuleFactory } from "~/model/factory";
 import type { Module } from "~/model/module";
-import { asParams } from "~/model/variable";
 
 const mainModulePath = "./config/main.json5";
 

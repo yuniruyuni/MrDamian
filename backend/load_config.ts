@@ -2,9 +2,9 @@ import fs from "node:fs/promises";
 import { dirname } from "node:path";
 import JSON5 from "json5";
 import {
-  type ComponentConfig,
   type ModuleConfig,
   type PipelineConfig,
+  type RawComponentConfig,
   type SubmoduleConfig,
   isSubmoduleConfig,
 } from "~/model/config";
@@ -39,8 +39,8 @@ async function loadPipelineConfig(
 
 async function loadComponentConfig(
   path: string,
-  config: ComponentConfig,
-): Promise<ComponentConfig> {
+  config: RawComponentConfig,
+): Promise<RawComponentConfig> {
   if (isSubmoduleConfig(config)) {
     const base_dir = dirname(path);
     const mpath = `${base_dir}/${config.path}`;

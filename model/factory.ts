@@ -1,21 +1,22 @@
-import type { Component } from "./component";
+import type { Component, ComponentConfig } from "mrdamian-plugin";
+
 import {
-  type ComponentConfig,
   type ModuleConfig,
   type PipelineConfig,
+  type RawComponentConfig,
   isSubmoduleConfig,
-} from "./config";
-import { Evaluator } from "./evaluator";
+} from "~/model/config";
+import { Evaluator } from "~/model/evaluator";
 import {
   type EventAbsorber,
   type EventEmitter,
   NamedEventEmitter,
   eventChannel,
-} from "./events";
-import { Module } from "./module";
-import type { Pipeline } from "./pipeline";
-import { Submodule } from "./submodule";
-import { Unsupported } from "./unsupported";
+} from "~/model/events";
+import { Module } from "~/model/module";
+import type { Pipeline } from "~/model/pipeline";
+import { Submodule } from "~/model/submodule";
+import { Unsupported } from "~/model/unsupported";
 
 export interface ComponentGenerator<
   T extends ComponentConfig = ComponentConfig,
@@ -57,7 +58,7 @@ export class ModuleFactory {
   }
 
   private constructEvaluator(
-    config: ComponentConfig,
+    config: RawComponentConfig,
   ): Evaluator<ComponentConfig> {
     // filter if key is undefined.
     const keys: string[] = [config.type, config.name].filter(

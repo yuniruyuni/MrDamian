@@ -1,10 +1,9 @@
-import { Component } from "./component";
-import type { ComponentConfig } from "./component";
-import type { SubmoduleConfig } from "./config";
-import type { Field } from "./environment";
-import type { NamedEventEmitter, } from "./events";
-import { type ComponentGenerators, ModuleFactory } from "./factory";
-import type { Module } from "./module";
+import { Component, type ComponentConfig, type Field } from "mrdamian-plugin";
+
+import type { SubmoduleConfig } from "~/model/config";
+import type { NamedEventEmitter } from "~/model/events";
+import { type ComponentGenerators, ModuleFactory } from "~/model/factory";
+import type { Module } from "~/model/module";
 
 // TODO: allow direct definition submodule (not file path but configure object.)
 export class Submodule extends Component<SubmoduleConfig> {
@@ -25,7 +24,9 @@ export class Submodule extends Component<SubmoduleConfig> {
     for (const [name, type] of Object.entries(config.module.inherit)) {
       const iname = config.inherit[name];
       const instance = instances.get(`${type}/${iname}`);
-      if (instance) { continue; }
+      if (instance) {
+        continue;
+      }
       inherited.set(name, instance);
     }
 

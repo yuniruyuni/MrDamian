@@ -1,8 +1,9 @@
-import type { ModuleConfig, Parameters } from "./config";
-import type { Environment } from "./environment";
-import type { EventAbsorber } from "./events";
-import type { Pipeline } from "./pipeline";
-import type { Server } from "./server";
+import type { Environment } from "mrdamian-plugin";
+
+import type { ModuleConfig, Parameters } from "~/model/config";
+import type { EventAbsorber } from "~/model/events";
+import type { Pipeline } from "~/model/pipeline";
+import type { Server } from "~/model/server";
 
 export class Module {
   absorber: EventAbsorber;

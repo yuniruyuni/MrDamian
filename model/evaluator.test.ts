@@ -1,8 +1,9 @@
 import { describe, expect, it } from "bun:test";
-import { type Environment, type Parameters, asParams } from "./config";
-import { type Arguments, asArgs } from "./environment";
+import type { Environment } from "mrdamian-plugin";
 
-import { evaluate } from "./evaluator";
+import { type Arguments, asArgs } from "~/model/arguments";
+import { type Parameters, asParams } from "~/model/config";
+import { evaluate } from "~/model/evaluator";
 
 describe("evaluate", () => {
   it("transforms parameter's expression into environment value", () => {

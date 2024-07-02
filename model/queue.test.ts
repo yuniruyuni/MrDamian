@@ -1,5 +1,6 @@
 import { describe, expect, it } from "bun:test";
-import { Queue } from "./queue";
+
+import { Queue } from "~/model/queue";
 
 describe("Queue", () => {
   it("pop ordering is aligned with push ordering (FIFO)", async () => {

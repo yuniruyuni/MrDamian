@@ -2,7 +2,7 @@ import path from "node:path";
 import JSON5 from "json5";
 import search from "libnpmsearch";
 import { PluginManager } from "live-plugin-manager";
-import type { ComponentGenerator, ComponentGenerators  } from "~/model/factory";
+import type { ComponentGenerator, ComponentGenerators } from "~/model/factory";
 import type { PluginInfo } from "~/model/plugin";
 
 export class Plugin {
@@ -10,11 +10,7 @@ export class Plugin {
   version: string;
   gen: ComponentGenerator;
 
-  constructor(
-    name: string,
-    version: string,
-    gen: ComponentGenerator,
-  ) {
+  constructor(name: string, version: string, gen: ComponentGenerator) {
     this.name = name;
     this.version = version;
     this.gen = gen;
@@ -30,7 +26,7 @@ export class Plugin {
 }
 
 export type InstalledPlugin = {
-  name:string;
+  name: string;
   version: string;
 };
 

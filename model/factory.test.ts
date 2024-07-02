@@ -1,9 +1,9 @@
 import { describe, expect, it } from "bun:test";
-import { Component } from "./component";
-import type { ComponentConfig } from "./config";
-import { ModuleFactory } from "./factory";
-import { type Field, asArgs, asParams } from "./variable";
+import { Component, type ComponentConfig, type Field } from "mrdamian-plugin";
 
+import { asArgs } from "~/model/arguments";
+import { asParams } from "~/model/config";
+import { ModuleFactory } from "~/model/factory";
 
 type DummyConfig = ComponentConfig;
 class DummyComponent extends Component<DummyConfig> {
@@ -15,7 +15,7 @@ class DummyComponent extends Component<DummyConfig> {
 
 describe("Factory", () => {
   it("can construct module", async () => {
-    const gens = {dummy: DummyComponent};
+    const gens = { dummy: DummyComponent };
     const factory = new ModuleFactory(gens);
 
     const mod = factory.construct({
@@ -29,7 +29,6 @@ describe("Factory", () => {
           args: asArgs({
             hoge: "fuga",
           }),
-          height: 100,
         },
       ],
     });
@@ -43,7 +42,6 @@ describe("Factory", () => {
             args: {
               hoge: "fuga",
             },
-            height: 100,
             name: "name",
             type: "dummy",
             when: "true && false",
@@ -62,7 +60,6 @@ describe("Factory", () => {
             args: asArgs({
               hoge: "fuga",
             }),
-            height: 100,
           },
         },
       ],

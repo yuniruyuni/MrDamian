@@ -1,5 +1,10 @@
 import { describe, expect, it } from "bun:test";
-import { KeyNotExistError, NamedEventEmitter, eventChannel } from "./events";
+
+import {
+  KeyNotExistError,
+  NamedEventEmitter,
+  eventChannel,
+} from "~/model/events";
 
 describe("NamedEventEmitter", () => {
   it("emit with keys", async () => {
@@ -26,6 +31,8 @@ describe("NamedEventEmitter", () => {
 
   it("should be omit zero key construction", async () => {
     const [emitter] = eventChannel();
-    expect(() => new NamedEventEmitter(emitter, [])).toThrowError(KeyNotExistError);
+    expect(() => new NamedEventEmitter(emitter, [])).toThrowError(
+      KeyNotExistError,
+    );
   });
 });

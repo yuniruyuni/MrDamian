@@ -1,6 +1,4 @@
-import { Component } from "./component";
-import type { ComponentConfig } from "./config";
-import type { Field } from "./variable";
+import { Component, type ComponentConfig, type Field } from "mrdamian-plugin";
 
 export class Unsupported extends Component<ComponentConfig> {
   async process(): Promise<Field> {
