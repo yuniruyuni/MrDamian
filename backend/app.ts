@@ -97,10 +97,12 @@ export class App {
       return c.json({ status: "ok" });
     });
 
-    route.use(serveStatic({ root: "static" }));
-
     if (this.module !== undefined) {
       this.module.mount(route);
     }
+
+    route.use(serveStatic({ root: "static" }));
+
+    route.get("*", serveStatic({ path: "static/index.html" }));
   }
 }
