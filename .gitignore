@@ -94,5 +94,5 @@ typings/
 /build/
 /package/
 
-# automatically generated with our plugin system
-/.plugins
+# ignore plugin setting (it is auto generated)
+config/plugins.json5
