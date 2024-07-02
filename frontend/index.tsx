@@ -1,7 +1,7 @@
 import type { FC } from "react";
 import React, { useEffect, useState } from "react";
 import ReactDOM from "react-dom/client";
-import { Route, Switch, useLocation } from "wouter";
+import { Route, Router, Switch, useLocation } from "wouter";
 
 import { type ModuleConfig, asParams } from "~/model/config";
 import { AlertProvider, AlertRegion } from "./Alert";
@@ -36,7 +36,7 @@ const Root: FC = () => {
 
   useEffect(() => {
     (async () => {
-      const res = await fetch("/api/module");
+      const res = await fetch("/-/api/module");
       const json = await res.json();
       setModules(json as ModuleConfig);
     })();
@@ -99,9 +99,11 @@ if (!rootElm) throw new Error("Failed to get root element");
 const root = ReactDOM.createRoot(rootElm);
 root.render(
   <React.StrictMode>
-    <AlertProvider>
-      <AlertRegion />
-      <Root />
-    </AlertProvider>
+    <Router base="/-">
+      <AlertProvider>
+        <AlertRegion />
+        <Root />
+      </AlertProvider>
+    </Router>
   </React.StrictMode>,
 );

@@ -70,22 +70,22 @@ export class App {
   }
 
   constructRoutes(route: Hono) {
-    route.get("/api/module", async (c) => {
+    route.get("/-/api/module", async (c) => {
       return c.json(this.params);
     });
 
-    route.post("/api/module/run", async (c) => {
+    route.post("/-/api/module/run", async (c) => {
       if (this.running) return c.json({ status: "running" });
       this.run();
       return c.json({ status: "ok" });
     });
 
-    route.get("/api/plugin", async (c) => {
+    route.get("/-/api/plugin", async (c) => {
       const packages = await this.loader.search("mrdamian-plugin-");
       return c.json(packages);
     });
 
-    route.post("/api/plugin", async (c) => {
+    route.post("/-/api/plugin", async (c) => {
       const params = (await c.req.json()) as { name: string };
       await this.loader.installFromNpm(params.name);
       await this.loader.saveConfig(this.pluginConfigPath);
@@ -101,8 +101,10 @@ export class App {
       this.module.mount(route);
     }
 
-    route.use(serveStatic({ root: "static" }));
+    route.get("/-/index.css", serveStatic({ path: "static/index.css" }));
+    route.get("/-/index.js", serveStatic({ path: "static/index.js" }));
+    route.get("/-/*", serveStatic({ path: "static/index.html" }));
 
-    route.get("*", serveStatic({ path: "static/index.html" }));
+    route.get("/", (c) => c.redirect("/-/"));
   }
 }

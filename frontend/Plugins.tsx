@@ -8,7 +8,7 @@ export const Plugins: FC = () => {
   const { pushAlert } = useContext(AlertContext);
   useEffect(() => {
     (async () => {
-      const res = await fetch("/api/plugin");
+      const res = await fetch("/-/api/plugin");
       const json = await res.json();
       setPlugins(json as PluginInfo[]);
     })();
@@ -16,7 +16,7 @@ export const Plugins: FC = () => {
 
   const onInstall = useCallback(
     async (name: string) => {
-      const res = await fetch("/api/plugin", {
+      const res = await fetch("/-/api/plugin", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
