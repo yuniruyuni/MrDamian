@@ -1,7 +1,7 @@
 import clsx from "clsx";
 import type { ComponentConfig, Environment, Field } from "mrdamian-plugin";
-import type { FC } from "react";
-import type { ModuleConfig } from "~/model/config";
+import { type FC, useEffect, useState } from "react";
+import { type ModuleConfig, asParams } from "~/model/config";
 
 const Config: FC<{ args: Environment }> = ({ args }) => (
   <dl className="divide-y divide-gray-100 grid grid-cols-[max-content,1fr] m-1">
@@ -45,7 +45,7 @@ const Component: FC<{ config: ComponentConfig }> = ({ config }) => (
   </div>
 );
 
-export const Modules: FC<{ modules: ModuleConfig }> = ({ modules }) => (
+const ModuleList: FC<{ modules: ModuleConfig }> = ({ modules }) => (
   <ul className="timeline timeline-vertical timeline-compact">
     {modules.pipeline.map((comp, index) => (
       // TODO: create unique key without index value.
@@ -72,3 +72,22 @@ export const Modules: FC<{ modules: ModuleConfig }> = ({ modules }) => (
     ))}
   </ul>
 );
+
+
+export const Modules: FC = () => {
+  const [modules, setModules] = useState<ModuleConfig>({
+    params: asParams({}),
+    pipeline: [],
+    inherit: {},
+  });
+
+  useEffect(() => {
+    (async () => {
+      const res = await fetch("/-/api/module");
+      const json = await res.json();
+      setModules(json as ModuleConfig);
+    })();
+  }, []);
+
+  return (<ModuleList modules={modules} />);
+};
