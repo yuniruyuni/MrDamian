@@ -28,16 +28,10 @@ const Body: FC<{ children: React.ReactNode }> = ({ children }) => (
 
 const Routing: FC = () => (
   <Router base="/-">
-    <Route path="/modules">
+    <Route path="/modules/*?">
       <Modules />
     </Route>
-    <Route path="/modules/*">
-      <Modules />
-    </Route>
-    <Route path="/plugins">
-      <Plugins />
-    </Route>
-    <Route path="/plugins/*">
+    <Route path="/plugins/*?">
       <Plugins />
     </Route>
     <Route path="/">
