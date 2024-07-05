@@ -49,6 +49,7 @@ const Step: FC<{ config: ComponentConfig, selected: boolean }> = ({ config, sele
       to={configLink(config)}
     >
       <h2 className="font-medium text-lg">{config.type}</h2>
+      <h3 className="font-thin">{config.name}</h3>
     </Link>
   );
 };
