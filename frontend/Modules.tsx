@@ -38,15 +38,25 @@ const configLink = (config: ComponentConfig)=>{
   return `/modules/${config.type}/`;
 };
 
-const Step: FC<{ config: ComponentConfig, selected: boolean }> = ({ config, selected }) => (
-  <div className={clsx("timeline-end timeline-box w-full", selected && "bg-slate-200")}>
-    <h2 className="font-medium text-lg">
-      <Link to={configLink(config)}>{config.type}</Link>
-    </h2>
-  </div>
-);
+const Step: FC<{ config: ComponentConfig, selected: boolean }> = ({ config, selected }) => {
+  return (
+    <Link
+      className={clsx(
+        "timeline-end timeline-box w-full",
+        selected && "bg-slate-200",
+        "transition-transform duration-200 ease-in-out hover:-translate-x-8"
+      )}
+      to={configLink(config)}
+    >
+      <h2 className="font-medium text-lg">{config.type}</h2>
+    </Link>
+  );
+};
 
-const Pipeline: FC<{ pipeline: ComponentConfig[], selected?: {type: string, name?: string} }> = ({ pipeline, selected }) => (
+const Pipeline: FC<{
+  pipeline: ComponentConfig[];
+  selected?: { type: string; name?: string };
+}> = ({ pipeline, selected }) => (
   <ul className="timeline timeline-vertical timeline-compact min-w-fit w-full flex-1 h-full">
     {pipeline.map((comp, index) => (
       // TODO: create unique key without index value.
@@ -67,7 +77,12 @@ const Pipeline: FC<{ pipeline: ComponentConfig[], selected?: {type: string, name
             />
           </svg>
         </div>
-        <Step config={comp} selected={comp.type === selected?.type && comp.name === selected.name} />
+        <Step
+          config={comp}
+          selected={
+            (comp.type === selected?.type) && (comp.name === selected.name)
+          }
+        />
         {index !== pipeline.length - 1 && <hr />}
       </li>
     ))}
@@ -84,23 +99,20 @@ const Component: FC<{ component: ComponentConfig }> = ({ component }) => (
 
 const ModuleList: FC<{ modules: ModuleConfig }> = ({ modules }) => (
   <div className="flex flex-row gap-4 h-full">
-    <Route path="/modules">
-      <Pipeline pipeline={modules.pipeline} />
+    <Route path="/modules/:type?/:name?">
+      {({ type, name }) => (
+        <Pipeline pipeline={modules.pipeline} selected={type ? { type, name } : undefined} />
+      )}
     </Route>
 
     <Route path="/modules/:type/:name?">
-      {({type, name}) => {
+      {({ type, name }) => {
         const comp = modules.pipeline.find(
           (comp) => comp.type === type && comp.name === name,
         );
-        if (!comp) return false;
+        if (!comp) return;
 
-        return (
-          <>
-            <Pipeline pipeline={modules.pipeline} selected={{ type, name }} />
-            <Component component={comp} />
-          </>
-        );
+        return <Component component={comp} />;
       }}
     </Route>
   </div>
