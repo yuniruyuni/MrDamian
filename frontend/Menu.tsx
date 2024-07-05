@@ -9,6 +9,7 @@ const Details: FC<{children: React.ReactNode}> = ({children}) => {
       onMouseEnter={() => setOpen(true)}
       onMouseLeave={() => setOpen(false)}
     >
+      <div className="absolute w-full h-full" />
       {children}
     </details>
   );
@@ -36,7 +37,6 @@ export const Menu: FC = () => (
         <li className="z-50">
           <Details>
             <summary>Menu</summary>
-            <div className="absolute w-full h-full" />
             <ul>
               <li>
                 <button
