@@ -4,7 +4,6 @@ import { type FC, useEffect, useState } from "react";
 import { Link, Route } from "wouter";
 import { type ModuleConfig, asParams } from "~/model/config";
 
-
 const Config: FC<{ args: Environment }> = ({ args }) => (
   <dl className="divide-y divide-gray-100 grid grid-cols-[max-content,1fr] m-1">
     {args &&
@@ -33,18 +32,21 @@ const ShowField: FC<{ name: string; value: Field }> = ({ name, value }) => (
   </div>
 );
 
-const configLink = (config: ComponentConfig)=>{
-  if( config.name ) return `/modules/${config.type}/${config.name}`;
+const configLink = (config: ComponentConfig) => {
+  if (config.name) return `/modules/${config.type}/${config.name}`;
   return `/modules/${config.type}/`;
 };
 
-const Step: FC<{ config: ComponentConfig, selected: boolean }> = ({ config, selected }) => {
+const Step: FC<{ config: ComponentConfig; selected: boolean }> = ({
+  config,
+  selected,
+}) => {
   return (
     <Link
       className={clsx(
         "timeline-end timeline-box w-full",
         selected && "bg-slate-200",
-        "transition-transform duration-200 ease-in-out hover:-translate-x-8"
+        "transition-transform duration-200 ease-in-out hover:-translate-x-8",
       )}
       to={configLink(config)}
     >
@@ -80,9 +82,7 @@ const Pipeline: FC<{
         </div>
         <Step
           config={comp}
-          selected={
-            (comp.type === selected?.type) && (comp.name === selected.name)
-          }
+          selected={comp.type === selected?.type && comp.name === selected.name}
         />
         {index !== pipeline.length - 1 && <hr />}
       </li>
@@ -102,7 +102,10 @@ const ModuleList: FC<{ modules: ModuleConfig }> = ({ modules }) => (
   <div className="flex flex-row gap-4 h-full">
     <Route path="/modules/:type?/:name?">
       {({ type, name }) => (
-        <Pipeline pipeline={modules.pipeline} selected={type ? { type, name } : undefined} />
+        <Pipeline
+          pipeline={modules.pipeline}
+          selected={type ? { type, name } : undefined}
+        />
       )}
     </Route>
 
@@ -119,7 +122,6 @@ const ModuleList: FC<{ modules: ModuleConfig }> = ({ modules }) => (
   </div>
 );
 
-
 export const Modules: FC = () => {
   const [modules, setModules] = useState<ModuleConfig>({
     params: asParams({}),
@@ -135,5 +137,5 @@ export const Modules: FC = () => {
     })();
   }, []);
 
-  return (<ModuleList modules={modules} />);
+  return <ModuleList modules={modules} />;
 };

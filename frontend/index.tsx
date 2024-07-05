@@ -15,15 +15,11 @@ const Container: FC<{ children: React.ReactNode }> = ({ children }) => (
 );
 
 const Header: FC<{ children: React.ReactNode }> = ({ children }) => (
-  <div className="w-full h-fit">
-    {children}
-  </div>
+  <div className="w-full h-fit">{children}</div>
 );
 
 const Body: FC<{ children: React.ReactNode }> = ({ children }) => (
-  <div className="w-full h-full flex-1">
-    {children}
-  </div>
+  <div className="w-full h-full flex-1">{children}</div>
 );
 
 const Routing: FC = () => (

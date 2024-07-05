@@ -1,7 +1,7 @@
 import { type FC, useState } from "react";
 import { Link } from "wouter";
 
-const Details: FC<{children: React.ReactNode}> = ({children}) => {
+const Details: FC<{ children: React.ReactNode }> = ({ children }) => {
   const [open, setOpen] = useState(false);
   return (
     <details
@@ -42,7 +42,9 @@ export const Menu: FC = () => (
                 <button
                   type="button"
                   onClick={() => fetch("/-/api/module/run", { method: "POST" })}
-                  onKeyDown={() => fetch("/-/api/module/run", { method: "POST" })}
+                  onKeyDown={() =>
+                    fetch("/-/api/module/run", { method: "POST" })
+                  }
                 >
                   Run
                 </button>
