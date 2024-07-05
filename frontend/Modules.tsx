@@ -83,28 +83,12 @@ const Component: FC<{ component: ComponentConfig }> = ({ component }) => (
 );
 
 const ModuleList: FC<{ modules: ModuleConfig }> = ({ modules }) => (
-  <div className="flex flex-row h-full">
+  <div className="flex flex-row gap-4 h-full">
     <Route path="/modules">
       <Pipeline pipeline={modules.pipeline} />
     </Route>
 
-    <Route path="/modules/:type">
-      {({type}) => {
-        const comp = modules.pipeline.find(
-          (comp) => comp.type === type && comp.name === undefined,
-        );
-        if (!comp) return false;
-
-        return (
-          <>
-            <Pipeline pipeline={modules.pipeline} selected={{ type }} />
-            <Component component={comp} />
-          </>
-        );
-      }}
-    </Route>
-
-    <Route path="/modules/:type/:name">
+    <Route path="/modules/:type/:name?">
       {({type, name}) => {
         const comp = modules.pipeline.find(
           (comp) => comp.type === type && comp.name === name,
