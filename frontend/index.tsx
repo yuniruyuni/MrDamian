@@ -9,7 +9,21 @@ import { Modules } from "./Modules";
 import { Plugins } from "./Plugins";
 
 const Container: FC<{ children: React.ReactNode }> = ({ children }) => (
-  <div className="md:container md:mx-auto">{children}</div>
+  <div className="md:container md:mx-auto h-screen flex flex-col">
+    {children}
+  </div>
+);
+
+const Header: FC<{ children: React.ReactNode }> = ({ children }) => (
+  <div className="w-full h-fit">
+    {children}
+  </div>
+);
+
+const Body: FC<{ children: React.ReactNode }> = ({ children }) => (
+  <div className="w-full h-full flex-1">
+    {children}
+  </div>
 );
 
 const Routing: FC = () => (
@@ -40,8 +54,12 @@ root.render(
     <AlertProvider>
       <AlertRegion />
       <Container>
-        <Menu />
-        <Routing />
+        <Header>
+          <Menu />
+        </Header>
+        <Body>
+          <Routing />
+        </Body>
       </Container>
     </AlertProvider>
   </React.StrictMode>,

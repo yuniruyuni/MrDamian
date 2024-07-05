@@ -33,58 +33,89 @@ const ShowField: FC<{ name: string; value: Field }> = ({ name, value }) => (
   </div>
 );
 
-const Component: FC<{ config: ComponentConfig }> = ({ config }) => (
-  <div className="timeline-end timeline-box w-full">
+const configLink = (config: ComponentConfig)=>{
+  if( config.name ) return `/modules/${config.type}/${config.name}`;
+  return `/modules/${config.type}/`;
+};
+
+const Step: FC<{ config: ComponentConfig, selected: boolean }> = ({ config, selected }) => (
+  <div className={clsx("timeline-end timeline-box w-full", selected && "bg-slate-200")}>
     <h2 className="font-medium text-lg">
-      <Link to={`/modules/${config.type}/${config.name}`}>{config.type}</Link>
+      <Link to={configLink(config)}>{config.type}</Link>
     </h2>
   </div>
 );
 
+const Pipeline: FC<{ pipeline: ComponentConfig[], selected?: {type: string, name?: string} }> = ({ pipeline, selected }) => (
+  <ul className="timeline timeline-vertical timeline-compact min-w-fit w-full flex-1 h-full">
+    {pipeline.map((comp, index) => (
+      // TODO: create unique key without index value.
+      <li key={`${comp.type}/${comp.name}/${index}`}>
+        {index !== 0 && <hr />}
+        <div className="timeline-middle">
+          <svg
+            role="graphics-symbol"
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 20 20"
+            fill="currentColor"
+            className="w-5 h-5"
+          >
+            <path
+              fillRule="evenodd"
+              d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.857-9.809a.75.75 0 00-1.214-.882l-3.483 4.79-1.88-1.88a.75.75 0 10-1.06 1.061l2.5 2.5a.75.75 0 001.137-.089l4-5.5z"
+              clipRule="evenodd"
+            />
+          </svg>
+        </div>
+        <Step config={comp} selected={comp.type === selected?.type && comp.name === selected.name} />
+        {index !== pipeline.length - 1 && <hr />}
+      </li>
+    ))}
+  </ul>
+);
+
+const Component: FC<{ component: ComponentConfig }> = ({ component }) => (
+  <iframe
+    className="w-full h-full overflow-auto"
+    src={`/${[component.type, component.name].filter((v) => v).join("/")}/`}
+    title={component.type}
+  />
+);
+
 const ModuleList: FC<{ modules: ModuleConfig }> = ({ modules }) => (
-  <div className="flex flex-row">
-    <ul className="timeline timeline-vertical timeline-compact min-w-fit">
-      {modules.pipeline.map((comp, index) => (
-        // TODO: create unique key without index value.
-        <li key={`${comp.type}/${comp.name}/${index}`}>
-          {index !== 0 && <hr />}
-          <div className="timeline-middle">
-            <svg
-              role="graphics-symbol"
-              xmlns="http://www.w3.org/2000/svg"
-              viewBox="0 0 20 20"
-              fill="currentColor"
-              className="w-5 h-5"
-            >
-              <path
-                fillRule="evenodd"
-                d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.857-9.809a.75.75 0 00-1.214-.882l-3.483 4.79-1.88-1.88a.75.75 0 10-1.06 1.061l2.5 2.5a.75.75 0 001.137-.089l4-5.5z"
-                clipRule="evenodd"
-              />
-            </svg>
-          </div>
-          <Component config={comp} />
-          {index !== modules.pipeline.length - 1 && <hr />}
-        </li>
-      ))}
-    </ul>
-    <Route path="/modules/:type/:name">
+  <div className="flex flex-row h-full">
+    <Route path="/modules">
+      <Pipeline pipeline={modules.pipeline} />
+    </Route>
+
+    <Route path="/modules/:type">
       {({type}) => {
-        console.log("matched");
         const comp = modules.pipeline.find(
-          (comp) => comp.type === type,
+          (comp) => comp.type === type && comp.name === undefined,
         );
         if (!comp) return false;
 
         return (
-          <iframe
-            className={clsx("w-full", "overflow-auto")}
-            src={`/${[comp.type, comp.name].filter((v) => v).join("/")}/`}
-            title={`${comp.type} settings`}
-            height={
-              50 /* TODO: deprecate contant and will make it as enough height. */
-            }
-          />
+          <>
+            <Pipeline pipeline={modules.pipeline} selected={{ type }} />
+            <Component component={comp} />
+          </>
+        );
+      }}
+    </Route>
+
+    <Route path="/modules/:type/:name">
+      {({type, name}) => {
+        const comp = modules.pipeline.find(
+          (comp) => comp.type === type && comp.name === name,
+        );
+        if (!comp) return false;
+
+        return (
+          <>
+            <Pipeline pipeline={modules.pipeline} selected={{ type, name }} />
+            <Component component={comp} />
+          </>
         );
       }}
     </Route>
