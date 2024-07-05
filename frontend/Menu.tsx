@@ -28,8 +28,8 @@ export const Menu: FC = () => (
         <li>
           <button
             type="button"
-            onClick={() => fetch("/api/module/run", { method: "POST" })}
-            onKeyDown={() => fetch("/api/module/run", { method: "POST" })}
+            onClick={() => fetch("/-/api/module/run", { method: "POST" })}
+            onKeyDown={() => fetch("/-/api/module/run", { method: "POST" })}
           >
             Run
           </button>
@@ -41,8 +41,8 @@ export const Menu: FC = () => (
               <li>
                 <button
                   type="button"
-                  onClick={() => fetch("/api/module/run", { method: "POST" })}
-                  onKeyDown={() => fetch("/api/module/run", { method: "POST" })}
+                  onClick={() => fetch("/-/api/module/run", { method: "POST" })}
+                  onKeyDown={() => fetch("/-/api/module/run", { method: "POST" })}
                 >
                   Run
                 </button>
@@ -50,8 +50,8 @@ export const Menu: FC = () => (
               <li>
                 <button
                   type="button"
-                  onClick={() => fetch("/api/module/run", { method: "POST" })}
-                  onKeyUp={() => fetch("/api/module/run", { method: "POST" })}
+                  onClick={() => fetch("/-/api/module/run", { method: "POST" })}
+                  onKeyUp={() => fetch("/-/api/module/run", { method: "POST" })}
                 >
                   Save
                 </button>
