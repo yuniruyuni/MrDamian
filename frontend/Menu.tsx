@@ -1,5 +1,18 @@
-import type { FC } from "react";
+import { type FC, useState } from "react";
 import { Link } from "wouter";
+
+const Details: FC<{children: React.ReactNode}> = ({children}) => {
+  const [open, setOpen] = useState(false);
+  return (
+    <details
+      open={open}
+      onMouseEnter={() => setOpen(true)}
+      onMouseLeave={() => setOpen(false)}
+    >
+      {children}
+    </details>
+  );
+};
 
 export const Menu: FC = () => (
   <div className="navbar w-full bg-base-100">
@@ -21,8 +34,9 @@ export const Menu: FC = () => (
           </button>
         </li>
         <li className="z-50">
-          <details>
+          <Details>
             <summary>Menu</summary>
+            <div className="absolute w-full h-full" />
             <ul>
               <li>
                 <button
@@ -46,7 +60,7 @@ export const Menu: FC = () => (
                 <Link to="/-/plugins">Plugins</Link>
               </li>
             </ul>
-          </details>
+          </Details>
         </li>
       </ul>
     </div>
