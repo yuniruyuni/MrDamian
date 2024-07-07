@@ -80,47 +80,99 @@
     },
     {
       type: "panel",
-      // pipelineにおけるcomponent(これ自体)と被ってるからいい名称が必要。form?
+      forms: [
+        {
+          // トグルボタン。
+          // ON/OFFに応じて、ここに入ってきたイベントに
+          // nameで与えたフィールドがtrue/falseで追加される。
+          // この場合は panel.auto_shoutout に true や false が入る
+          type: "toggle",
+          // ここだけの強い制約としてnameはtypeによらず一意である必要がある。
+          name: "auto_shoutout",
+          text: "Auto shoutout"
+        },
+        {
+          // ボタン。この設定値の場合クリックごとに
+          // panel.shoutout = true
+          // という値を持ったイベントが発火
+          type: "button",
+          name: "shoutout",
+          text: "Send shoutout"
+        },
+        {
+          type: "group",
+          name: "message",
+          forms: [
+            {
+              // テキストラベル
+              // ユーザ画面上にテキストを表示する
+              type: "label",
+              name: "latest",
+              // とりあえずのデフォルト値を設定しておく
+              // この値は後でargsで上書きできるが、そのときはjexpr構文が使える
+              text: "",
+            }
+            {
+              type: "label",
+              name: "count",
+              text: "",
+            }
+          ]
+        }
+      ],
+      // panelのinitialize action(defaultアクション)ではargsを受け取らない。
+      // これによってjexpr構文を使えないことを強制する
+    },
+    {
+      when: "twitch.main.message",
+      type: "panel",
+      // updateアクションを使うとstatus値をpipeline側から強制更新できる
+      // この場合はtwitchメッセージを受信した時に
+      // panelコンポネントのlatest_messageを更新するという寸法。
+      // パネルを動的に追加/削除することはできないという点には注意。
+      // (そういうことをしたいなら新しいコンポネントプラグインを作る想定)
+      action: "update",
       args: {
-        forms: [
-          {
-            // トグルボタン。
-            // ON/OFFに応じて、ここに入ってきたイベントに
-            // nameで与えたフィールドがtrue/falseで追加される。
-            // この場合は panel.auto_shoutout に true や false が入る
-            type: "toggle",
-            name: "auto_shoutout",
-            text: "Auto shoutout"
-          },
-          {
-            // ボタン。この設定値の場合クリックごとに
-            // panel.shoutout = true
-            // という値を持ったイベントが発火
-            type: "button",
-            name: "shoutout",
-            text: "Send shoutout"
-          },
-          {
-            // テキストラベル
-            // ユーザ画面上にテキストを表示する
-            type: "text",
-            name: "latest_message",
-            // 1文字目が $ で始まるので jexpr に渡る。
-            // このようにオブジェクトの内側にあっても相変わらずjexprの呼び出しが可能である。
-            text: "$ format('{}: {}', message.name, message.text)"
-          },
-          {
-            // ここにtypeとかあってもjexprの展開を許すことになるだろうけれど...
-            type: "$ hoge",
-            name: "hoge_component",
-            // こういうふうに引数が噛み合わなくなるのを回避できない
-            // が、それはユーザの勝手に任せることにした。
-            // コンポネントの実装に応じて
-            // 実行時エラーになったり無視されるだろう。
-            hoge: "hogehoge",
-          }
-        ],
+        // この名称指定もグループについて考慮する必要があった。
+        // 簡易に記述できるドット区切りで指定するのか、
+        // それとも様々な文字列の指定が可能な配列で指定するのかで悩んだ。
+        // nameはそもそもjexprの制約もありドット区切りできるような文字列しか使えない
+        // そこで利用者の利便性を考慮するとドット区切りが望ましいと判断。
+        name: "message.latest",
+        // このようにjexprの展開した結果でcomponentの値を更新することができる
+        text: "$ format('{}: {}', message.name, message.text)"
       }
+    },
+    {
+      when: "hoge",
+      type: "panel",
+      action: "update",
+      args: {
+        // ここにtypeとかあるならjexprの展開を許すことになるが
+        // これで選べるのはすでにcomponentsとして刺さっているものだけなので
+        // 該当するものがない場合は単に更新操作が無視される
+        // type: "$ hoge",
+        name: "hoge_component",
+        // 引数が噛み合わなくなるのを回避できない
+        // が、それはユーザの勝手に任せることにした。
+        // コンポネントの実装に応じて実行時エラーになったり無視されるだろう。
+        hoge: "hogehoge",
+      },
+    },
+    {
+      when: "twitch.main.message",
+      // 実行ごとにカウントアップするだけのコンポネント
+      // しかしwhenと組み合わせてメッセージ受信数をカウントするのに使えるという寸法
+      type: "count",
+      name: "message",
+    },
+    {
+      when: "panel",
+      action: "update",
+      args: {
+        name: "message.count",
+        text: "$ format('total: {}', count)",
+      },
     },
     {
       // 定期的にイベントを発行するコンポネント
