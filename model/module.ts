@@ -1,6 +1,7 @@
-import type { Environment } from "mrdamian-plugin";
+import type { Environment, Fetch } from "mrdamian-plugin";
 
 import type { ModuleConfig, Parameters } from "~/model/config";
+import type { Evaluator } from "~/model/evaluator";
 import type { EventAbsorber } from "~/model/events";
 import type { Pipeline } from "~/model/pipeline";
 import type { Server } from "~/model/server";
@@ -33,12 +34,40 @@ export class Module {
     await Promise.all(this.pipeline.map(async (comp) => comp.finalize(init)));
   }
 
-  mount<T extends Server<T>>(server: T): T {
+  defaultFetch(_req: Request): Response | Promise<Response> {
+    return new Response("No configuration", {
+      status: 200,
+      headers: { "Content-Type": "text/html" },
+    });
+  }
+
+  async mount<T extends Server<T>>(server: T): Promise<T> {
+    // TODO: care about submodule-inheritance of components.
+
+    // select all same key components.
+    const m: Map<string, Evaluator[]> = new Map();
+
     for (const comp of this.pipeline) {
       const path = [comp.config.type, comp.config.name]
         .filter((v): v is string => v !== undefined)
         .join("/");
-      server.mount(`/${path}/`, comp.fetch);
+      m.get(path)?.push(comp) ?? m.set(`/${path}/`, [comp]);
+    }
+
+    for ( const [path, comps] of m.entries()) {
+      const fetches: Fetch[] = (
+        await Promise.all(comps.map((comp) => comp.fetch()))
+      ).filter((f): f is Fetch => f !== undefined);
+
+      if( fetches.length > 0 ) {
+        // mount fetches related with such same type/name components.
+        for ( const fetch of fetches ) {
+          server.mount(path, fetch);
+        }
+      } else {
+        // mount defaultFetch if no valid fetch for such type/name components.
+        server.mount(path, (req: Request) => this.defaultFetch(req));
+      }
     }
     return server;
   }

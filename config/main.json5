@@ -82,7 +82,7 @@
       type: "panel",
       // pipelineにおけるcomponent(これ自体)と被ってるからいい名称が必要。form?
       args: {
-        components: [
+        forms: [
           {
             // トグルボタン。
             // ON/OFFに応じて、ここに入ってきたイベントに

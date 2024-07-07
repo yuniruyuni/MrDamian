@@ -57,7 +57,7 @@ export class App {
     this.module = factory.construct(this.params);
 
     const route = new Hono();
-    this.constructRoutes(route);
+    await this.constructRoutes(route);
     this.route = route;
   }
 
@@ -69,7 +69,7 @@ export class App {
     this.running = false;
   }
 
-  constructRoutes(route: Hono) {
+  async constructRoutes(route: Hono) {
     route.get("/-/api/module", async (c) => {
       return c.json(this.params);
     });
@@ -98,7 +98,7 @@ export class App {
     });
 
     if (this.module !== undefined) {
-      this.module.mount(route);
+      await this.module.mount(route);
     }
 
     route.get("/-/index.css", serveStatic({ path: "static/index.css" }));

@@ -11,7 +11,7 @@ import { type Arguments, asArgs } from "~/model/arguments";
 import { type SubmoduleConfig, isSubmoduleConfig } from "~/model/config";
 import type { Submodule } from "~/model/submodule";
 
-export class Evaluator<C extends ComponentConfig> {
+export class Evaluator<C extends ComponentConfig = ComponentConfig> {
   readonly component: Component<C>;
   readonly config: C & { args: Arguments };
 
@@ -24,16 +24,8 @@ export class Evaluator<C extends ComponentConfig> {
     this.config = config as C & { args: Arguments };
   }
 
-  get fetch(): Fetch {
-    if (this.component.fetch === undefined) {
-      return (_req: Request): Response | Promise<Response> => {
-        return new Response("No configuration", {
-          status: 200,
-          headers: { "Content-Type": "text/html" },
-        });
-      };
-    }
-    return this.component.fetch;
+  async fetch(): Promise<Fetch | undefined> {
+    return this.component.fetch(this.config);
   }
 
   async initialize(env: Environment): Promise<void> {
