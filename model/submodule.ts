@@ -37,8 +37,16 @@ export class Submodule extends Component<SubmoduleConfig> {
     return this.submodule.initialize(config.args ?? {});
   }
 
+  async start(config: SubmoduleConfig): Promise<void> {
+    return this.submodule.start(config.args ?? {});
+  }
+
   async process(config: SubmoduleConfig): Promise<Field> {
     return this.submodule.process(config.args ?? {});
+  }
+
+  async stop(config: SubmoduleConfig): Promise<void> {
+    return this.submodule.stop(config.args ?? {});
   }
 
   async finalize(config: SubmoduleConfig): Promise<void> {

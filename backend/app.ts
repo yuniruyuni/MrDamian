@@ -42,7 +42,7 @@ export class App {
     if (this.running) return;
     this.running = true;
 
-    await this.module.initialize({});
+    await this.module.start({});
 
     while (!this.module.aborted) {
       await this.module.receive();
@@ -59,14 +59,22 @@ export class App {
     const route = new Hono();
     await this.constructRoutes(route);
     this.route = route;
+
+    await this.module.initialize({});
   }
 
   async stop() {
     if (this.module !== undefined) {
+      await this.module.stop({});
+    }
+    this.running = false;
+  }
+
+  async finish() {
+    if (this.module !== undefined) {
       await this.module.finalize({});
     }
     this.module = undefined;
-    this.running = false;
   }
 
   async constructRoutes(route: Hono) {
@@ -91,6 +99,7 @@ export class App {
       await this.loader.saveConfig(this.pluginConfigPath);
 
       await this.stop();
+      await this.finish();
       await this.reload();
       this.run();
 

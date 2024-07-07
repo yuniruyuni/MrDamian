@@ -13,6 +13,7 @@ import {
   NamedEventEmitter,
   eventChannel,
 } from "~/model/events";
+import { type Instances, newInstances } from "~/model/instances";
 import { Module } from "~/model/module";
 import type { Pipeline } from "~/model/pipeline";
 import { Submodule } from "~/model/submodule";
@@ -33,11 +34,11 @@ export class ModuleFactory {
   private readonly emitter: EventEmitter;
   private readonly absorber: EventAbsorber;
 
-  private instances: Map<string, Component<ComponentConfig>>;
+  private instances: Instances;
 
   public constructor(gens: ComponentGenerators) {
     this.gens = gens;
-    this.instances = new Map();
+    this.instances = newInstances();
 
     const [emitter, absorber] = eventChannel();
     this.emitter = emitter;
@@ -50,7 +51,7 @@ export class ModuleFactory {
   ): Module {
     this.instances = inherited;
     const pipeline = this.constructPipeline(params.pipeline);
-    return new Module(params, pipeline, this.absorber);
+    return new Module(params, pipeline, this.absorber, this.instances);
   }
 
   private constructPipeline(pipeline: PipelineConfig): Pipeline {
@@ -62,9 +63,9 @@ export class ModuleFactory {
   ): Evaluator<ComponentConfig> {
     // filter if key is undefined.
     const keys: string[] = [config.type, config.name].filter(
-      (v): v is string => v !== undefined,
+      (v) => v !== undefined,
     );
-    const key = JSON.stringify(keys);
+    const key = keys.join("/");
     const emitter = new NamedEventEmitter(this.emitter, keys);
 
     // Call component should not be cached because Call is system component.

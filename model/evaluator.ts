@@ -25,11 +25,15 @@ export class Evaluator<C extends ComponentConfig = ComponentConfig> {
   }
 
   async fetch(): Promise<Fetch | undefined> {
-    return this.component.fetch(this.config);
+    return this.component.fetch();
   }
 
   async initialize(env: Environment): Promise<void> {
     return this.component.initialize(this.evaluate(env));
+  }
+
+  async start(env: Environment): Promise<void> {
+    return this.component.start(this.evaluate(env));
   }
 
   async receive(): Promise<void> {
@@ -58,6 +62,10 @@ export class Evaluator<C extends ComponentConfig = ComponentConfig> {
       obj = { [key]: obj };
     }
     return deepmerge(env, obj as Environment);
+  }
+
+  async stop(env: Environment): Promise<void> {
+    return this.component.stop(this.evaluate(env));
   }
 
   async finalize(env: Environment): Promise<void> {

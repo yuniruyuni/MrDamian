@@ -111,14 +111,14 @@
               // とりあえずのデフォルト値を設定しておく
               // この値は後でargsで上書きできるが、そのときはjexpr構文が使える
               text: "",
-            }
+            },
             {
               type: "label",
               name: "count",
               text: "",
-            }
-          ]
-        }
+            },
+          ],
+        },
       ],
       // panelのinitialize action(defaultアクション)ではargsを受け取らない。
       // これによってjexpr構文を使えないことを強制する
@@ -141,7 +141,7 @@
         name: "message.latest",
         // このようにjexprの展開した結果でcomponentの値を更新することができる
         text: "$ format('{}: {}', message.name, message.text)"
-      }
+      },
     },
     {
       when: "hoge",
@@ -167,7 +167,7 @@
       name: "message",
     },
     {
-      when: "panel",
+      type: "panel",
       action: "update",
       args: {
         name: "message.count",
@@ -202,7 +202,7 @@
       args: {
         // この部分はもちろんargsなのでjexprが使える(今回はただの定数)
         message: "Discordチャンネルもあります！チャンネルポイント交換から！"
-      }
+      },
     },
     {
       when: "twitch.main.message",
@@ -240,7 +240,7 @@
           user: "$ twitch.main.message.user",
           message: "$ twitch.main.message.message",
         },
-      }
-    }
+      },
+    },
   ]
 }
