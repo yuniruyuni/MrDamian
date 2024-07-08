@@ -1,0 +1,41 @@
+name: release
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'version'
+        required: true
+        default: '0.0.0'
+
+jobs:
+  release:
+    name: release
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    env:
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: oven-sh/setup-bun@v2
+
+      - run: bun install
+      - run: bun run build
+
+      - name: create archives
+        run: |
+          cd package/
+          tar czvf linux-arm64.tar.gz linux-arm64
+          tar czvf linux-x64.tar.gz linux-x64
+          zip -r windows-x64.zip windows-x64
+          zip -r mac-arm64.zip mac-arm64
+          zip -r mac-x64.zip mac-x64
+
+      - name: create release
+        run: |
+          gh release create v${{ github.event.inputs.version }} \
+            package/*.tar.gz \
+            package/*.zip
