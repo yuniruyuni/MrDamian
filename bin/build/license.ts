@@ -27,6 +27,7 @@ const allowedLicenes: string[] = [
   "Python-2.0",
   "(MIT AND CC-BY-3.0)",
   "MIT OR Apache-2.0",
+  "Unlicense",
 ];
 
 function matchLicenses(licenses: string | string[] | undefined): boolean {
