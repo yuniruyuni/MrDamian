@@ -37,19 +37,7 @@ export class App {
     return this.route.fetch(req);
   }
 
-  async run() {
-    if (!this.module) return;
-    if (this.running) return;
-    this.running = true;
-
-    await this.module.start({});
-
-    while (!this.module.aborted) {
-      await this.module.receive();
-    }
-  }
-
-  async reload() {
+  async load() {
     await this.loader.loadConfig(this.pluginConfigPath);
     const gens = await this.loader.loadAll();
     const factory = new ModuleFactory(gens);
@@ -61,20 +49,45 @@ export class App {
     this.route = route;
 
     await this.module.initialize({});
+
+    this.running = false;
+  }
+
+  async start() {
+    if (this.running) return;
+    this.running = true;
+
+    if (!this.module) return;
+    // accquire mod because this.module will be undefined after unload.
+    const mod = this.module;
+    await mod.start({});
+    while (!mod.aborted) {
+      await mod.receive();
+    }
   }
 
   async stop() {
+    if( !this.running ) return;
+
     if (this.module !== undefined) {
       await this.module.stop({});
     }
     this.running = false;
   }
 
-  async finish() {
-    if (this.module !== undefined) {
+  async unload() {
+    if( this.module ) {
       await this.module.finalize({});
+      this.module = undefined;
     }
-    this.module = undefined;
+  }
+
+  async reload() {
+    const restart = this.running;
+    await this.stop();
+    await this.unload();
+    await this.load();
+    if( restart ) this.start();
   }
 
   async constructRoutes(route: Hono) {
@@ -82,9 +95,15 @@ export class App {
       return c.json(this.params);
     });
 
-    route.post("/-/api/module/run", async (c) => {
+    route.post("/-/api/module/start", async (c) => {
       if (this.running) return c.json({ status: "running" });
-      this.run();
+      this.start();
+      return c.json({ status: "ok" });
+    });
+
+    route.post("/-/api/module/stop", async (c) => {
+      if (!this.running) return c.json({ status: "not running" });
+      this.stop();
       return c.json({ status: "ok" });
     });
 
@@ -98,10 +117,7 @@ export class App {
       await this.loader.installFromNpm(params.name);
       await this.loader.saveConfig(this.pluginConfigPath);
 
-      await this.stop();
-      await this.finish();
       await this.reload();
-      this.run();
 
       return c.json({ status: "ok" });
     });

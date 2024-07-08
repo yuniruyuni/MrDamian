@@ -28,10 +28,19 @@ export const Menu: FC = () => (
         <li>
           <button
             type="button"
-            onClick={() => fetch("/-/api/module/run", { method: "POST" })}
-            onKeyDown={() => fetch("/-/api/module/run", { method: "POST" })}
+            onClick={() => fetch("/-/api/module/start", { method: "POST" })}
+            onKeyDown={() => fetch("/-/api/module/start", { method: "POST" })}
           >
-            Run
+            Start
+          </button>
+        </li>
+        <li>
+          <button
+            type="button"
+            onClick={() => fetch("/-/api/module/stop", { method: "POST" })}
+            onKeyDown={() => fetch("/-/api/module/stop", { method: "POST" })}
+          >
+            Stop
           </button>
         </li>
         <li className="z-50">
@@ -41,12 +50,23 @@ export const Menu: FC = () => (
               <li>
                 <button
                   type="button"
-                  onClick={() => fetch("/-/api/module/run", { method: "POST" })}
+                  onClick={() => fetch("/-/api/module/start", { method: "POST" })}
                   onKeyDown={() =>
-                    fetch("/-/api/module/run", { method: "POST" })
+                    fetch("/-/api/module/start", { method: "POST" })
                   }
                 >
-                  Run
+                  Start
+                </button>
+              </li>
+              <li>
+                <button
+                  type="button"
+                  onClick={() => fetch("/-/api/module/stop", { method: "POST" })}
+                  onKeyDown={() =>
+                    fetch("/-/api/module/stop", { method: "POST" })
+                  }
+                >
+                  Stop
                 </button>
               </li>
               <li>

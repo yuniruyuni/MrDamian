@@ -4,7 +4,7 @@ import open from "open";
 import { App } from "~/backend/app";
 
 const app = new App();
-await app.reload();
+await app.load();
 
 // for once open browser.
 // refer: https://bun.sh/docs/runtime/hot
