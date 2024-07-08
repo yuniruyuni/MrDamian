@@ -1,5 +1,6 @@
 name: test
 on: [push]
+
 jobs:
   test:
     name: test
@@ -10,3 +11,10 @@ jobs:
 
       - run: bun install
       - run: bun run test
+
+      - name: Upload coverage reports to Codecov
+        uses: codecov/codecov-action@v4.0.1
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          file: ./coverage/lcov.info
+          fail_ci_if_error: true
