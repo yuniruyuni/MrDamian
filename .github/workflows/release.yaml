@@ -1,17 +1,12 @@
 name: release
-on:
-  workflow_dispatch:
-    inputs:
-      version:
-        description: 'version'
-        required: true
+on: [push]
 
 jobs:
-  release:
-    name: release
+  check:
+    name: check
     runs-on: ubuntu-latest
     permissions:
-      contents: write
+      contents: read
     env:
       GH_TOKEN: ${{ github.token }}
     steps:
@@ -19,6 +14,28 @@ jobs:
         with:
           fetch-depth: 0
 
+      - name: check version diff
+        id: check
+        run: |
+          if [ "`git diff HEAD HEAD^ package.json | grep version`" ]; then
+            version=$(cat package.json | jq -r .version)
+            echo "release version: $version"
+            echo "version=$version" >> $GITHUB_OUTPUT
+          fi
+    outputs:
+      version: ${{ steps.check.outputs.version }}
+
+  github-release:
+    needs: check
+    if: needs.check.outputs.version != ''
+    name: github-release
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    env:
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v4
       - uses: oven-sh/setup-bun@v2
 
       - run: bun install
@@ -35,6 +52,26 @@ jobs:
 
       - name: create release
         run: |
-          gh release create v${{ github.event.inputs.version }} \
+          gh release create v${{ needs.check.outputs.version }} \
             package/*.tar.gz \
             package/*.zip
+
+  npm-release:
+    needs: check
+    if: needs.check.outputs.version != ''
+    name: npm-release
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@v2
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20.14.0'
+          registry-url: 'https://registry.npmjs.org'
+      - run: bun install
+      - name: publish npm
+        run: npm publish --access public
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
