@@ -112,4 +112,18 @@ describe("Evaluator", () => {
     await target[method]({});
     expect(component.mocks[method]).toBeCalled();
   });
+
+  it("skip process if when is not meeted", async () => {
+    const component = new DummyComponent();
+    const config: ComponentConfig & { args: Arguments } = {
+      type: "dummy",
+      when: "$ false",
+      args: asArgs({}),
+    };
+    const target = new Evaluator(component, config);
+
+    await target.process({});
+
+    expect(component.mocks.process).not.toBeCalled();
+  });
 });
