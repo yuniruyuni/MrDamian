@@ -42,8 +42,24 @@ class DummyComponent extends Component<ComponentConfig> {
     return this.mocks.fetch();
   }
 
+  async initialize(config: ComponentConfig): Promise<void> {
+    this.mocks.initialize(config);
+  }
+
+  async start(config: ComponentConfig): Promise<void> {
+    this.mocks.start(config);
+  }
+
   async process(config: ComponentConfig): Promise<Field> {
     return this.mocks.process(config);
+  }
+
+  async stop(config: ComponentConfig): Promise<void> {
+    this.mocks.stop(config);
+  }
+
+  async finalize(config: ComponentConfig): Promise<void> {
+    this.mocks.finalize(config);
   }
 }
 
@@ -81,7 +97,11 @@ describe("evaluate", () => {
 });
 
 describe("Evaluator", () => {
-  it("propagates fetch call", async () => {
+  const keys = ["fetch", "initialize", "start", "process", "stop", "finalize"] as const;
+  type Keys = (typeof keys)[number];
+  // `...keys` is needed for remove readonly modifier from keys.
+  // maybe it.each should take args as `readonly` but current Bun.it doesn't support it.
+  it.each([...keys])("propagates %s call", async (method: Keys) => {
     const component = new DummyComponent();
     const config: ComponentConfig & { args: Arguments } = {
       type: "dummy",
@@ -89,8 +109,7 @@ describe("Evaluator", () => {
     };
     const target = new Evaluator(component, config);
 
-    await target.fetch();
-
-    expect(component.mocks.fetch).toBeCalled();
+    await target[method]({});
+    expect(component.mocks[method]).toBeCalled();
   });
 });
