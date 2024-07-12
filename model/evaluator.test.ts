@@ -9,7 +9,11 @@ import type {
 } from "mrdamian-plugin";
 
 import { type Arguments, asArgs } from "~/model/arguments";
-import { type Parameters, asParams } from "~/model/config";
+import {
+  type Parameters,
+  type SubmoduleConfig,
+  asParams,
+} from "~/model/config";
 import { Evaluator, evaluate } from "~/model/evaluator";
 
 class DummyComponent extends Component<ComponentConfig> {
@@ -113,11 +117,39 @@ describe("Evaluator", () => {
     expect(component.mocks[method]).toBeCalled();
   });
 
+  it("process if when is not passed", async () => {
+    const component = new DummyComponent();
+    const config: ComponentConfig & { args: Arguments } = {
+      type: "dummy",
+      // when: ...,
+      args: asArgs({}),
+    };
+    const target = new Evaluator(component, config);
+
+    await target.process({});
+
+    expect(component.mocks.process).toBeCalled();
+  });
+
+  it("process if when is meeted", async () => {
+    const component = new DummyComponent();
+    const config: ComponentConfig & { args: Arguments } = {
+      type: "dummy",
+      when: "true",
+      args: asArgs({}),
+    };
+    const target = new Evaluator(component, config);
+
+    await target.process({});
+
+    expect(component.mocks.process).toBeCalled();
+  });
+
   it("skip process if when is not meeted", async () => {
     const component = new DummyComponent();
     const config: ComponentConfig & { args: Arguments } = {
       type: "dummy",
-      when: "$ false",
+      when: "false",
       args: asArgs({}),
     };
     const target = new Evaluator(component, config);
@@ -125,5 +157,48 @@ describe("Evaluator", () => {
     await target.process({});
 
     expect(component.mocks.process).not.toBeCalled();
+  });
+
+  it("inherit component for submodule processing", async () => {
+    const component = new DummyComponent();
+    const config: SubmoduleConfig & { args: Arguments } = {
+      type: "submodule",
+      path: "dummy.json5",
+      inherit: {
+        main: "hoge",
+      },
+      module: {
+        inherit: {
+          main: "dummy",
+        },
+        params: asParams({}),
+        pipeline: [],
+      },
+      args: asArgs({}),
+    };
+    const target = new Evaluator(component, config);
+
+    await target.process({
+      dummy: {
+        hoge: {
+          foo: 1,
+          bar: 2,
+          buz: 3,
+        },
+      },
+    });
+
+    expect(component.mocks.process).toBeCalledWith({
+      ...config,
+      args: {
+        dummy: {
+          main: {
+            foo: 1,
+            bar: 2,
+            buz: 3,
+          },
+        },
+      },
+    });
   });
 });

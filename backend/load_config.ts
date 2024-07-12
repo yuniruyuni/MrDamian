@@ -48,5 +48,10 @@ async function loadComponentConfig(
     (config as SubmoduleConfig).module = mparams;
     (config as SubmoduleConfig).inherit ||= {};
   }
+
+  if( config.when?.startsWith("$") ){
+    console.warn("warning: 'when' condition doesn't need started with '$'.")
+  }
+
   return config;
 }
