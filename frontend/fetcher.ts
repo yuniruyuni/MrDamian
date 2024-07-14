@@ -15,13 +15,14 @@ const fetchWithError = async (url: string, init: RequestInit) => {
   return await res.json();
 };
 
-export const GET = (url: string) =>
-  fetchWithError(url, { method: "GET" });
-export const POST = <Arg>(url: string, { arg }: { arg: Arg }) =>
-  fetchWithError(url, { method: "POST", body: JSON.stringify(arg) });
-export const PUT = <Arg>(url: string, { arg }: { arg: Arg }) =>
-  fetchWithError(url, { method: "PUT", body: JSON.stringify(arg) });
-export const PATCH = <Arg>(url: string, { arg }: { arg: Arg }) =>
-  fetchWithError(url, { method: "PATCH", body: JSON.stringify(arg) });
-export const DELETE = <Arg>(url: string, { arg }: { arg: Arg }) =>
-  fetchWithError(url, { method: "DELETE", body: JSON.stringify(arg) });
+export const fetcher = {
+  get: (url: string) => fetchWithError(url, { method: "GET" }),
+  post: <Arg>(url: string, { arg }: { arg: Arg }) =>
+    fetchWithError(url, { method: "POST", body: JSON.stringify(arg) }),
+  put: <Arg>(url: string, { arg }: { arg: Arg }) =>
+    fetchWithError(url, { method: "PUT", body: JSON.stringify(arg) }),
+  patch: <Arg>(url: string, { arg }: { arg: Arg }) =>
+    fetchWithError(url, { method: "PATCH", body: JSON.stringify(arg) }),
+  delete: <Arg>(url: string, { arg }: { arg: Arg }) =>
+    fetchWithError(url, { method: "DELETE", body: JSON.stringify(arg) }),
+};

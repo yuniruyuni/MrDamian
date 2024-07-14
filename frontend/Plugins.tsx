@@ -5,13 +5,13 @@ import useSWRImmutable from "swr/immutable";
 import useSWRMutation from "swr/mutation";
 import type { PluginInfo } from "~/model/plugin";
 import { AlertContext } from "./Alert";
-import { GET, POST } from "./fetcher";
+import { fetcher } from "./fetcher";
 
 const Plugin: FC<{ plugin: PluginInfo }> = ({ plugin }) => {
   const { pushAlert } = useContext(AlertContext);
   const { trigger: onInstall, error, isMutating } = useSWRMutation(
     '/-/api/plugin',
-    POST,
+    fetcher.post,
     {
       onSuccess: () => pushAlert("Succeeded to install plugin", "success"),
       onError: (err) => pushAlert(err.message, "error"),
@@ -52,7 +52,7 @@ const Plugin: FC<{ plugin: PluginInfo }> = ({ plugin }) => {
 };
 
 export const Plugins: FC = () => {
-  const { data: plugins, error, isLoading } = useSWRImmutable<PluginInfo[]>('/-/api/plugin', GET);
+  const { data: plugins, error, isLoading } = useSWRImmutable<PluginInfo[]>('/-/api/plugin', fetcher.get);
 
   if( isLoading ) return <div className="overflow-x-auto">Loading...</div>;
   if( error ) return <div className="overflow-x-auto">Error: {error.message}</div>;
