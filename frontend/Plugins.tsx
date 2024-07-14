@@ -1,18 +1,15 @@
 import type { FC } from "react";
-import { useCallback, useContext, useEffect, useState } from "react";
+import { useCallback, useContext } from "react";
+import useSWR from "swr";
 import type { PluginInfo } from "~/model/plugin";
 import { AlertContext } from "./Alert";
 
 export const Plugins: FC = () => {
-  const [plugins, setPlugins] = useState<PluginInfo[]>([]);
   const { pushAlert } = useContext(AlertContext);
-  useEffect(() => {
-    (async () => {
-      const res = await fetch("/-/api/plugin");
-      const json = await res.json();
-      setPlugins(json as PluginInfo[]);
-    })();
-  }, []);
+  const { data: plugins, error, isLoading } = useSWR<PluginInfo[]>(
+    '/-/api/plugin',
+    (url: string) => fetch(url).then(res => res.json()),
+  );
 
   const onInstall = useCallback(
     async (name: string) => {
@@ -32,6 +29,10 @@ export const Plugins: FC = () => {
     },
     [pushAlert],
   );
+
+  if( isLoading ) return <div className="overflow-x-auto">Loading...</div>;
+  if( error ) return <div className="overflow-x-auto">Error: {error.message}</div>;
+  if( !plugins ) return <div className="overflow-x-auto">plugins not found</div>
 
   return (
     <div className="overflow-x-auto">
