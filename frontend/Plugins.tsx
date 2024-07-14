@@ -5,32 +5,13 @@ import useSWRImmutable from "swr/immutable";
 import useSWRMutation from "swr/mutation";
 import type { PluginInfo } from "~/model/plugin";
 import { AlertContext } from "./Alert";
-
-const fetchWithError = async (url: string, init: RequestInit) => {
-  const res = await fetch(url, {
-    ...init,
-    headers: {
-      // this method defautly send json data so we can safely add this header.
-      // some usecase(ex: multipart request) may need to remove this header,
-      // in such case, user code can specify "Content-Type" in init.headers.
-      "Content-Type": "application/json",
-      ...init.headers,
-      // this method only accept json response so we can safely add this header.
-      "Accept": "application/json",
-    },
-  });
-  if( !res.ok ) throw new Error(await res.text());
-  return await res.json();
-};
-
-const get = (url: string) => fetchWithError(url, { headers: { method: 'GET' } });
-const post = <Arg,>(url: string, { arg }: { arg: Arg }) => fetchWithError(url, { method: 'POST', body: JSON.stringify(arg) });
+import { GET, POST } from "./fetcher";
 
 const Plugin: FC<{ plugin: PluginInfo }> = ({ plugin }) => {
   const { pushAlert } = useContext(AlertContext);
   const { trigger: onInstall, error, isMutating } = useSWRMutation(
     '/-/api/plugin',
-    post,
+    POST,
     {
       onSuccess: () => pushAlert("Succeeded to install plugin", "success"),
       onError: (err) => pushAlert(err.message, "error"),
@@ -71,7 +52,7 @@ const Plugin: FC<{ plugin: PluginInfo }> = ({ plugin }) => {
 };
 
 export const Plugins: FC = () => {
-  const { data: plugins, error, isLoading } = useSWRImmutable<PluginInfo[]>('/-/api/plugin', get);
+  const { data: plugins, error, isLoading } = useSWRImmutable<PluginInfo[]>('/-/api/plugin', GET);
 
   if( isLoading ) return <div className="overflow-x-auto">Loading...</div>;
   if( error ) return <div className="overflow-x-auto">Error: {error.message}</div>;
