@@ -1,12 +1,12 @@
 import type { FC } from "react";
 import { useCallback, useContext } from "react";
-import useSWR from "swr";
+import useSWRImmutable from "swr/immutable";
 import type { PluginInfo } from "~/model/plugin";
 import { AlertContext } from "./Alert";
 
 export const Plugins: FC = () => {
   const { pushAlert } = useContext(AlertContext);
-  const { data: plugins, error, isLoading } = useSWR<PluginInfo[]>(
+  const { data: plugins, error, isLoading } = useSWRImmutable<PluginInfo[]>(
     '/-/api/plugin',
     (url: string) => fetch(url).then(res => res.json()),
   );
