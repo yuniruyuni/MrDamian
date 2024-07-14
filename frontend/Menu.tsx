@@ -1,5 +1,9 @@
-import { type FC, useState } from "react";
+import clsx from "clsx";
+import { type FC, useContext, useState } from "react";
+import useSWRMutation from "swr/mutation";
 import { Link } from "wouter";
+import { AlertContext } from "./Alert";
+import { fetcher } from "./fetcher";
 
 const Details: FC<{ children: React.ReactNode }> = ({ children }) => {
   const [open, setOpen] = useState(false);
@@ -15,41 +19,27 @@ const Details: FC<{ children: React.ReactNode }> = ({ children }) => {
   );
 };
 
-const StartButton = () => {
+const PostButton: FC<{ children: React.ReactNode, url: string }> = ({ url, children }) => {
+  const { pushAlert } = useContext(AlertContext);
+  const { trigger, isMutating } = useSWRMutation(url, fetcher.post, {
+    onError: (err) => pushAlert(err.message, "error"),
+  });
+
   return (
     <button
       type="button"
-      onClick={() => fetch("/-/api/module/start", { method: "POST" })}
-      onKeyDown={() => fetch("/-/api/module/start", { method: "POST" })}
+      className={clsx(isMutating && "loading loading-spinner")}
+      onClick={() => trigger()}
+      onKeyDown={() => trigger()}
     >
-      Start
+      {children}
     </button>
   );
 }
 
-const StopButton = () => {
-  return (
-    <button
-      type="button"
-      onClick={() => fetch("/-/api/module/stop", { method: "POST" })}
-      onKeyDown={() => fetch("/-/api/module/stop", { method: "POST" })}
-    >
-      Stop
-    </button>
-  );
-}
-
-const SaveButton = () => {
-  return (
-    <button
-      type="button"
-      onClick={() => fetch("/-/api/module/save", { method: "POST" })}
-      onKeyDown={() => fetch("/-/api/module/save", { method: "POST" })}
-    >
-      Save
-    </button>
-  );
-}
+const StartButton = () => <PostButton url="/-/api/module/start">Start</PostButton>;
+const StopButton = () => <PostButton url="/-/api/module/stop">Stop</PostButton>;
+const SaveButton = () => <PostButton url="/-/api/module/save">Save</PostButton>;
 
 export const Menu: FC = () => (
   <div className="navbar w-full bg-base-100">
