@@ -1,8 +1,10 @@
 import clsx from "clsx";
 import type { ComponentConfig, Environment, Field } from "mrdamian-plugin";
-import { type FC, useEffect, useState } from "react";
+import type { FC } from "react";
+import useSWRImmutable from "swr/immutable";
 import { Link, Route } from "wouter";
-import { type ModuleConfig, asParams } from "~/model/config";
+import type { ModuleConfig } from "~/model/config";
+import { fetcher } from "./fetcher";
 
 const Config: FC<{ args: Environment }> = ({ args }) => (
   <dl className="divide-y divide-gray-100 grid grid-cols-[max-content,1fr] m-1">
@@ -123,19 +125,8 @@ const ModuleList: FC<{ modules: ModuleConfig }> = ({ modules }) => (
 );
 
 export const Modules: FC = () => {
-  const [modules, setModules] = useState<ModuleConfig>({
-    params: asParams({}),
-    pipeline: [],
-    inherit: {},
-  });
-
-  useEffect(() => {
-    (async () => {
-      const res = await fetch("/-/api/module");
-      const json = await res.json();
-      setModules(json as ModuleConfig);
-    })();
-  }, []);
-
+  const { data: modules, error, isLoading } = useSWRImmutable("/-/api/module", fetcher.get);
+  if (error) return <div className="flex flex-row gap-4 h-full">Error: {error.message}</div>;
+  if (isLoading) return <div className="flex flex-row gap-4 h-full">loading...</div>;
   return <ModuleList modules={modules} />;
 };
