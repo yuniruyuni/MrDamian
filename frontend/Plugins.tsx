@@ -1,6 +1,7 @@
 import type { FC } from "react";
-import { useCallback, useContext } from "react";
+import { useContext } from "react";
 import useSWRImmutable from "swr/immutable";
+import useSWRMutation from "swr/mutation";
 import type { PluginInfo } from "~/model/plugin";
 import { AlertContext } from "./Alert";
 
@@ -11,23 +12,21 @@ export const Plugins: FC = () => {
     (url: string) => fetch(url).then(res => res.json()),
   );
 
-  const onInstall = useCallback(
-    async (name: string) => {
-      const res = await fetch("/-/api/plugin", {
+  const { trigger: onInstall } = useSWRMutation(
+    '/-/api/plugin',
+    (url: string, { arg }: { arg: string }) => fetch(url, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ name }),
-      });
-      const json = await res.json();
-      if (json.status === "ok") {
-        pushAlert("Succeeded to install plugin", "success");
-      } else {
-        pushAlert("Failed to install plugin", "error");
-      }
+        body: JSON.stringify({ name: arg }),
+    })
+    .then(res => res.json())
+    .then(res => res.status === "ok" ? res : new Error("Failed to install plugin")),
+    {
+      onSuccess: () => pushAlert("Succeeded to install plugin", "success"),
+      onError: (err) => pushAlert(err.message, "error"),
     },
-    [pushAlert],
   );
 
   if( isLoading ) return <div className="overflow-x-auto">Loading...</div>;
