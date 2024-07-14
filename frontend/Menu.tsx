@@ -15,6 +15,42 @@ const Details: FC<{ children: React.ReactNode }> = ({ children }) => {
   );
 };
 
+const StartButton = () => {
+  return (
+    <button
+      type="button"
+      onClick={() => fetch("/-/api/module/start", { method: "POST" })}
+      onKeyDown={() => fetch("/-/api/module/start", { method: "POST" })}
+    >
+      Start
+    </button>
+  );
+}
+
+const StopButton = () => {
+  return (
+    <button
+      type="button"
+      onClick={() => fetch("/-/api/module/stop", { method: "POST" })}
+      onKeyDown={() => fetch("/-/api/module/stop", { method: "POST" })}
+    >
+      Stop
+    </button>
+  );
+}
+
+const SaveButton = () => {
+  return (
+    <button
+      type="button"
+      onClick={() => fetch("/-/api/module/save", { method: "POST" })}
+      onKeyDown={() => fetch("/-/api/module/save", { method: "POST" })}
+    >
+      Save
+    </button>
+  );
+}
+
 export const Menu: FC = () => (
   <div className="navbar w-full bg-base-100">
     <div className="flex-1">
@@ -25,62 +61,16 @@ export const Menu: FC = () => (
 
     <div className="flex-none">
       <ul className="menu menu-horizontal">
-        <li>
-          <button
-            type="button"
-            onClick={() => fetch("/-/api/module/start", { method: "POST" })}
-            onKeyDown={() => fetch("/-/api/module/start", { method: "POST" })}
-          >
-            Start
-          </button>
-        </li>
-        <li>
-          <button
-            type="button"
-            onClick={() => fetch("/-/api/module/stop", { method: "POST" })}
-            onKeyDown={() => fetch("/-/api/module/stop", { method: "POST" })}
-          >
-            Stop
-          </button>
-        </li>
+        <li><StartButton /></li>
+        <li><StopButton /></li>
         <li className="z-50">
           <Details>
             <summary>Menu</summary>
             <ul>
-              <li>
-                <button
-                  type="button"
-                  onClick={() => fetch("/-/api/module/start", { method: "POST" })}
-                  onKeyDown={() =>
-                    fetch("/-/api/module/start", { method: "POST" })
-                  }
-                >
-                  Start
-                </button>
-              </li>
-              <li>
-                <button
-                  type="button"
-                  onClick={() => fetch("/-/api/module/stop", { method: "POST" })}
-                  onKeyDown={() =>
-                    fetch("/-/api/module/stop", { method: "POST" })
-                  }
-                >
-                  Stop
-                </button>
-              </li>
-              <li>
-                <button
-                  type="button"
-                  onClick={() => fetch("/-/api/module/run", { method: "POST" })}
-                  onKeyUp={() => fetch("/-/api/module/run", { method: "POST" })}
-                >
-                  Save
-                </button>
-              </li>
-              <li>
-                <Link to="/-/plugins">Plugins</Link>
-              </li>
+              <li><StartButton /></li>
+              <li><StopButton /></li>
+              <li><SaveButton /></li>
+              <li><Link to="/-/plugins">Plugins</Link></li>
             </ul>
           </Details>
         </li>
