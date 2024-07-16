@@ -1,41 +1,14 @@
 {
   pipeline: [
     {
-      // typeはcomponentの種類を指定するフィールド
-      type: "non-exist-component",
-
-      // typeにjexpr構文がきた場合はエラーになる。
-      // type: "$ value", // つまりこれはエラーになる
-
-      // nameはコンポネントのインスタンスの名称で、
-      // パイプライン全体を通して同じnameを持つcomponentは
-      // すべて内部データを共有している。
-      // また出力データ(=Environment)のキーとしても使われる。
-      // nameにはjexpr構文を使うことができない。
-      name: "main",
-
-      // whenはコンポネントの実行条件を指定するフィールドで、
-      // jexpr構文が常に適用される。そのため $ を指定する必要がない。
-      // しかしこの条件に関係なくinit()は実行されるので初期化は常に可能。
-      when: "condition && condition2",
-
-      // argsはコンポネントの実行時に渡る引数のオブジェクトで、
-      // このオブジェクトの中身はjexpr構文が適用される。
-      args: {
-        // つまりこのように書いた場合、valueの中身が展開される。
-        key: "$ value",
-        recursive: {
-          // このように子ノードで書いた場合もvalueが展開される。
-          key: "$ value",
-          // jexpr構文なのでもちろん比較演算等も行うことができる
-          less: "$ value < 10",
-          // 文字列の結合や(システムで登録された)関数の適用なども行うことができる。
-          concat: "$ format('{}: {}', value1, value2)",
-        },
-      },
+      type: "panel",
+      // panelのinitialize action(defaultアクション)は
+      // パネルの表示を行う本体を定義する。
+      // define actionを行うことでこのpanelに対して任意のpanel groupを差し込むことができる
+      // そしてdefine actionはreactiveに定義されている。
     },
-    // twitchコンポネント例
     {
+      // twitchコンポネント
       type: "twitch",
 
       // twitchコンポネントの場合
@@ -58,8 +31,8 @@
       // channelは配信者のチャンネル名。
       channel: "yuniruyuni"
     },
-    // youtubeコンポネント例
     {
+      // youtubeコンポネント
       // 多分twitchと使い心地は同じ感じにできる。
       // APIは https://developers.google.com/youtube/v3/live/docs?hl=ja が使える
       // OAuthのdevice code grant flowも存在する: https://developers.google.com/identity/protocols/oauth2/native-app?hl=ja
@@ -80,83 +53,41 @@
     },
     {
       type: "panel",
-      forms: [
-        {
-          // トグルボタン。
-          // ON/OFFに応じて、ここに入ってきたイベントに
-          // nameで与えたフィールドがtrue/falseで追加される。
-          // この場合は panel.auto_shoutout に true や false が入る
-          type: "toggle",
-          // ここだけの強い制約としてnameはtypeによらず一意である必要がある。
-          name: "auto_shoutout",
-          text: "Auto shoutout"
-        },
-        {
-          // ボタン。この設定値の場合クリックごとに
-          // panel.shoutout = true
-          // という値を持ったイベントが発火
-          type: "button",
-          name: "shoutout",
-          text: "Send shoutout"
-        },
-        {
-          type: "group",
-          name: "message",
-          forms: [
-            {
-              // テキストラベル
-              // ユーザ画面上にテキストを表示する
-              type: "label",
-              name: "latest",
-              // とりあえずのデフォルト値を設定しておく
-              // この値は後でargsで上書きできるが、そのときはjexpr構文が使える
-              text: "",
-            },
-            {
-              type: "label",
-              name: "count",
-              text: "",
-            },
-          ],
-        },
-      ],
-      // panelのinitialize action(defaultアクション)ではargsを受け取らない。
-      // これによってjexpr構文を使えないことを強制する
-    },
-    {
-      when: "twitch.main.message",
-      type: "panel",
-      // updateアクションを使うとstatus値をpipeline側から強制更新できる
-      // この場合はtwitchメッセージを受信した時に
-      // panelコンポネントのlatest_messageを更新するという寸法。
-      // パネルを動的に追加/削除することはできないという点には注意。
-      // (そういうことをしたいなら新しいコンポネントプラグインを作る想定)
-      action: "update",
+      // define acitonを実行することでpanelに対して新しいpanel groupを差し込むことができる
+      // 実行のたびに内容がこれに従った形にアップデートされるので
+      // パネルの内容をリアクティブに変更することができる。
+      action: "define",
+      group: "shoutout",
       args: {
-        // この名称指定もグループについて考慮する必要があった。
-        // 簡易に記述できるドット区切りで指定するのか、
-        // それとも様々な文字列の指定が可能な配列で指定するのかで悩んだ。
-        // nameはそもそもjexprの制約もありドット区切りできるような文字列しか使えない
-        // そこで利用者の利便性を考慮するとドット区切りが望ましいと判断。
-        name: "message.latest",
-        // このようにjexprの展開した結果でcomponentの値を更新することができる
-        text: "$ format('{}: {}', message.name, message.text)"
-      },
-    },
-    {
-      when: "hoge",
-      type: "panel",
-      action: "update",
-      args: {
-        // ここにtypeとかあるならjexprの展開を許すことになるが
-        // これで選べるのはすでにcomponentsとして刺さっているものだけなので
-        // 該当するものがない場合は単に更新操作が無視される
-        // type: "$ hoge",
-        name: "hoge_component",
-        // 引数が噛み合わなくなるのを回避できない
-        // が、それはユーザの勝手に任せることにした。
-        // コンポネントの実装に応じて実行時エラーになったり無視されるだろう。
-        hoge: "hogehoge",
+        forms: [
+          {
+            // select。この設定値の場合、クリックごとに
+            // defsの定義された状態を順番にループして
+            // 現在の状態を保持する
+            type: "select",
+            name: "auto_shoutout",
+            alts: [
+              {
+                text: "auto shoutout on",
+                color: "base",
+                value: true,
+              },
+              {
+                text: "auto shoutout off",
+                color: "dark",
+                value: false,
+              },
+            ],
+          },
+          {
+            // ボタン。この設定値の場合クリックごとに
+            // panel.shoutout = true
+            // という値を持ったイベントが発火
+            type: "button",
+            name: "shoutout",
+            text: "Send shoutout"
+          },
+        ],
       },
     },
     {
@@ -167,11 +98,25 @@
       name: "message",
     },
     {
+      // メッセージが来るたびに再定義を走らせるのでreactiveにメッセージ表示ができる
+      when: "twitch.main.message",
       type: "panel",
-      action: "update",
+      action: "define",
+      group: "message",
       args: {
-        name: "message.count",
-        text: "$ format('total: {}', count)",
+        forms: [
+          {
+            type: "label",
+            name: "latest",
+            // このようにjexprの展開した結果でcomponentの値を更新することができる
+            text: "$ message.name + ': ' + message.text",
+          },
+          {
+            type: "label",
+            name: "count",
+            text: "$ format('total: {}', count)",
+          },
+        ]
       },
     },
     {
