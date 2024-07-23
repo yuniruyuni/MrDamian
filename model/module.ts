@@ -54,7 +54,7 @@ export class Module {
 
   async mount<T extends Server<T>>(server: T): Promise<T> {
     // TODO: care about submodule-inheritance of components.
-    for( const [key, instance] of this.instances.entries() ) {
+    for (const [key, instance] of this.instances.entries()) {
       const f = await instance.fetch();
       const path = `/${key}/`;
       if (f !== undefined) server.mount(path, f);

@@ -4,6 +4,7 @@ import { Component, type ComponentConfig, type Field } from "mrdamian-plugin";
 import { asArgs } from "~/model/arguments";
 import { asParams } from "~/model/config";
 import { ModuleFactory } from "~/model/factory";
+import { EmitterStack, eventChannel } from "./events";
 
 type DummyConfig = ComponentConfig;
 class DummyComponent extends Component<DummyConfig> {
@@ -16,7 +17,9 @@ class DummyComponent extends Component<DummyConfig> {
 describe("Factory", () => {
   it("can construct module", async () => {
     const gens = { dummy: DummyComponent };
-    const factory = new ModuleFactory(gens);
+    const [emitter, _absorber] = eventChannel();
+    const stack = new EmitterStack([emitter]);
+    const factory = new ModuleFactory(gens, stack);
 
     const mod = factory.construct({
       params: asParams({}),

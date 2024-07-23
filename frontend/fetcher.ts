@@ -8,10 +8,10 @@ const fetchWithError = async (url: string, init: RequestInit) => {
       "Content-Type": "application/json",
       ...init.headers,
       // this method only accept json response so we can safely add this header.
-      "Accept": "application/json",
+      Accept: "application/json",
     },
   });
-  if( !res.ok ) throw new Error(await res.text());
+  if (!res.ok) throw new Error(await res.text());
   return await res.json();
 };
 

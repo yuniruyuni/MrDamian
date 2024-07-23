@@ -1,7 +1,7 @@
 import { Component, type ComponentConfig, type Field } from "mrdamian-plugin";
 
 import type { SubmoduleConfig } from "~/model/config";
-import type { NamedEventEmitter } from "~/model/events";
+import type { EmitterStack, NamedEventEmitter } from "~/model/events";
 import { type ComponentGenerators, ModuleFactory } from "~/model/factory";
 import type { Module } from "~/model/module";
 
@@ -13,12 +13,13 @@ export class Submodule extends Component<SubmoduleConfig> {
   constructor(
     config: SubmoduleConfig,
     emitter: NamedEventEmitter,
+    stack: EmitterStack,
     gens: ComponentGenerators,
     instances: Map<string, Component<ComponentConfig>>,
   ) {
     // TODO: validate params with some schema.
     super(emitter);
-    this.factory = new ModuleFactory(gens);
+    this.factory = new ModuleFactory(gens, stack);
     const inherited = new Map();
 
     for (const [name, type] of Object.entries(config.module.inherit)) {

@@ -125,8 +125,16 @@ const ModuleList: FC<{ modules: ModuleConfig }> = ({ modules }) => (
 );
 
 export const Modules: FC = () => {
-  const { data: modules, error, isLoading } = useSWRImmutable("/-/api/module", fetcher.get);
-  if (error) return <div className="flex flex-row gap-4 h-full">Error: {error.message}</div>;
-  if (isLoading) return <div className="flex flex-row gap-4 h-full">loading...</div>;
+  const {
+    data: modules,
+    error,
+    isLoading,
+  } = useSWRImmutable("/-/api/module", fetcher.get);
+  if (error)
+    return (
+      <div className="flex flex-row gap-4 h-full">Error: {error.message}</div>
+    );
+  if (isLoading)
+    return <div className="flex flex-row gap-4 h-full">loading...</div>;
   return <ModuleList modules={modules} />;
 };

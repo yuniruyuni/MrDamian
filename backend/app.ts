@@ -67,7 +67,7 @@ export class App {
   }
 
   async stop() {
-    if( !this.running ) return;
+    if (!this.running) return;
 
     if (this.module !== undefined) {
       await this.module.stop({});
@@ -76,7 +76,7 @@ export class App {
   }
 
   async unload() {
-    if( this.module ) {
+    if (this.module) {
       await this.module.finalize({});
       this.module = undefined;
     }
@@ -87,7 +87,7 @@ export class App {
     await this.stop();
     await this.unload();
     await this.load();
-    if( restart ) this.start();
+    if (restart) this.start();
   }
 
   async constructRoutes(route: Hono) {

@@ -8,8 +8,8 @@ import {
 } from "~/model/config";
 import { Evaluator } from "~/model/evaluator";
 import {
+  type EmitterStack,
   type EventAbsorber,
-  type EventEmitter,
   NamedEventEmitter,
   eventChannel,
 } from "~/model/events";
@@ -31,18 +31,19 @@ export type ComponentGenerators = {
 
 export class ModuleFactory {
   private readonly gens: ComponentGenerators;
-  private readonly emitter: EventEmitter;
   private readonly absorber: EventAbsorber;
+  private readonly stack: EmitterStack;
 
   private instances: Instances;
 
-  public constructor(gens: ComponentGenerators) {
+  public constructor(gens: ComponentGenerators, stack: EmitterStack) {
     this.gens = gens;
     this.instances = newInstances();
 
     const [emitter, absorber] = eventChannel();
-    this.emitter = emitter;
     this.absorber = absorber;
+
+    this.stack = stack.push(emitter);
   }
 
   public construct(
@@ -66,12 +67,12 @@ export class ModuleFactory {
       (v) => v !== undefined,
     );
     const key = keys.join("/");
-    const emitter = new NamedEventEmitter(this.emitter, keys);
+    const emitter = new NamedEventEmitter(this.stack, keys);
 
     // Call component should not be cached because Call is system component.
     if (isSubmoduleConfig(config)) {
       return new Evaluator(
-        new Submodule(config, emitter, this.gens, this.instances),
+        new Submodule(config, emitter, this.stack, this.gens, this.instances),
         config,
       );
     }

@@ -19,7 +19,10 @@ const Details: FC<{ children: React.ReactNode }> = ({ children }) => {
   );
 };
 
-const PostButton: FC<{ children: React.ReactNode, url: string }> = ({ url, children }) => {
+const PostButton: FC<{ children: React.ReactNode; url: string }> = ({
+  url,
+  children,
+}) => {
   const { pushAlert } = useContext(AlertContext);
   const { trigger, isMutating } = useSWRMutation(url, fetcher.post, {
     onError: (err) => pushAlert(err.message, "error"),
@@ -35,9 +38,11 @@ const PostButton: FC<{ children: React.ReactNode, url: string }> = ({ url, child
       {children}
     </button>
   );
-}
+};
 
-const StartButton = () => <PostButton url="/-/api/module/start">Start</PostButton>;
+const StartButton = () => (
+  <PostButton url="/-/api/module/start">Start</PostButton>
+);
 const StopButton = () => <PostButton url="/-/api/module/stop">Stop</PostButton>;
 const SaveButton = () => <PostButton url="/-/api/module/save">Save</PostButton>;
 
@@ -51,16 +56,28 @@ export const Menu: FC = () => (
 
     <div className="flex-none">
       <ul className="menu menu-horizontal">
-        <li><StartButton /></li>
-        <li><StopButton /></li>
+        <li>
+          <StartButton />
+        </li>
+        <li>
+          <StopButton />
+        </li>
         <li className="z-50">
           <Details>
             <summary>Menu</summary>
             <ul>
-              <li><StartButton /></li>
-              <li><StopButton /></li>
-              <li><SaveButton /></li>
-              <li><Link to="/-/plugins">Plugins</Link></li>
+              <li>
+                <StartButton />
+              </li>
+              <li>
+                <StopButton />
+              </li>
+              <li>
+                <SaveButton />
+              </li>
+              <li>
+                <Link to="/-/plugins">Plugins</Link>
+              </li>
             </ul>
           </Details>
         </li>

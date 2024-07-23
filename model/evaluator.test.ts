@@ -18,13 +18,13 @@ import { Evaluator, evaluate } from "~/model/evaluator";
 
 class DummyComponent extends Component<ComponentConfig> {
   mocks: {
-    emitter: { emit: () => void },
-    fetch: ()=> Fetch | undefined,
-    initialize: (config: ComponentConfig) => Promise<Field>,
-    start: (config: ComponentConfig) => Promise<Field>,
-    process: (config: ComponentConfig) => Promise<Field>,
-    stop: (config: ComponentConfig) => Promise<Field>,
-    finalize: (config: ComponentConfig) => Promise<Field>,
+    emitter: { emit: () => void };
+    fetch: () => Fetch | undefined;
+    initialize: (config: ComponentConfig) => Promise<Field>;
+    start: (config: ComponentConfig) => Promise<Field>;
+    process: (config: ComponentConfig) => Promise<Field>;
+    stop: (config: ComponentConfig) => Promise<Field>;
+    finalize: (config: ComponentConfig) => Promise<Field>;
   };
   constructor() {
     const emitter = {
@@ -67,7 +67,6 @@ class DummyComponent extends Component<ComponentConfig> {
   }
 }
 
-
 describe("evaluate", () => {
   it("transforms parameter's expression into environment value", () => {
     const args: Arguments = asArgs({
@@ -101,7 +100,14 @@ describe("evaluate", () => {
 });
 
 describe("Evaluator", () => {
-  const keys = ["fetch", "initialize", "start", "process", "stop", "finalize"] as const;
+  const keys = [
+    "fetch",
+    "initialize",
+    "start",
+    "process",
+    "stop",
+    "finalize",
+  ] as const;
   type Keys = (typeof keys)[number];
   // `...keys` is needed for remove readonly modifier from keys.
   // maybe it.each should take args as `readonly` but current Bun.it doesn't support it.

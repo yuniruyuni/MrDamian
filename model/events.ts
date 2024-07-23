@@ -1,6 +1,6 @@
-import type { Environment, Field } from "mrdamian-plugin";
-
+import { type Environment, type Field, Path } from "mrdamian-plugin";
 import { Queue } from "~/model/queue";
+import type { NonEmptyArray } from "~/model/types";
 
 class EventChannel {
   queue: Queue<Environment>;
@@ -62,26 +62,50 @@ export function eventChannel(): [EventEmitter, EventAbsorber] {
   return [new EventEmitter(channel), new EventAbsorber(channel)];
 }
 
+export class EmitterStack {
+  stack: NonEmptyArray<EventEmitter>;
+
+  constructor(stack: NonEmptyArray<EventEmitter>) {
+    this.stack = stack;
+  }
+
+  push(e: EventEmitter): EmitterStack {
+    return new EmitterStack([e, ...this.stack]);
+  }
+
+  emit(event: Environment, path: Path = Path.local) {
+    const e = this.pathOf(path);
+    if (!e) return;
+    e.emit(event);
+  }
+
+  pathOf(path: Path): EventEmitter {
+    const index =
+      path < 0
+        ? this.stack.length + (path % this.stack.length)
+        : path % this.stack.length;
+    return this.stack[index];
+  }
+}
+
 export const KeyNotExistError = new Error("keys length should not be zero");
 
 export class NamedEventEmitter {
-  emitter: EventEmitter;
+  stack: EmitterStack;
   keys: string[];
-  constructor(emitter: EventEmitter, keys: string[]) {
-    if (keys.length <= 0) {
-      throw KeyNotExistError;
-    }
+  constructor(stack: EmitterStack, keys: string[]) {
+    if (keys.length <= 0) throw KeyNotExistError;
 
-    this.emitter = emitter;
+    this.stack = stack;
     this.keys = keys;
   }
 
-  emit(field: Field): void {
+  emit(field: Field, path: Path = Path.local): void {
     let obj = field;
     for (const key of this.keys.reverse()) {
       obj = { [key]: obj };
     }
     // key must not be 0-length, so obj will be always Environment.
-    this.emitter.emit(obj as Environment);
+    this.stack.emit(obj as Environment, path);
   }
 }

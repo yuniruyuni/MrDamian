@@ -9,14 +9,14 @@ import { fetcher } from "./fetcher";
 
 const Plugin: FC<{ plugin: PluginInfo }> = ({ plugin }) => {
   const { pushAlert } = useContext(AlertContext);
-  const { trigger: onInstall, error, isMutating } = useSWRMutation(
-    '/-/api/plugin',
-    fetcher.post,
-    {
-      onSuccess: () => pushAlert("Succeeded to install plugin", "success"),
-      onError: (err) => pushAlert(err.message, "error"),
-    },
-  );
+  const {
+    trigger: onInstall,
+    error,
+    isMutating,
+  } = useSWRMutation("/-/api/plugin", fetcher.post, {
+    onSuccess: () => pushAlert("Succeeded to install plugin", "success"),
+    onError: (err) => pushAlert(err.message, "error"),
+  });
 
   if (error) return <tr>plugin error...</tr>;
 
@@ -34,13 +34,11 @@ const Plugin: FC<{ plugin: PluginInfo }> = ({ plugin }) => {
         {!plugin.installed && (
           <button
             type="button"
-            className={
-              clsx(
-                "btn btn-primary",
-                "place-content-center",
-                isMutating && "loading loading-spinner",
-              )
-            }
+            className={clsx(
+              "btn btn-primary",
+              "place-content-center",
+              isMutating && "loading loading-spinner",
+            )}
             onClick={() => onInstall({ name: plugin.name })}
           >
             Install
@@ -52,11 +50,16 @@ const Plugin: FC<{ plugin: PluginInfo }> = ({ plugin }) => {
 };
 
 export const Plugins: FC = () => {
-  const { data: plugins, error, isLoading } = useSWRImmutable<PluginInfo[]>('/-/api/plugin', fetcher.get);
+  const {
+    data: plugins,
+    error,
+    isLoading,
+  } = useSWRImmutable<PluginInfo[]>("/-/api/plugin", fetcher.get);
 
-  if( isLoading ) return <div className="overflow-x-auto">Loading...</div>;
-  if( error ) return <div className="overflow-x-auto">Error: {error.message}</div>;
-  if( !plugins ) return <div className="overflow-x-auto">plugins not found</div>
+  if (isLoading) return <div className="overflow-x-auto">Loading...</div>;
+  if (error)
+    return <div className="overflow-x-auto">Error: {error.message}</div>;
+  if (!plugins) return <div className="overflow-x-auto">plugins not found</div>;
 
   return (
     <div className="overflow-x-auto">
@@ -67,7 +70,9 @@ export const Plugins: FC = () => {
           <th>Version</th>
         </tr>
         <tbody>
-          {plugins.map((plugin) => <Plugin key={plugin.name} plugin={plugin} />)}
+          {plugins.map((plugin) => (
+            <Plugin key={plugin.name} plugin={plugin} />
+          ))}
         </tbody>
       </table>
     </div>

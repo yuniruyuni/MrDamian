@@ -2,7 +2,7 @@ import { describe, expect, it } from "bun:test";
 
 import { asArgs } from "~/model/arguments";
 import { type SubmoduleConfig, asParams } from "~/model/config";
-import { NamedEventEmitter, eventChannel } from "~/model/events";
+import { EmitterStack, NamedEventEmitter, eventChannel } from "~/model/events";
 import type { ComponentGenerators } from "~/model/factory";
 import { Submodule } from "~/model/submodule";
 
@@ -28,9 +28,10 @@ describe("Submodule", () => {
       },
     };
     const [emitter, absorber] = eventChannel();
-    const named: NamedEventEmitter = new NamedEventEmitter(emitter, ["key"]);
+    const stack: EmitterStack = new EmitterStack([emitter]);
+    const named: NamedEventEmitter = new NamedEventEmitter(stack, ["key"]);
     const gens: ComponentGenerators = {};
-    const submodule = new Submodule(config, named, gens, new Map());
+    const submodule = new Submodule(config, named, stack, gens, new Map());
 
     submodule.emit("abc");
 
