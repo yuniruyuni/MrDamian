@@ -16,8 +16,10 @@
 - 全体を通して1つのComponentと見做せるように振る舞う。
 
 ## Pipeline
-- パイプラインは、複数のComponentを組み合わせて構成される。
-    - `Pipeline = Component[]`
+- パイプラインは、複数のComponent Actionを組み合わせて構成される一連の処理。
+    - `Pipeline = Component<Action>[]`
+- 1つのModuleには、1つのPipelineが存在する。
+- イベントを受信すると、Pipelineの前から順番にActionが1回ずつ実行される。
 
 ## ComponentConstructor
 - Componentを生成するためのコンストラクタのインタフェイス
@@ -27,9 +29,26 @@
 - システム側で事前いろいろな種類のものが定義されている。
 - "when" というフィールドがある場合、そのComponentが実行されるのはwhenの条件が真のときだけ。
 
-### ComponentName
-- Componentそれぞれにつけられたユーザ定義の名称。
+### (Component) Action
+- 1回分のComponentの呼び出し。
+- Pipelineに刺さるのは各ComponentのAction。
+
+### (Component) Instance
+- (Component)Actionは複数の呼び出しの間で内部データを共有する。
+- 異なる(Component)Nameが設定されたときに、異なる内部データが生成される。
+- このAction間で共有される内部データのこと。
+
+### (Component) Name
+- (Component)Actionにつけられたユーザ定義の名称。
 - ただし省略可能で、その場合はComponentのtypeと同じ名前が使われる。
+- 異なるComponent Nameがつけられるたびに別のInstanceが立ち上がる。
+
+### (Action) ID
+- Pipeline内でのActionの一意な識別子。
+- Actionそれぞれを区別するために利用される。
+- ユーザ側では設定できず、システム側で自動生成される。
+- Plugin作者側でこれを使って内部挙動を作ることができたり
+- 管理画面上でActionそれぞれを一意に識別するために使われる。
 
 ## Parameters
 - 各ModuleのConfigファイルの中で "params" に定義されるJSONオブジェクト。
