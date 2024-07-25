@@ -1,8 +1,5 @@
-import { Component, type ComponentConfig, type Field } from "mrdamian-plugin";
+import type { Action, Component } from "mrdamian-plugin";
 
-export class Unsupported extends Component<ComponentConfig> {
-  async process(): Promise<Field> {
-    // just ignore all things.
-    return undefined;
-  }
+export class Unsupported implements Component<Action> {
+  // just ignore all things.
 }

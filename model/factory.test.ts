@@ -1,14 +1,14 @@
 import { describe, expect, it } from "bun:test";
-import { Component, type ComponentConfig, type Field } from "mrdamian-plugin";
+import type { Action, Component, Field } from "mrdamian-plugin";
 
 import { asArgs } from "~/model/arguments";
+import { fillComponent } from "~/model/component";
 import { asParams } from "~/model/config";
+import { EmitterStack } from "~/model/events";
 import { ModuleFactory } from "~/model/factory";
-import { EmitterStack, eventChannel } from "./events";
 
-type DummyConfig = ComponentConfig;
-class DummyComponent extends Component<DummyConfig> {
-  dummy = "dummy";
+type DummyConfig = Action;
+class DummyComponent implements Component<DummyConfig> {
   async process(): Promise<Field> {
     return undefined;
   }
@@ -16,9 +16,8 @@ class DummyComponent extends Component<DummyConfig> {
 
 describe("Factory", () => {
   it("can construct module", async () => {
-    const gens = { dummy: DummyComponent };
-    const [emitter, _absorber] = eventChannel();
-    const stack = new EmitterStack([emitter]);
+    const gens = { DummyComponent };
+    const [stack] = new EmitterStack().spawn();
     const factory = new ModuleFactory(gens, stack);
 
     const mod = factory.construct({
@@ -26,6 +25,7 @@ describe("Factory", () => {
       inherit: {},
       pipeline: [
         {
+          id: "0",
           type: "dummy",
           name: "name",
           when: "true && false",
@@ -42,6 +42,7 @@ describe("Factory", () => {
         params: {},
         pipeline: [
           {
+            id: "0",
             args: {
               hoge: "fuga",
             },
@@ -53,10 +54,8 @@ describe("Factory", () => {
       },
       pipeline: [
         {
-          component: {
-            dummy: "dummy",
-          },
-          config: {
+          component: fillComponent(new DummyComponent()),
+          action: {
             type: "dummy",
             name: "name",
             when: "true && false",

@@ -1,27 +1,31 @@
 import deepmerge from "deepmerge";
 import { EvalAstFactory, parse } from "jexpr";
 import type {
-  Component,
-  ComponentConfig,
+  Action,
   Environment,
   Fetch,
 } from "mrdamian-plugin";
 
 import { type Arguments, asArgs } from "~/model/arguments";
-import { type SubmoduleConfig, isSubmoduleConfig } from "~/model/config";
+import type { FilledComponent } from "~/model/component";
+import { type SubmoduleAction, isSubmoduleAction } from "~/model/config";
+import type { NamedEventEmitter } from "~/model/events";
 import type { Submodule } from "~/model/submodule";
 
-export class Evaluator<C extends ComponentConfig = ComponentConfig> {
-  readonly component: Component<C>;
-  readonly config: C & { args: Arguments };
+export class Evaluator<A extends Action = Action> {
+  readonly component: FilledComponent<A>;
+  readonly action: A & { args: Arguments };
+  readonly emitter: NamedEventEmitter;
 
   constructor(
-    component: Component<C>,
-    config: ComponentConfig & { args: Arguments },
+    component: FilledComponent<A>,
+    action: Action & { args: Arguments },
+    emitter: NamedEventEmitter,
   ) {
     this.component = component;
     // TODO: implement some validator.
-    this.config = config as C & { args: Arguments };
+    this.action = action as A & { args: Arguments };
+    this.emitter = emitter;
   }
 
   async fetch(): Promise<Fetch | undefined> {
@@ -29,15 +33,15 @@ export class Evaluator<C extends ComponentConfig = ComponentConfig> {
   }
 
   async initialize(env: Environment): Promise<void> {
-    return this.component.initialize(this.evaluate(env));
+    return this.component.initialize(this.evaluate(env), this.emitter);
   }
 
   async start(env: Environment): Promise<void> {
-    return this.component.start(this.evaluate(env));
+    return this.component.start(this.evaluate(env), this.emitter);
   }
 
   async receive(): Promise<void> {
-    if (!isSubmoduleConfig(this.config)) return;
+    if (!isSubmoduleAction(this.action)) return;
 
     const submodule = this.component as unknown as Submodule;
     return submodule.receive();
@@ -45,16 +49,16 @@ export class Evaluator<C extends ComponentConfig = ComponentConfig> {
 
   async process(env: Environment): Promise<Environment> {
     // skip if when condition is not met.
-    if (this.config.when) {
-      const res = evaluateExpression(this.config.when, env);
+    if (this.action.when) {
+      const res = evaluateExpression(this.action.when, env);
       if (!res) {
         return env;
       }
     }
 
-    const ret = await this.component.process(this.evaluate(env));
+    const ret = await this.component.process(this.evaluate(env), this.emitter);
 
-    const keys: string[] = [this.config.type, this.config.name].filter(
+    const keys: string[] = [this.action.type, this.action.name].filter(
       (v): v is string => v !== undefined,
     );
     let obj = ret;
@@ -65,29 +69,29 @@ export class Evaluator<C extends ComponentConfig = ComponentConfig> {
   }
 
   async stop(env: Environment): Promise<void> {
-    return this.component.stop(this.evaluate(env));
+    return this.component.stop(this.evaluate(env), this.emitter);
   }
 
   async finalize(env: Environment): Promise<void> {
-    return this.component.finalize(this.evaluate(env));
+    return this.component.finalize(this.evaluate(env), this.emitter);
   }
 
-  private evaluate(env: Environment): C {
+  private evaluate(env: Environment): A {
     // TODO: validate args
-    const args = evaluate(this.config.args ?? asArgs({}), env);
+    const args = evaluate(this.action.args ?? asArgs({}), env);
     const inherited = this.inherit(env);
 
-    return { ...this.config, args: deepmerge(args, inherited) };
+    return { ...this.action, args: deepmerge(args, inherited) };
   }
 
   private inherit(env: Environment): Environment {
-    if (!isSubmoduleConfig(this.config)) return {};
-    if (!this.config.module.inherit) return {};
+    if (!isSubmoduleAction(this.action)) return {};
+    if (!this.action.module.inherit) return {};
 
-    const config: SubmoduleConfig = this.config;
-    return Object.entries(config.module.inherit).reduce(
+    const action: SubmoduleAction = this.action;
+    return Object.entries(action.module.inherit).reduce(
       (inherited, [name, type]) => {
-        const iname = config.inherit[name];
+        const iname = action.inherit[name];
         const keys = [type, iname].filter((v): v is string => v !== undefined);
         return deepmerge(inherited, {
           [type]: {

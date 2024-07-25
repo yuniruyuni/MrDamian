@@ -1,70 +1,26 @@
 import { describe, expect, it, mock } from "bun:test";
 
-import { Component } from "mrdamian-plugin";
-import type {
-  ComponentConfig,
-  Environment,
-  Fetch,
-  Field,
-} from "mrdamian-plugin";
+import type { Action, Environment } from "mrdamian-plugin";
 
 import { type Arguments, asArgs } from "~/model/arguments";
+import type { FilledComponent } from "~/model/component";
 import {
   type Parameters,
-  type SubmoduleConfig,
+  type SubmoduleAction,
   asParams,
 } from "~/model/config";
 import { Evaluator, evaluate } from "~/model/evaluator";
+import type { NamedEventEmitter } from "~/model/events";
 
-class DummyComponent extends Component<ComponentConfig> {
-  mocks: {
-    emitter: { emit: () => void };
-    fetch: () => Fetch | undefined;
-    initialize: (config: ComponentConfig) => Promise<Field>;
-    start: (config: ComponentConfig) => Promise<Field>;
-    process: (config: ComponentConfig) => Promise<Field>;
-    stop: (config: ComponentConfig) => Promise<Field>;
-    finalize: (config: ComponentConfig) => Promise<Field>;
+function dummyComponent(): FilledComponent<Action> {
+  return {
+    fetch: mock(),
+    initialize: mock(),
+    start: mock(),
+    process: mock(),
+    stop: mock(),
+    finalize: mock(),
   };
-  constructor() {
-    const emitter = {
-      emit: mock(),
-    };
-    super(emitter);
-    this.mocks = {
-      emitter,
-      fetch: mock(),
-      initialize: mock(),
-      start: mock(),
-      process: mock(),
-      stop: mock(),
-      finalize: mock(),
-    };
-  }
-
-  async fetch(): Promise<Fetch | undefined> {
-    return this.mocks.fetch();
-  }
-
-  async initialize(config: ComponentConfig): Promise<void> {
-    this.mocks.initialize(config);
-  }
-
-  async start(config: ComponentConfig): Promise<void> {
-    this.mocks.start(config);
-  }
-
-  async process(config: ComponentConfig): Promise<Field> {
-    return this.mocks.process(config);
-  }
-
-  async stop(config: ComponentConfig): Promise<void> {
-    this.mocks.stop(config);
-  }
-
-  async finalize(config: ComponentConfig): Promise<void> {
-    this.mocks.finalize(config);
-  }
 }
 
 describe("evaluate", () => {
@@ -112,62 +68,65 @@ describe("Evaluator", () => {
   // `...keys` is needed for remove readonly modifier from keys.
   // maybe it.each should take args as `readonly` but current Bun.it doesn't support it.
   it.each([...keys])("propagates %s call", async (method: Keys) => {
-    const component = new DummyComponent();
-    const config: ComponentConfig & { args: Arguments } = {
+    const component = dummyComponent();
+    const action: Action & { args: Arguments } = {
+      id: "0",
       type: "dummy",
       args: asArgs({}),
     };
-    const target = new Evaluator(component, config);
+    const target = new Evaluator(component, action, {} as NamedEventEmitter);
 
     await target[method]({});
-    expect(component.mocks[method]).toBeCalled();
+    expect(component[method]).toBeCalled();
   });
 
   it("process if when is not passed", async () => {
-    const component = new DummyComponent();
-    const config: ComponentConfig & { args: Arguments } = {
+    const component = dummyComponent();
+    const action: Action & { args: Arguments } = {
+      id: "0",
       type: "dummy",
       // when: ...,
       args: asArgs({}),
     };
-    const target = new Evaluator(component, config);
+    const target = new Evaluator(component, action, {} as NamedEventEmitter);
 
     await target.process({});
 
-    expect(component.mocks.process).toBeCalled();
+    expect(component.process).toBeCalled();
   });
 
   it("process if when is meeted", async () => {
-    const component = new DummyComponent();
-    const config: ComponentConfig & { args: Arguments } = {
+    const component = dummyComponent();
+    const action: Action & { args: Arguments } = {
+      id: "0",
       type: "dummy",
       when: "true",
       args: asArgs({}),
     };
-    const target = new Evaluator(component, config);
-
+    const target = new Evaluator(component, action, {} as NamedEventEmitter);
     await target.process({});
 
-    expect(component.mocks.process).toBeCalled();
+    expect(component.process).toBeCalled();
   });
 
   it("skip process if when is not meeted", async () => {
-    const component = new DummyComponent();
-    const config: ComponentConfig & { args: Arguments } = {
+    const component = dummyComponent();
+    const action: Action & { args: Arguments } = {
+      id: "0",
       type: "dummy",
       when: "false",
       args: asArgs({}),
     };
-    const target = new Evaluator(component, config);
-
+    const target = new Evaluator(component, action, {} as NamedEventEmitter);
     await target.process({});
 
-    expect(component.mocks.process).not.toBeCalled();
+    expect(component.process).not.toBeCalled();
   });
 
   it("inherit component for submodule processing", async () => {
-    const component = new DummyComponent();
-    const config: SubmoduleConfig & { args: Arguments } = {
+    const component = dummyComponent();
+    const action: SubmoduleAction & { args: Arguments } = {
+      id: "0",
       type: "submodule",
       path: "dummy.json5",
       inherit: {
@@ -182,7 +141,7 @@ describe("Evaluator", () => {
       },
       args: asArgs({}),
     };
-    const target = new Evaluator(component, config);
+    const target = new Evaluator(component, action, {} as NamedEventEmitter);
 
     await target.process({
       dummy: {
@@ -194,17 +153,20 @@ describe("Evaluator", () => {
       },
     });
 
-    expect(component.mocks.process).toBeCalledWith({
-      ...config,
-      args: {
-        dummy: {
-          main: {
-            foo: 1,
-            bar: 2,
-            buz: 3,
+    expect(component.process).toBeCalledWith(
+      {
+        ...action,
+        args: {
+          dummy: {
+            main: {
+              foo: 1,
+              bar: 2,
+              buz: 3,
+            },
           },
         },
       },
-    });
+      {} as NamedEventEmitter,
+    );
   });
 });

@@ -1,5 +1,5 @@
-import type { ComponentConfig } from "mrdamian-plugin";
+import type { Action } from "mrdamian-plugin";
 
 import type { Evaluator } from "~/model/evaluator";
 
-export type Pipeline = Evaluator<ComponentConfig>[];
+export type Pipeline = Evaluator<Action>[];

@@ -1,15 +1,15 @@
 import { describe, expect, it } from "bun:test";
 
 import {
+  EmitterStack,
   KeyNotExistError,
   NamedEventEmitter,
-  eventChannel,
 } from "~/model/events";
 
 describe("NamedEventEmitter", () => {
   it("emit with keys", async () => {
-    const [emitter, absorber] = eventChannel();
-    const named = new NamedEventEmitter(emitter, ["dummy", "name"]);
+    const [stack, absorber] = (new EmitterStack()).spawn();
+    const named = new NamedEventEmitter(stack, ["dummy", "name"]);
     named.emit("abc");
 
     expect(await absorber.absorb()).toEqual({
@@ -20,8 +20,8 @@ describe("NamedEventEmitter", () => {
   });
 
   it("single key", async () => {
-    const [emitter, absorber] = eventChannel();
-    const named = new NamedEventEmitter(emitter, ["dummy"]);
+    const [stack, absorber] = (new EmitterStack()).spawn();
+    const named = new NamedEventEmitter(stack, ["dummy"]);
     named.emit("abc");
 
     expect(await absorber.absorb()).toEqual({
@@ -30,8 +30,8 @@ describe("NamedEventEmitter", () => {
   });
 
   it("should be omit zero key construction", async () => {
-    const [emitter] = eventChannel();
-    expect(() => new NamedEventEmitter(emitter, [])).toThrowError(
+    const [stack] = (new EmitterStack()).spawn();
+    expect(() => new NamedEventEmitter(stack, [])).toThrowError(
       KeyNotExistError,
     );
   });

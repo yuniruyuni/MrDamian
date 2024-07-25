@@ -6,6 +6,7 @@ import { load } from "~/backend/load_config";
 import { PluginLoader } from "~/backend/load_plugin";
 
 import { type ModuleConfig, asParams } from "~/model/config";
+import { EmitterStack } from "~/model/events";
 import { ModuleFactory } from "~/model/factory";
 import type { Module } from "~/model/module";
 
@@ -40,7 +41,8 @@ export class App {
   async load() {
     await this.loader.loadConfig(this.pluginConfigPath);
     const gens = await this.loader.loadAll();
-    const factory = new ModuleFactory(gens);
+    const stack = new EmitterStack();
+    const factory = new ModuleFactory(gens, stack);
     this.params = await load(mainModulePath);
     this.module = factory.construct(this.params);
 

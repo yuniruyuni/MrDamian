@@ -1,5 +1,5 @@
 import clsx from "clsx";
-import type { ComponentConfig, Environment, Field } from "mrdamian-plugin";
+import type { Action, Environment, Field } from "mrdamian-plugin";
 import type { FC } from "react";
 import useSWRImmutable from "swr/immutable";
 import { Link, Route } from "wouter";
@@ -34,12 +34,12 @@ const ShowField: FC<{ name: string; value: Field }> = ({ name, value }) => (
   </div>
 );
 
-const configLink = (config: ComponentConfig) => {
+const configLink = (config: Action) => {
   if (config.name) return `/modules/${config.type}/${config.name}`;
   return `/modules/${config.type}/`;
 };
 
-const Step: FC<{ config: ComponentConfig; selected: boolean }> = ({
+const Step: FC<{ config: Action; selected: boolean }> = ({
   config,
   selected,
 }) => {
@@ -59,7 +59,7 @@ const Step: FC<{ config: ComponentConfig; selected: boolean }> = ({
 };
 
 const Pipeline: FC<{
-  pipeline: ComponentConfig[];
+  pipeline: Action[];
   selected?: { type: string; name?: string };
 }> = ({ pipeline, selected }) => (
   <ul className="timeline timeline-vertical timeline-compact min-w-fit w-full flex-1 h-full">
@@ -92,7 +92,7 @@ const Pipeline: FC<{
   </ul>
 );
 
-const Component: FC<{ component: ComponentConfig }> = ({ component }) => (
+const Component: FC<{ component: Action }> = ({ component }) => (
   <iframe
     className="w-full h-full overflow-auto"
     src={`/${[component.type, component.name].filter((v) => v).join("/")}/`}

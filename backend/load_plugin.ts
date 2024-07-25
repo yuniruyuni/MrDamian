@@ -2,15 +2,16 @@ import path from "node:path";
 import JSON5 from "json5";
 import search from "libnpmsearch";
 import { PluginManager } from "live-plugin-manager";
+import type { Action } from "mrdamian-plugin";
 import type { ComponentGenerator, ComponentGenerators } from "~/model/factory";
 import type { PluginInfo } from "~/model/plugin";
 
 export class Plugin {
   name: string;
   version: string;
-  gen: ComponentGenerator;
+  gen: ComponentGenerator<Action>;
 
-  constructor(name: string, version: string, gen: ComponentGenerator) {
+  constructor(name: string, version: string, gen: ComponentGenerator<Action>) {
     this.name = name;
     this.version = version;
     this.gen = gen;

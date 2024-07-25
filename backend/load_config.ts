@@ -4,9 +4,9 @@ import JSON5 from "json5";
 import {
   type ModuleConfig,
   type PipelineConfig,
-  type RawComponentConfig,
-  type SubmoduleConfig,
-  isSubmoduleConfig,
+  type RawAction,
+  type SubmoduleAction,
+  isSubmoduleAction,
 } from "~/model/config";
 
 export const ConfigParseError = new Error("Failed to parse config file");
@@ -32,21 +32,21 @@ async function loadPipelineConfig(
 ): Promise<PipelineConfig> {
   return await Promise.all(
     config.map(async (comp) => {
-      return await loadComponentConfig(path, comp);
+      return await loadAction(path, comp);
     }),
   );
 }
 
-async function loadComponentConfig(
+async function loadAction(
   path: string,
-  config: RawComponentConfig,
-): Promise<RawComponentConfig> {
-  if (isSubmoduleConfig(config)) {
+  config: RawAction,
+): Promise<RawAction> {
+  if (isSubmoduleAction(config)) {
     const base_dir = dirname(path);
     const mpath = `${base_dir}/${config.path}`;
     const mparams = await loadModuleConfig(mpath);
-    (config as SubmoduleConfig).module = mparams;
-    (config as SubmoduleConfig).inherit ||= {};
+    (config as SubmoduleAction).module = mparams;
+    (config as SubmoduleAction).inherit ||= {};
   }
 
   if (config.when?.startsWith("$")) {

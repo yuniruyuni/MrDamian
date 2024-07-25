@@ -1,8 +1,8 @@
-import type { ComponentConfig, Environment } from "mrdamian-plugin";
+import type { Action, Environment } from "mrdamian-plugin";
 
 import type { Arguments } from "~/model/arguments";
 
-export type RawComponentConfig = ComponentConfig & { args: Arguments };
+export type RawAction = Action & { args: Arguments };
 
 declare const parametersSymbol: unique symbol;
 
@@ -21,14 +21,14 @@ export type ModuleConfig = {
   pipeline: PipelineConfig;
 };
 
-export type PipelineConfig = RawComponentConfig[];
+export type PipelineConfig = RawAction[];
 
 // Inheritance expresses submodule's component instance inheritance.
 type Inheritance = {
   [key: string]: string;
 };
 
-export type SubmoduleConfig = ComponentConfig & {
+export type SubmoduleAction = Action & {
   // "path" field is a path to module file.
   // All modules are defined as json5 files.
   path: string;
@@ -41,9 +41,9 @@ export type SubmoduleConfig = ComponentConfig & {
   module: ModuleConfig;
 };
 
-export function isSubmoduleConfig(
-  config: ComponentConfig,
-): config is SubmoduleConfig {
-  if (config.type !== "submodule") return false;
-  return (config as SubmoduleConfig).path !== undefined;
+export function isSubmoduleAction(
+  action: Action,
+): action is SubmoduleAction {
+  if (action.type !== "submodule") return false;
+  return (action as SubmoduleAction).path !== undefined;
 }

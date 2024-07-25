@@ -1,17 +1,17 @@
-import type { Component, ComponentConfig } from "mrdamian-plugin";
+import type { Action, Component } from "mrdamian-plugin";
 
+import { type FilledComponent, fillComponent } from "~/model/component";
 import {
   type ModuleConfig,
   type PipelineConfig,
-  type RawComponentConfig,
-  isSubmoduleConfig,
+  type RawAction,
+  isSubmoduleAction,
 } from "~/model/config";
 import { Evaluator } from "~/model/evaluator";
 import {
   type EmitterStack,
   type EventAbsorber,
   NamedEventEmitter,
-  eventChannel,
 } from "~/model/events";
 import { type Instances, newInstances } from "~/model/instances";
 import { Module } from "~/model/module";
@@ -19,36 +19,42 @@ import type { Pipeline } from "~/model/pipeline";
 import { Submodule } from "~/model/submodule";
 import { Unsupported } from "~/model/unsupported";
 
+// ComponentGenerator is a constructive object type.
 export interface ComponentGenerator<
-  T extends ComponentConfig = ComponentConfig,
+  T extends Action = Action,
 > {
-  new (emitter: NamedEventEmitter): Component<T>;
+  new (): Component<T>;
 }
 
 export type ComponentGenerators = {
-  [key: string]: ComponentGenerator<ComponentConfig>;
+  [key: string]: ComponentGenerator<Action>;
 };
 
 export class ModuleFactory {
   private readonly gens: ComponentGenerators;
   private readonly absorber: EventAbsorber;
   private readonly stack: EmitterStack;
+  private readonly path: string;
 
   private instances: Instances;
 
-  public constructor(gens: ComponentGenerators, stack: EmitterStack) {
+  public constructor(
+    gens: ComponentGenerators,
+    stack: EmitterStack,
+    path = "",
+  ) {
     this.gens = gens;
     this.instances = newInstances();
 
-    const [emitter, absorber] = eventChannel();
+    const [child, absorber] = stack.spawn();
+    this.stack = child;
     this.absorber = absorber;
-
-    this.stack = stack.push(emitter);
+    this.path = path;
   }
 
   public construct(
     params: ModuleConfig,
-    inherited: Map<string, Component<ComponentConfig>> = new Map(),
+    inherited: Instances = newInstances(),
   ): Module {
     this.instances = inherited;
     const pipeline = this.constructPipeline(params.pipeline);
@@ -56,55 +62,48 @@ export class ModuleFactory {
   }
 
   private constructPipeline(pipeline: PipelineConfig): Pipeline {
-    return pipeline.map((params) => this.constructEvaluator(params));
+    return pipeline.map((params, i) =>
+      this.constructEvaluator({...params, id: `${this.path}/${i}`})
+    );
   }
 
   private constructEvaluator(
-    config: RawComponentConfig,
-  ): Evaluator<ComponentConfig> {
+    action: RawAction,
+  ): Evaluator<Action> {
     // filter if key is undefined.
-    const keys: string[] = [config.type, config.name].filter(
+    const keys: string[] = [action.type, action.name].filter(
       (v) => v !== undefined,
     );
     const key = keys.join("/");
     const emitter = new NamedEventEmitter(this.stack, keys);
 
     // Call component should not be cached because Call is system component.
-    if (isSubmoduleConfig(config)) {
+    if (isSubmoduleAction(action)) {
       return new Evaluator(
-        new Submodule(config, emitter, this.stack, this.gens, this.instances),
-        config,
+        fillComponent(new Submodule(action, this.stack, this.gens, this.instances)),
+        action,
+        emitter,
       );
     }
 
     let component = this.instances.get(key);
     if (!component) {
-      component = this.constructComponent(config, emitter);
+      component = this.constructFilledComponent(action);
       this.instances.set(key, component);
     }
-    return new Evaluator(component, config);
+    return new Evaluator(component, action, emitter);
   }
 
-  private constructComponent(
-    config: ComponentConfig,
-    emitter: NamedEventEmitter,
-  ): Component<ComponentConfig> {
+  private constructFilledComponent(config: Action): FilledComponent<Action> {
+    return fillComponent(this.constructComponent(config));
+  }
+
+  private constructComponent(config: Action): Component<Action> {
     const gen = this.gens[config.type];
     if (!gen) {
       console.log(`Unsupported component: ${config.type}`);
-      return new Unsupported(emitter);
+      return new Unsupported();
     }
-    const comp = new gen(emitter);
-    if (comp.initialize === undefined) {
-      console.warn(`component '${config.type}' doesn't have initialize method`);
-    }
-    if (comp.process === undefined) {
-      console.warn(`component '${config.type}' doesn't have process method`);
-    }
-    if (comp.finalize === undefined) {
-      console.warn(`component '${config.type}' doesn't have finalize method`);
-    }
-
-    return comp;
+    return new gen();
   }
 }

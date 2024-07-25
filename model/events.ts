@@ -1,6 +1,9 @@
-import { type Environment, type Field, Path } from "mrdamian-plugin";
+import {
+  type Environment,
+  type Field,
+  Path,
+} from "mrdamian-plugin";
 import { Queue } from "~/model/queue";
-import type { NonEmptyArray } from "~/model/types";
 
 class EventChannel {
   queue: Queue<Environment>;
@@ -57,20 +60,19 @@ export class EventEmitter {
   }
 }
 
-export function eventChannel(): [EventEmitter, EventAbsorber] {
-  const channel = new EventChannel();
-  return [new EventEmitter(channel), new EventAbsorber(channel)];
-}
-
 export class EmitterStack {
-  stack: NonEmptyArray<EventEmitter>;
+  stack: EventEmitter[];
 
-  constructor(stack: NonEmptyArray<EventEmitter>) {
+  constructor(stack: EventEmitter[] = []) {
     this.stack = stack;
   }
 
-  push(e: EventEmitter): EmitterStack {
-    return new EmitterStack([e, ...this.stack]);
+  spawn(): [EmitterStack, EventAbsorber] {
+    const channel = new EventChannel();
+    return [
+      new EmitterStack([new EventEmitter(channel), ...this.stack]),
+      new EventAbsorber(channel),
+    ];
   }
 
   emit(event: Environment, path: Path = Path.local) {
@@ -79,7 +81,9 @@ export class EmitterStack {
     e.emit(event);
   }
 
-  pathOf(path: Path): EventEmitter {
+  pathOf(path: Path): EventEmitter | undefined {
+    if( this.stack.length === 0 ) return undefined;
+
     const index =
       path < 0
         ? this.stack.length + (path % this.stack.length)
