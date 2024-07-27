@@ -57,16 +57,16 @@
       // 実行のたびに内容がこれに従った形にアップデートされるので
       // パネルの内容をリアクティブに変更することができる。
       action: "define",
-      group: "shoutout",
       args: {
-        forms: [
+        name: "shoutout",
+        width: 2,
+        height: 1,
+        cells: [
           {
-            // select。この設定値の場合、クリックごとに
             // defsの定義された状態を順番にループして
             // 現在の状態を保持する
-            type: "select",
             name: "auto_shoutout",
-            alts: [
+            defs: [
               {
                 text: "auto shoutout on",
                 color: "base",
@@ -80,12 +80,17 @@
             ],
           },
           {
-            // ボタン。この設定値の場合クリックごとに
+            // 1つしか設定値がない場合クリックごとに
             // panel.shoutout = true
             // という値を持ったイベントが発火
-            type: "button",
             name: "shoutout",
-            text: "Send shoutout"
+            defs: [
+              {
+                text: "Send shoutout",
+                color: "base",
+                value: true,
+              }
+            ]
           },
         ],
       },
@@ -99,22 +104,36 @@
     },
     {
       // メッセージが来るたびに再定義を走らせるのでreactiveにメッセージ表示ができる
+      // ただしdischarge動作の発生はtwitch.main.messageが来たときだけになるという注意点はある。
+      // (つねにdischargeを送り出したいならdefineを分けよう)
       when: "twitch.main.message",
       type: "panel",
       action: "define",
-      group: "message",
       args: {
-        forms: [
+        name: "message",
+        width: 1,
+        height: 2,
+        cells: [
           {
-            type: "label",
             name: "latest",
-            // このようにjexprの展開した結果でcomponentの値を更新することができる
-            text: "$ message.name + ': ' + message.text",
+            defs: [
+              {
+                // このようにjexprの展開した結果でcomponentの値を更新することができる
+                text: "$ format('{}: {}', message.name, message.text)",
+                color: "base",
+                value: true,
+              }
+            ]
           },
           {
-            type: "label",
             name: "count",
-            text: "$ format('total: {}', count)",
+            defs: [
+              {
+                text: "$ format('total: {}', count)",
+                color: "base",
+                value: true,
+              }
+            ]
           },
         ]
       },

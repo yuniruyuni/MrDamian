@@ -50,7 +50,7 @@
     "json5": "^2.2.3",
     "libnpmsearch": "^7.0.6",
     "live-plugin-manager": "^1.0.0",
-    "mrdamian-plugin": "^0.0.19",
+    "mrdamian-plugin": "^0.0.20",
     "open": "^10.1.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
@@ -72,7 +72,7 @@
     "daisyui": "^4.12.10",
     "license-checker": "^25.0.1",
     "npm-run-all2": "^6.2.2",
-    "tailwindcss": "^3.4.6",
+    "tailwindcss": "^3.4.7",
     "typescript": "^5.5.4"
   },
   "trustedDependencies": ["@biomejs/biome", "bun"]

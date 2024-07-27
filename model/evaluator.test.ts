@@ -72,6 +72,7 @@ describe("Evaluator", () => {
     const action: Action & { args: Arguments } = {
       id: "0",
       type: "dummy",
+      action: "",
       args: asArgs({}),
     };
     const target = new Evaluator(component, action, {} as NamedEventEmitter);
@@ -85,6 +86,7 @@ describe("Evaluator", () => {
     const action: Action & { args: Arguments } = {
       id: "0",
       type: "dummy",
+      action: "",
       // when: ...,
       args: asArgs({}),
     };
@@ -100,6 +102,7 @@ describe("Evaluator", () => {
     const action: Action & { args: Arguments } = {
       id: "0",
       type: "dummy",
+      action: "",
       when: "true",
       args: asArgs({}),
     };
@@ -114,6 +117,7 @@ describe("Evaluator", () => {
     const action: Action & { args: Arguments } = {
       id: "0",
       type: "dummy",
+      action: "",
       when: "false",
       args: asArgs({}),
     };
@@ -128,6 +132,7 @@ describe("Evaluator", () => {
     const action: SubmoduleAction & { args: Arguments } = {
       id: "0",
       type: "submodule",
+      action: "",
       path: "dummy.json5",
       inherit: {
         main: "hoge",

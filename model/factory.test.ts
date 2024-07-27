@@ -27,6 +27,7 @@ describe("Factory", () => {
         {
           id: "0",
           type: "dummy",
+          action: "",
           name: "name",
           when: "true && false",
           args: asArgs({

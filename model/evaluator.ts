@@ -28,7 +28,7 @@ export class Evaluator<A extends Action = Action> {
     this.emitter = emitter;
   }
 
-  async fetch(): Promise<Fetch | undefined> {
+  async fetch(): Promise<Fetch> {
     return this.component.fetch();
   }
 

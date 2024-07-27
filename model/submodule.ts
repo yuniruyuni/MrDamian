@@ -17,7 +17,7 @@ export class Submodule implements Component<SubmoduleAction> {
     instances: Map<string, Component<Action>>,
   ) {
     // TODO: validate params with some schema.
-    this.factory = new ModuleFactory(gens, stack, action.id);
+    this.factory = new ModuleFactory(gens, stack);
     const inherited = new Map();
 
     for (const [name, type] of Object.entries(action.module.inherit)) {

@@ -34,14 +34,12 @@ export class ModuleFactory {
   private readonly gens: ComponentGenerators;
   private readonly absorber: EventAbsorber;
   private readonly stack: EmitterStack;
-  private readonly path: string;
 
   private instances: Instances;
 
   public constructor(
     gens: ComponentGenerators,
     stack: EmitterStack,
-    path = "",
   ) {
     this.gens = gens;
     this.instances = newInstances();
@@ -49,7 +47,6 @@ export class ModuleFactory {
     const [child, absorber] = stack.spawn();
     this.stack = child;
     this.absorber = absorber;
-    this.path = path;
   }
 
   public construct(
@@ -62,9 +59,7 @@ export class ModuleFactory {
   }
 
   private constructPipeline(pipeline: PipelineConfig): Pipeline {
-    return pipeline.map((params, i) =>
-      this.constructEvaluator({...params, id: `${this.path}/${i}`})
-    );
+    return pipeline.map((params) => this.constructEvaluator(params));
   }
 
   private constructEvaluator(
@@ -86,11 +81,8 @@ export class ModuleFactory {
       );
     }
 
-    let component = this.instances.get(key);
-    if (!component) {
-      component = this.constructFilledComponent(action);
-      this.instances.set(key, component);
-    }
+    const component = this.instances.get(key) || this.constructFilledComponent(action);
+    this.instances.set(key, component);
     return new Evaluator(component, action, emitter);
   }
 
