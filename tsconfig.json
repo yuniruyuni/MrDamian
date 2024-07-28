@@ -33,12 +33,5 @@
     /* Debugging */
     "sourceMap": true
   },
-  "include": [
-    "bin/**/*",
-    "backend/**/*",
-    "frontend/**/*",
-    "model/**/*",
-    "component/**/*"
-  ],
-  "exclude": [".plugins/**/*", "static/**/*"]
+  "exclude": ["static/**/*"]
 }
