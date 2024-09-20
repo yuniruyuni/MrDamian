@@ -2,7 +2,7 @@
   "name": "mrdamian",
   "productName": "mrdamian",
   "license": "MIT",
-  "version": "0.0.9",
+  "version": "0.0.10",
   "description": "Mr.Damian is a platform for streaming assistant tool",
   "main": "src/main.ts",
   "type": "module",
@@ -75,5 +75,8 @@
     "tailwindcss": "^3.4.12",
     "typescript": "^5.6.2"
   },
-  "trustedDependencies": ["@biomejs/biome", "bun"]
+  "trustedDependencies": [
+    "@biomejs/biome",
+    "bun"
+  ]
 }
