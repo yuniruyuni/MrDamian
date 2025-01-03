@@ -16,7 +16,10 @@ export async function load(path: string): Promise<ModuleConfig> {
   return config;
 }
 
-async function loadModuleConfig(path: string, route: string): Promise<ModuleConfig> {
+async function loadModuleConfig(
+  path: string,
+  route: string,
+): Promise<ModuleConfig> {
   const content = await fs.readFile(path, { encoding: "utf-8" });
   // TODO: add validation by some schema.
   const config = JSON5.parse(content) as ModuleConfig;
@@ -59,7 +62,7 @@ async function loadAction(
   config.id = route;
 
   // config.action's default value is empty string.
-  if (config.action === undefined ) {
+  if (config.action === undefined) {
     config.action = "";
   }
 

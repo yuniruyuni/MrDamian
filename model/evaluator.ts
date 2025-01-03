@@ -1,10 +1,6 @@
 import deepmerge from "deepmerge";
 import { EvalAstFactory, parse } from "jexpr";
-import type {
-  Action,
-  Environment,
-  Fetch,
-} from "mrdamian-plugin";
+import type { Action, Environment, Fetch } from "mrdamian-plugin";
 
 import { type Arguments, asArgs } from "~/model/arguments";
 import type { FilledComponent } from "~/model/component";

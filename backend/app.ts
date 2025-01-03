@@ -110,7 +110,7 @@ export class App {
     });
 
     route.get("/-/api/plugin", async (c) => {
-      const packages = await this.loader.search("mrdamian-plugin-");
+      const packages = await this.loader.search("mrdamian");
       return c.json(packages);
     });
 

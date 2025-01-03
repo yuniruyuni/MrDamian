@@ -1,8 +1,4 @@
-import {
-  type Environment,
-  type Field,
-  Path,
-} from "mrdamian-plugin";
+import { type Environment, type Field, Path } from "mrdamian-plugin";
 import { Queue } from "~/model/queue";
 
 class EventChannel {
@@ -82,7 +78,7 @@ export class EmitterStack {
   }
 
   pathOf(path: Path): EventEmitter | undefined {
-    if( this.stack.length === 0 ) return undefined;
+    if (this.stack.length === 0) return undefined;
 
     const index =
       path < 0

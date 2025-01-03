@@ -8,7 +8,7 @@ import {
 
 describe("NamedEventEmitter", () => {
   it("emit with keys", async () => {
-    const [stack, absorber] = (new EmitterStack()).spawn();
+    const [stack, absorber] = new EmitterStack().spawn();
     const named = new NamedEventEmitter(stack, ["dummy", "name"]);
     named.emit("abc");
 
@@ -20,7 +20,7 @@ describe("NamedEventEmitter", () => {
   });
 
   it("single key", async () => {
-    const [stack, absorber] = (new EmitterStack()).spawn();
+    const [stack, absorber] = new EmitterStack().spawn();
     const named = new NamedEventEmitter(stack, ["dummy"]);
     named.emit("abc");
 
@@ -30,7 +30,7 @@ describe("NamedEventEmitter", () => {
   });
 
   it("should be omit zero key construction", async () => {
-    const [stack] = (new EmitterStack()).spawn();
+    const [stack] = new EmitterStack().spawn();
     expect(() => new NamedEventEmitter(stack, [])).toThrowError(
       KeyNotExistError,
     );

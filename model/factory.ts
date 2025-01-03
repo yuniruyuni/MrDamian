@@ -20,9 +20,7 @@ import { Submodule } from "~/model/submodule";
 import { Unsupported } from "~/model/unsupported";
 
 // ComponentGenerator is a constructive object type.
-export interface ComponentGenerator<
-  T extends Action = Action,
-> {
+export interface ComponentGenerator<T extends Action = Action> {
   new (): Component<T>;
 }
 
@@ -37,10 +35,7 @@ export class ModuleFactory {
 
   private instances: Instances;
 
-  public constructor(
-    gens: ComponentGenerators,
-    stack: EmitterStack,
-  ) {
+  public constructor(gens: ComponentGenerators, stack: EmitterStack) {
     this.gens = gens;
     this.instances = newInstances();
 
@@ -62,9 +57,7 @@ export class ModuleFactory {
     return pipeline.map((params) => this.constructEvaluator(params));
   }
 
-  private constructEvaluator(
-    action: RawAction,
-  ): Evaluator<Action> {
+  private constructEvaluator(action: RawAction): Evaluator<Action> {
     // filter if key is undefined.
     const keys: string[] = [action.type, action.name].filter(
       (v) => v !== undefined,
@@ -75,13 +68,16 @@ export class ModuleFactory {
     // Call component should not be cached because Call is system component.
     if (isSubmoduleAction(action)) {
       return new Evaluator(
-        fillComponent(new Submodule(action, this.stack, this.gens, this.instances)),
+        fillComponent(
+          new Submodule(action, this.stack, this.gens, this.instances),
+        ),
         action,
         emitter,
       );
     }
 
-    const component = this.instances.get(key) || this.constructFilledComponent(action);
+    const component =
+      this.instances.get(key) || this.constructFilledComponent(action);
     this.instances.set(key, component);
     return new Evaluator(component, action, emitter);
   }

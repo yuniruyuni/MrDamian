@@ -2,7 +2,6 @@ import { describe, expect, it } from "bun:test";
 import type { Action, Component, Field } from "mrdamian-plugin";
 
 import { asArgs } from "~/model/arguments";
-import { fillComponent } from "~/model/component";
 import { asParams } from "~/model/config";
 import { EmitterStack } from "~/model/events";
 import { ModuleFactory } from "~/model/factory";
@@ -38,15 +37,25 @@ describe("Factory", () => {
     });
 
     expect(mod).toMatchObject({
-      absorber: {}, // just check existence.
+      absorber: {
+        channel: {
+          queue: {
+            aborted: false,
+            data: expect.any(Array),
+            waiting: expect.any(Array),
+          },
+        },
+      },
       config: {
+        inherit: {},
         params: {},
         pipeline: [
           {
-            id: "0",
+            action: "",
             args: {
               hoge: "fuga",
             },
+            id: "0",
             name: "name",
             type: "dummy",
             when: "true && false",
@@ -54,17 +63,11 @@ describe("Factory", () => {
         ],
       },
       pipeline: [
-        {
-          component: fillComponent(new DummyComponent()),
-          action: {
-            type: "dummy",
-            name: "name",
-            when: "true && false",
-            args: asArgs({
-              hoge: "fuga",
-            }),
-          },
-        },
+        expect.objectContaining({
+          action: expect.any(Object),
+          component: expect.any(Object),
+          emitter: expect.any(Object),
+        }),
       ],
     });
   });

@@ -41,9 +41,7 @@ export type SubmoduleAction = Action & {
   module: ModuleConfig;
 };
 
-export function isSubmoduleAction(
-  action: Action,
-): action is SubmoduleAction {
+export function isSubmoduleAction(action: Action): action is SubmoduleAction {
   if (action.type !== "submodule") return false;
   return (action as SubmoduleAction).path !== undefined;
 }
