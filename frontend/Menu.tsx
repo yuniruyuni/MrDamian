@@ -75,9 +75,6 @@ export const Menu: FC = () => (
               <li>
                 <SaveButton />
               </li>
-              <li>
-                <Link to="/-/plugins">Plugins</Link>
-              </li>
             </ul>
           </Details>
         </li>

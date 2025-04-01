@@ -1,9 +1,8 @@
-import path from "node:path";
 import { Hono } from "hono";
 import { serveStatic } from "hono/bun";
 
 import { load } from "~/backend/load_config";
-import { PluginLoader } from "~/backend/load_plugin";
+import { ModuleLoader } from "~/backend/load_module";
 
 import { type ModuleConfig, asParams } from "~/model/config";
 import { EmitterStack } from "~/model/events";
@@ -16,8 +15,7 @@ export class App {
   route: Hono;
   params: ModuleConfig;
   module?: Module;
-  loader: PluginLoader;
-  pluginConfigPath: string;
+  loader: ModuleLoader;
   running: boolean;
 
   constructor() {
@@ -28,9 +26,7 @@ export class App {
       pipeline: [],
     };
 
-    this.pluginConfigPath = path.join(process.cwd(), "config/plugins.json5");
-    const pluginsPath = path.join(process.cwd(), "node_modules");
-    this.loader = new PluginLoader(pluginsPath);
+    this.loader = new ModuleLoader();
     this.running = false;
   }
 
@@ -39,7 +35,7 @@ export class App {
   }
 
   async load() {
-    await this.loader.loadConfig(this.pluginConfigPath);
+    await this.loader.loadConfig();
     const gens = await this.loader.loadAll();
     const stack = new EmitterStack();
     const factory = new ModuleFactory(gens, stack);
@@ -106,21 +102,6 @@ export class App {
     route.post("/-/api/module/stop", async (c) => {
       if (!this.running) return c.json({ status: "not running" });
       this.stop();
-      return c.json({ status: "ok" });
-    });
-
-    route.get("/-/api/plugin", async (c) => {
-      const packages = await this.loader.search("mrdamian");
-      return c.json(packages);
-    });
-
-    route.post("/-/api/plugin", async (c) => {
-      const params = (await c.req.json()) as { name: string };
-      await this.loader.installFromNpm(params.name);
-      await this.loader.saveConfig(this.pluginConfigPath);
-
-      await this.reload();
-
       return c.json({ status: "ok" });
     });
 

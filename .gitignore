@@ -93,6 +93,7 @@ typings/
 /static/
 /build/
 /package/
+/module/panel/dist/
 
 # ignore plugin setting (it is auto generated)
 config/plugins.json5

@@ -1,6 +1,9 @@
 /** @type {import('tailwindcss').Config} */
 export default {
-  content: ["./frontend/**/*.{html,js,jsx,ts,tsx}"],
+  content: [
+    "./frontend/**/*.{html,js,jsx,ts,tsx}",
+    "./module/**/*.{html,js,jsx,ts,tsx}",
+  ],
   future: {
     hoverOnlyWhenSupported: true,
   },

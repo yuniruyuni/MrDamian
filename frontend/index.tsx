@@ -6,7 +6,6 @@ import { Redirect, Route, Router } from "wouter";
 import { AlertProvider, AlertRegion } from "./Alert";
 import { Menu } from "./Menu";
 import { Modules } from "./Modules";
-import { Plugins } from "./Plugins";
 
 const Container: FC<{ children: React.ReactNode }> = ({ children }) => (
   <div className="md:container md:mx-auto h-screen flex flex-col">
@@ -26,9 +25,6 @@ const Routing: FC = () => (
   <Router base="/-">
     <Route path="/modules/*?">
       <Modules />
-    </Route>
-    <Route path="/plugins/*?">
-      <Plugins />
     </Route>
     <Route path="/">
       <Redirect to="/modules/" />
